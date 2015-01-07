@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\DataNose\MaterialDesign\unspecified\classes.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="470ac648d0a68f47e1cf3fc98c6e31c04ab42db4">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\classes-46d3b0fd0a04994abba74f06f28841e77082c18f.jar" />
+    </item>
+    <item
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\DataNose\MaterialDesign\unspecified\libs\android-support-v4.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="9b6a9a9078af571732159b904ad423b03b7cc786">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\android-support-v4-55b2a342e8b8a0307ff8c6bb3e63f44ea526e813.jar" />
+    </item>
+    <item
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\21.0.3\classes.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\classes-5a0c8e627bf47760606327c7295282f7f71da1b0.jar" />
+    </item>
+    <item
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\DataNose\MaterialDesign\unspecified\libs\nineoldandroids-2.4.0.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="59f19e43354d32de831379c23ce03bb259a4c2b7">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\nineoldandroids-2.4.0-8aa8ec154d49f33fb0361aac6215ef643ea6ec57.jar" />
+    </item>
+
+</items>

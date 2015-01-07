@@ -1,0 +1,74 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="nl.workmoose.datanose.LoginActivity"
+    android:background="@color/white"
+    android:id="@+id/parentContainer">
+
+    <com.gc.materialdesign.views.ProgressBarCircularIndeterminate
+        android:id="@+id/progressBar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@color/blue"
+        android:layout_centerInParent="true"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:text="@string/app_name"
+        android:textSize="30sp"
+        android:gravity="center_horizontal"
+        android:paddingTop="50dp"
+        android:textColor="@color/white"
+        android:background="@color/blue"/>
+
+    <RelativeLayout
+        android:id="@+id/inputContainer"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="170dp"
+        android:background="@color/white">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/student_id"
+            android:textSize="25sp"
+            android:textColor="@color/black"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/studentIdText"
+            android:layout_marginTop="25dp"/>
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/idInput"
+            android:layout_below="@id/studentIdText"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textCursorDrawable="@color/black"
+            android:textSize="25sp"
+            android:background="@color/white"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="0dp" />
+
+        <com.gc.materialdesign.views.ButtonFlat
+            android:id="@+id/okButton"
+            android:layout_height="70dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/idInput"
+            android:layout_marginTop="5dp"
+            android:paddingBottom="20dp"
+            android:layout_width="match_parent"
+            android:text="@string/ok" />
+
+
+    </RelativeLayout>
+
+</RelativeLayout>
