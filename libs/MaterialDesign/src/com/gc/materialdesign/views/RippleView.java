@@ -58,7 +58,7 @@ public abstract class RippleView extends CustomView{
 		 * init Ripple speed
 		 */
 		rippleSpeed = attrs.getAttributeFloatValue(MATERIALDESIGNXML, "rippleSpeed", rippleSpeed);
-
+        rippleSpeed += 6;
         rippleSpeed = Utils.dpToPx(rippleSpeed, getResources());
 
 		clickAfterRipple = attrs.getAttributeBooleanValue(MATERIALDESIGNXML, "clickAfterRipple", clickAfterRipple);

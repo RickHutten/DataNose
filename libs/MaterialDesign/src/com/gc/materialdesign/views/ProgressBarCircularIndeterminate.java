@@ -124,17 +124,6 @@ public class ProgressBarCircularIndeterminate extends CustomView {
 	 * @param canvas
 	 */
 	private void drawSecondAnimation(Canvas canvas) {
-		/*if (arcO == limite)
-			arcD += 6;
-		if (arcD >= 290 || arcO > limite) {
-			arcO += 6;
-			arcD -= 6;
-		}
-		if (arcO > limite + 290) {
-			limite = arcO;
-			arcO = limite;
-			arcD = 1;
-		}*/
         iteration++;
 
         int max = 270;
@@ -155,8 +144,6 @@ public class ProgressBarCircularIndeterminate extends CustomView {
                 wait = 0;
             }
         }
-
-        System.out.println("" + arcO + " " + arcD);
 		Bitmap bitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
 		Canvas temp = new Canvas(bitmap);
 		Paint paint = new Paint();

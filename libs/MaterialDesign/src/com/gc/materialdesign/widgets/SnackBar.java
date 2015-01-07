@@ -13,15 +13,16 @@ import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 
 import com.gc.materialdesign.R;
 import com.gc.materialdesign.views.ButtonFlat;
 
-public class SnackBar extends Dialog{
+public class SnackBar extends Dialog {
 	
 	private String text;
-	private float textSize = 14;//Roboto Regular 14sp 
+	private float textSize = 18; //Roboto Regular 18sp
 	private String buttonText;
 	private View.OnClickListener onClickListener;
 	private Activity activity;
@@ -33,7 +34,7 @@ public class SnackBar extends Dialog{
 	OnHideListener onHideListener;
 	// Timer
 	private boolean mIndeterminate = false;
-	private int mTimer = 3 * 1000;
+	private int mTimer = 6 * 1000;
 	
 	// With action button
 	public SnackBar(Activity activity, String text, String buttonText, View.OnClickListener onClickListener) {
@@ -57,6 +58,14 @@ public class SnackBar extends Dialog{
 	    requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    setContentView(R.layout.snackbar);
 	    setCanceledOnTouchOutside(false);
+        final View snackbarContainer = findViewById(R.id.snackbarContainer);
+        snackbarContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+                snackbarContainer.setOnClickListener(null);
+            }
+        });
 	    ((TextView)findViewById(R.id.text)).setText(text); 
 	    ((TextView)findViewById(R.id.text)).setTextSize(textSize); //set textSize
 		button = (ButtonFlat) findViewById(R.id.buttonflat);
@@ -101,7 +110,6 @@ public class SnackBar extends Dialog{
 	
 	// Dismiss timer 
 	Thread dismissTimer = new Thread(new Runnable() {
-		
 		@Override
 		public void run() {
 			try {

@@ -1,25 +1,26 @@
 package nl.workmoose.datanose;
 
-import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
+import com.gc.materialdesign.widgets.SnackBar;
+
+import java.util.Calendar;
 
 
 public class LoginActivity extends ActionBarActivity {
 
+    final private static String URL_PART_1 =
+            "http://content.datanose.nl/Timetable.svc/GetActivitiesByStudent?id=";
+    final private static String URL_PART_2 = "&week=";
+    final private static String URL_PART_3 = "&acyear=";
     EditText idInput;
     String studentId;
     Bundle savedInstanceState;
@@ -39,7 +40,7 @@ public class LoginActivity extends ActionBarActivity {
         idInput.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
                     idEntered();
                     return true;
                 }
@@ -54,36 +55,68 @@ public class LoginActivity extends ActionBarActivity {
                 idEntered();
             }
         });
-
     }
 
     private void idEntered() {
         studentId = idInput.getText().toString();
         if (studentId.equals("")) {
+            String message = getResources().getString(R.string.enter_student_id);
+            SnackBar snackbar = new SnackBar(this, message);
+            snackbar.show();
             return;
         }
-        System.out.println("Called!");
         inputContainer = findViewById(R.id.inputContainer);
         Animation fadeOut = new AlphaAnimation(1f, 0f);
         fadeOut.setDuration(200);
         fadeOut.setFillAfter(true);
         idInput.setEnabled(false);
         inputContainer.setAnimation(fadeOut);
+
         okButton.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
         progressBar.restartAnimation();
-        studentId = idInput.getText().toString();
-        System.out.println("Student id: " + studentId);
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                backToBeginning();
+        studentId = idInput.getText().toString();
+
+        /*
+        http://nl.wikipedia.org/wiki/NEN_2772
+        De norm schrijft voor dat de eerste week van het jaar die week is die vier of meer dagen in dat jaar heeft.
+        Vuistregels om de weeknummering van een jaar te bepalen:
+        1 februari valt altijd in week 5
+        4 januari valt altijd in week 1
+        28 december valt altijd in de laatste week van het jaar
+        */
+        Calendar calendar = Calendar.getInstance();
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.setMinimalDaysInFirstWeek(4);
+
+        // week: 0 for the first week of the academic year, 1 for the next, ..
+        // year: the academic year, so not always the current year
+        // the first week of the acatemic year is ALWAYS week 36
+        int week = calendar.get(Calendar.WEEK_OF_YEAR);
+        int year = calendar.get(Calendar.YEAR);
+        if (week >= 36) {
+            week -= 36;
+        } else {
+            if (calendar.get(Calendar.DAY_OF_MONTH) < 15) {
+                // If week is in the new calendar year
+                year -= 1;
             }
-        }, 10000);
+            // Calculate the academic week
+            Calendar tempCal = Calendar.getInstance();
+            tempCal.setFirstDayOfWeek(Calendar.MONDAY);
+            tempCal.setMinimalDaysInFirstWeek(4);
+            tempCal.set(year, Calendar.DECEMBER, 28);
+            int totalWeeksInYear = tempCal.get(Calendar.WEEK_OF_YEAR);
+            week = week + (totalWeeksInYear - 36);
+        }
+
+        String urlString = URL_PART_1 + studentId + URL_PART_2 + week + URL_PART_3 + year;
+        DownloadXml downloadXml = new DownloadXml(this);
+        downloadXml.execute(urlString, week + " " + year);
     }
 
-    private void backToBeginning() {
+    public void backToBeginning() {
         progressBar.setVisibility(View.INVISIBLE);
         inputContainer = findViewById(R.id.inputContainer);
         Animation fadeIn = new AlphaAnimation(0f, 1f);
