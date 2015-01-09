@@ -1,5 +1,7 @@
 package nl.workmoose.datanose;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -12,15 +14,18 @@ import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.gc.materialdesign.widgets.SnackBar;
 
+import java.io.File;
 import java.util.Calendar;
 
 
 public class LoginActivity extends ActionBarActivity {
 
+    final private static String SHARED_PREF = "prefs";
     final private static String URL_PART_1 =
             "http://content.datanose.nl/Timetable.svc/GetActivitiesByStudent?id=";
     final private static String URL_PART_2 = "&week=";
     final private static String URL_PART_3 = "&acyear=";
+
     EditText idInput;
     String studentId;
     Bundle savedInstanceState;
@@ -111,9 +116,16 @@ public class LoginActivity extends ActionBarActivity {
             week = week + (totalWeeksInYear - 36);
         }
 
-        String urlString = URL_PART_1 + studentId + URL_PART_2 + week + URL_PART_3 + year;
-        DownloadXml downloadXml = new DownloadXml(this);
-        downloadXml.execute(urlString, week + " " + year);
+        SharedPreferences s = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
+        if (s.contains("studentId")) {
+            if (!s.getString("studentId", "-1").equals(studentId)) {
+                // Clear directory if a new student number is entered
+                for(File file: getFilesDir().listFiles()) file.delete();
+            }
+        }
+
+        DataDownloadManager dataDownloadManager = new DataDownloadManager(this);
+        dataDownloadManager.downloadWeekXML(studentId, week, year);
     }
 
     public void backToBeginning() {
