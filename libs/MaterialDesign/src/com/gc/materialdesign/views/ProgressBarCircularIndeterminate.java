@@ -21,7 +21,6 @@ public class ProgressBarCircularIndeterminate extends CustomView {
 
 	@Override
 	protected void onInitDefaultValues() {
-		// TODO 自动生成的方法存根
 		minWidth = 32;
 		minHeight = 32;
 		backgroundColor = Color.parseColor("#1E88E5");
@@ -29,7 +28,6 @@ public class ProgressBarCircularIndeterminate extends CustomView {
 	
 	@Override
 	protected void setAttributes(AttributeSet attrs) {
-		// TODO 自动生成的方法存根
 		super.setAttributes(attrs);
 		float size = 4;// default ring width
 		String width = attrs.getAttributeValue(MATERIALDESIGNXML, "ringWidth");
@@ -59,8 +57,7 @@ public class ProgressBarCircularIndeterminate extends CustomView {
 		super.onDraw(canvas);
 		if (firstAnimationOver == false) {
             drawFirstAnimation(canvas);
-        }
-		if (cont > 0) {
+        } else {
             drawSecondAnimation(canvas);
         }
 		invalidate();
@@ -81,7 +78,6 @@ public class ProgressBarCircularIndeterminate extends CustomView {
 		if (radius1 < getWidth() / 2) {
 			Paint paint = new Paint();
 			paint.setAntiAlias(true);
-			//paint.setColor(makePressColor());
             paint.setColor(backgroundColor);
 			radius1 = (radius1 >= getWidth() / 2) ? (float) getWidth() / 2 : radius1 + Utils.dpToPx(1, getResources());
 			canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius1, paint);
@@ -90,26 +86,21 @@ public class ProgressBarCircularIndeterminate extends CustomView {
 			Canvas temp = new Canvas(bitmap);
 			Paint paint = new Paint();
 			paint.setAntiAlias(true);
-			paint.setColor(makePressColor());
             paint.setColor(backgroundColor);
 			temp.drawCircle(getWidth() / 2, getHeight() / 2, getHeight() / 2, paint);
 			Paint transparentPaint = new Paint();
 			transparentPaint.setAntiAlias(true);
 			transparentPaint.setColor(getResources().getColor(android.R.color.transparent));
 			transparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-			//if (cont >= 8000) {
-			//	radius2 = (radius2 >= getWidth() / 2) ? (float) getWidth() / 2 : radius2 + Utils.dpToPx(1, getResources());
-			//} else {
+
 			radius2 = (radius2 >= getWidth() / 2 - Utils.dpToPx(ringWidth, getResources())) ?
 						(float) getWidth() / 2 - Utils.dpToPx(ringWidth, getResources()) : radius2 + Utils.dpToPx(1, getResources());
-			//}
+
 			temp.drawCircle(getWidth() / 2, getHeight() / 2, radius2, transparentPaint);
 			canvas.drawBitmap(bitmap, 0, 0, new Paint());
-			if (radius2 >= getWidth() / 2 - Utils.dpToPx(ringWidth, getResources()))
-				cont++;
-			if (radius2 >= getWidth() / 2)
-				firstAnimationOver = true;
 
+			if (radius2 >= getWidth() / 2 - Utils.dpToPx(ringWidth, getResources()))
+                firstAnimationOver = true;
 		}
 	}
 
@@ -149,13 +140,13 @@ public class ProgressBarCircularIndeterminate extends CustomView {
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
 		paint.setColor(backgroundColor);
-		temp.drawARGB(255, 255, 255, 255);
-		//temp.drawArc(new RectF(0, 0, getWidth(), getHeight()), arcO, arcD, true, paint);
+        Paint transparentPaint = new Paint();
+        transparentPaint.setColor(getResources().getColor(android.R.color.transparent));
+        transparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        transparentPaint.setAntiAlias(true);
+        temp.drawPaint(transparentPaint);
         temp.drawArc(new RectF(0, 0, getWidth(), getHeight()), arcO, arcD, true, paint);
-		Paint transparentPaint = new Paint();
-		transparentPaint.setAntiAlias(true);
-		transparentPaint.setColor(getResources().getColor(android.R.color.white));
-		//transparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+
         temp.drawCircle(getWidth() / 2, getHeight() / 2,
                 getWidth() / 2 - Utils.dpToPx(ringWidth, getResources()), transparentPaint);
 

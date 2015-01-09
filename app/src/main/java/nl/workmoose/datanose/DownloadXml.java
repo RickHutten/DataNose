@@ -13,9 +13,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 public class DownloadXml extends AsyncTask<String, Void, String> {
 
@@ -40,6 +42,10 @@ public class DownloadXml extends AsyncTask<String, Void, String> {
                 msg = context.getResources().getString(R.string.timeout);
             } catch (FileNotFoundException e) {
                 msg = context.getResources().getString(R.string.webpage_doesnt_exist);
+            } catch (ConnectException e) {
+                msg = context.getResources().getString(R.string.connection_error);
+            } catch (UnknownHostException e) {
+                msg = context.getResources().getString(R.string.unknown_host);
             } catch (IOException e) {
                 e.printStackTrace();
                 msg = context.getResources().getString(R.string.unknown_error);

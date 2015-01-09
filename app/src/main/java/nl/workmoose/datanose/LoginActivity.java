@@ -2,12 +2,15 @@ package nl.workmoose.datanose;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.EditText;
 
 import com.gc.materialdesign.views.ButtonFlat;
@@ -21,10 +24,6 @@ import java.util.Calendar;
 public class LoginActivity extends ActionBarActivity {
 
     final private static String SHARED_PREF = "prefs";
-    final private static String URL_PART_1 =
-            "http://content.datanose.nl/Timetable.svc/GetActivitiesByStudent?id=";
-    final private static String URL_PART_2 = "&week=";
-    final private static String URL_PART_3 = "&acyear=";
 
     EditText idInput;
     String studentId;
@@ -32,6 +31,12 @@ public class LoginActivity extends ActionBarActivity {
     ProgressBarCircularIndeterminate progressBar;
     ButtonFlat okButton;
     View inputContainer;
+    int screen_width;
+    int screen_height;
+
+    public LoginActivity () {
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,19 @@ public class LoginActivity extends ActionBarActivity {
         this.savedInstanceState = savedInstanceState;
         setContentView(R.layout.activity_login);
 
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        screen_width = size.x;
+        screen_height = size.y;
+
+        View inputContainer = findViewById(R.id.inputContainer);
+        inputContainer.setVisibility(View.VISIBLE);
+        Animation slideIn = new TranslateAnimation(0, 0, screen_height, 0);
+        slideIn.setInterpolator(new AccelerateDecelerateInterpolator());
+        slideIn.setFillAfter(true);
+        slideIn.setDuration(500);
+        inputContainer.setAnimation(slideIn);
         okButton = (ButtonFlat) findViewById(R.id.okButton);
         progressBar = (ProgressBarCircularIndeterminate) findViewById(R.id.progressBar);
         idInput = (EditText) findViewById(R.id.idInput);
@@ -71,11 +89,12 @@ public class LoginActivity extends ActionBarActivity {
             return;
         }
         inputContainer = findViewById(R.id.inputContainer);
-        Animation fadeOut = new AlphaAnimation(1f, 0f);
-        fadeOut.setDuration(200);
-        fadeOut.setFillAfter(true);
+        Animation slideOut = new TranslateAnimation(0, 0, 0, screen_height);
+        slideOut.setDuration(500);
+        slideOut.setInterpolator(new AccelerateDecelerateInterpolator());
+        slideOut.setFillAfter(true);
         idInput.setEnabled(false);
-        inputContainer.setAnimation(fadeOut);
+        inputContainer.setAnimation(slideOut);
 
         okButton.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
@@ -131,10 +150,11 @@ public class LoginActivity extends ActionBarActivity {
     public void backToBeginning() {
         progressBar.setVisibility(View.INVISIBLE);
         inputContainer = findViewById(R.id.inputContainer);
-        Animation fadeIn = new AlphaAnimation(0f, 1f);
-        fadeIn.setDuration(500);
-        fadeIn.setFillAfter(true);
-        inputContainer.setAnimation(fadeIn);
+        Animation slideIn = new TranslateAnimation(0, 0, screen_height, 0);
+        slideIn.setInterpolator(new AccelerateDecelerateInterpolator());
+        slideIn.setDuration(500);
+        slideIn.setFillAfter(true);
+        inputContainer.setAnimation(slideIn);
         okButton.setEnabled(true);
         idInput.setEnabled(true);
     }

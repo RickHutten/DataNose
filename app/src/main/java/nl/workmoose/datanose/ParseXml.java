@@ -11,6 +11,4 @@ public class ParseXml {
         this.context = context;
         this.fileName = fileName;
     }
-
-
 }

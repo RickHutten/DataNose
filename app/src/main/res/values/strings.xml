@@ -8,6 +8,11 @@
     <string name="webpage_doesnt_exist">Invalid student ID</string>
     <string name="enter_student_id">Please enter your student ID</string>
     <string name="timeout">Connection timed out</string>
+    <string name="connection_error">Failed to connect to server</string>
+    <string name="unknown_host">Unable to resolve host</string>
     <string name="unknown_error"> An unknown error occurred</string>
+    <string name="title_activity_schedule">ScheduleActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 
 </resources>
