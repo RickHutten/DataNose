@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <ScrollView
+        android:id="@+id/scheduleScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ScheduleActivity">
+
+        <RelativeLayout
+            android:id="@+id/scheduleContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <LinearLayout
+                android:id="@+id/timeHolder"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp" />
+
+            </LinearLayout>
+
+            <!-- Holds the actual items -->
+            <RelativeLayout
+                android:id="@+id/scheduleView"
+                android:layout_toRightOf="@id/timeHolder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <View
+                    android:id="@+id/timeLine"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/blue"
+                    android:visibility="invisible"/>
+
+                </RelativeLayout>
+
+        </RelativeLayout>  <!-- Schedule container -->
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/dateContainer"
+        android:layout_width="60dp"
+        android:paddingLeft="10dp"
+        android:layout_height="wrap_content" >
+
+        <RelativeLayout
+            android:id="@+id/date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white" >
+
+            <TextView
+                android:id="@+id/month"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:layout_marginTop="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Jan"/>
+
+            <TextView
+                android:id="@+id/dayOfMonth"
+                android:textColor="@color/blue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="20"
+                android:layout_marginTop="-5dp"
+                android:layout_marginBottom="-5dp"
+                android:layout_below="@id/month"
+                android:textSize="32sp"/>
+
+            <TextView
+                android:id="@+id/dayOfWeek"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_below="@id/dayOfMonth"
+                android:textSize="16sp"
+                android:text="Mon"/>
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_below="@id/date"
+            android:background="@drawable/white_gradient" />
+
+    </RelativeLayout> <!-- Date Container -->
+
+</RelativeLayout>

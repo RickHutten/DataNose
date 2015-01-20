@@ -1,12 +1,24 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="LoginTheme" parent="Theme.AppCompat.NoActionBar"/>
+
+    <style name="ScheduleTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/ActionbarStyle</item>
+        <item name="actionBarStyle">@style/ActionbarStyle</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
-    <style name="LoginTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="ActionbarStyle" parent="@style/Widget.AppCompat.Light.ActionBar">
+        <item name="android:background">@color/white</item>
+        <item name="background">@color/white</item>
+        <item name="android:icon">@color/transparent</item>
+        <item name="icon">@color/transparent</item>
+        <item name="android:titleTextStyle">@style/TextStyle</item>
+        <item name="titleTextStyle">@style/TextStyle</item>
+    </style>
 
+    <style name="TextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/black</item>
     </style>
 
 </resources>
