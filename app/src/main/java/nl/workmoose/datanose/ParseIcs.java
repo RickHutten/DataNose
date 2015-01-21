@@ -1,8 +1,6 @@
 package nl.workmoose.datanose;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Parcelable;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -18,7 +16,7 @@ public class ParseIcs {
         this.context = context;
     }
 
-    public ArrayList readFile() {
+    public ArrayList<ArrayList<String>> readFile() {
         long startTime = System.currentTimeMillis();
         System.out.println("Parsing file...");
         ArrayList<String> event = new ArrayList<>();
@@ -85,14 +83,18 @@ public class ParseIcs {
                     if (begin.equals("")||end.equals("")||name.equals("")||location.equals("")||
                             teacher.equals("")||uid.equals("")) {
                         System.out.println("Parsing went wrong :(");
+                    } else {
+                        // Put values in eventList if everything is correct
+                        eventList.add((ArrayList<String>) event.clone());
+                        event.clear();
                     }
-                    // Put values in eventList
-                    eventList.add((ArrayList<String>) event.clone());
-                    event.clear();
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Error parsing file");
+            ((ScheduleActivity) context).finish();
+            ((ScheduleActivity) context).overridePendingTransition(R.anim.do_nothing, R.anim.slide_down);
         }
 
         long endTime = System.currentTimeMillis();

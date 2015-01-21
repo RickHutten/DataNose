@@ -17,8 +17,7 @@ public class EventView extends RelativeLayout {
     private final static int LOCATION = 3;
     private final static int TEACHER = 4;
     private final static int UID = 5;
-    private final static int MAX_ITEMS = 6;
-    private final static int OCCUPATION_LIST = 7;
+
     private View rootView;
 
     public EventView(Context context) {
@@ -29,6 +28,10 @@ public class EventView extends RelativeLayout {
 
     public void setTitle(String title) {
         TextView tv = (TextView) rootView.findViewById(R.id.title);
+        if (title.startsWith(" ")) {
+            // Happens once in a while
+            title = title.replaceFirst(" ", "");
+        }
         tv.setText(title);
     }
 

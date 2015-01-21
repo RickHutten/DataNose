@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "nl.workmoose.datanose"
-        minSdkVersion 13
+        minSdkVersion 14
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -32,4 +32,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile project(':MaterialDesign')
+    compile project(':BetterPickers')
 }

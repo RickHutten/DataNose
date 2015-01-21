@@ -2,11 +2,11 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\DataNose\MaterialDesign\unspecified\classes.jar"
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\DataNose\MaterialDesign\unspecified\libs\nineoldandroids-2.4.0.jar"
         jumboMode="false"
         revision="21.1.0"
-        sha1="75f7a47da58114f8c177e9446a6ffb71e3be1607">
-        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\classes-46d3b0fd0a04994abba74f06f28841e77082c18f.jar" />
+        sha1="59f19e43354d32de831379c23ce03bb259a4c2b7">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\nineoldandroids-2.4.0-8aa8ec154d49f33fb0361aac6215ef643ea6ec57.jar" />
     </item>
     <item
         jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\DataNose\MaterialDesign\unspecified\libs\android-support-v4.jar"
@@ -16,6 +16,13 @@
         <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\android-support-v4-55b2a342e8b8a0307ff8c6bb3e63f44ea526e813.jar" />
     </item>
     <item
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\DataNose\MaterialDesign\unspecified\classes.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="965e22f1075ea1f1abced9d9fee77fa780598d17">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\classes-46d3b0fd0a04994abba74f06f28841e77082c18f.jar" />
+    </item>
+    <item
         jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\21.0.3\classes.jar"
         jumboMode="false"
         revision="21.1.0"
@@ -23,11 +30,11 @@
         <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\classes-5a0c8e627bf47760606327c7295282f7f71da1b0.jar" />
     </item>
     <item
-        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\DataNose\MaterialDesign\unspecified\libs\nineoldandroids-2.4.0.jar"
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\DataNose\BetterPickers\unspecified\classes.jar"
         jumboMode="false"
         revision="21.1.0"
-        sha1="59f19e43354d32de831379c23ce03bb259a4c2b7">
-        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\nineoldandroids-2.4.0-8aa8ec154d49f33fb0361aac6215ef643ea6ec57.jar" />
+        sha1="cb28346c439e7ff68eec410f64b19032ba394f9c">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\classes-236b99137465f0484bae22e95068df4f45fcf371.jar" />
     </item>
 
 </items>

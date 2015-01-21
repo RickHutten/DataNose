@@ -26,6 +26,7 @@ public class ScheduleFragment extends Fragment {
     private final static int DP_HOUR_WIDTH = 50; // Width of the hour bar in dp
     private final static int BEGIN_TIME = 0;
     private final static int END_TIME = 1;
+    private final static int MAX_ITEMS = 6; // Max items at the same time per event
 
     private int position;
     private int academicYear;
@@ -119,25 +120,14 @@ public class ScheduleFragment extends Fragment {
         }
         ScrollView sv = (ScrollView) rootView.findViewById(R.id.scheduleScrollView);
         int hour;
-        if (today()) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setFirstDayOfWeek(Calendar.MONDAY);
-            calendar.setMinimalDaysInFirstWeek(4);
-            hour = calendar.get(Calendar.HOUR_OF_DAY);
-            if (hour <= 9 || hour >= 22) {
-                // Don't scroll
-                return;
-            }
-        } else {
-            // The current view is not today, scroll to first event
-            hour = 100; // Yeah its not pretty, but it's the only thing that works that I can think of
-            for (ArrayList<String> event : events) {
-                int offSet = timeOffset();
-                int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
-                int beginHour = (int) Math.floor(beginTime / 100);
-                if (beginHour < hour) {
-                    hour = beginHour;
-                }
+        // Scroll to first event
+        hour = 100; // Yeah its not pretty, but it's the only thing that works that I can think of
+        for (ArrayList<String> event : events) {
+            int offSet = timeOffset();
+            int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
+            int beginHour = (int) Math.floor(beginTime / 100);
+            if (beginHour < hour) {
+                hour = beginHour;
             }
         }
         sv.scrollTo(0, dpToPx((hour - 9) * DP_HOUR_HEIGHT));
@@ -176,6 +166,20 @@ public class ScheduleFragment extends Fragment {
                 }
             }
             event.add("" + maxItems); // Add the number of events at the same time to the event
+        }
+        // Calculate the width of the items per hour
+        ArrayList<Integer> widthList = new ArrayList<>(Collections.nCopies(12, 0));
+        for (ArrayList<String> event : events) {
+            // Loop through every event
+            int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
+            int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
+            int beginHour = (int) Math.floor(beginTime / 100);
+            int endHour = (int) Math.ceil(endTime / 100);
+            for (int i = beginHour; i < endHour; i++) {
+                if (Integer.parseInt(event.get(MAX_ITEMS)) > widthList.get(i - 9)) {
+                    widthList.set(i - 9, Integer.parseInt(event.get(MAX_ITEMS)));
+                }
+            }
         }
 
         ArrayList<Boolean> columnOccupation;
@@ -216,7 +220,7 @@ public class ScheduleFragment extends Fragment {
                     long endMinute = endTime - endHour*100L;
                     long length = (endHour*60L + endMinute) - (beginHour * 60L + beginMinute);
                     float width = scheduleView.getWidth();
-                    int itemWidth = (int) width / globalMaxWidth;
+                    int itemWidth = (int) width / widthList.get(beginHour - 9);
 
                     EventView eventView = new EventView(scheduleActivity);
                     RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
@@ -239,8 +243,8 @@ public class ScheduleFragment extends Fragment {
 
     private int timeOffset() {
         // Convert UTC to local timezone
-        TimeZone tz = TimeZone.getDefault();
-        int offSet = tz.getOffset(currentDayInMillis); // offSet is in milliseconds
+        TimeZone thisTimeZone = TimeZone.getDefault();
+        int offSet = thisTimeZone.getOffset(currentDayInMillis); // offSet is in milliseconds
         return (((offSet / 1000) / 60) / 60) * 100; // Here milliseconds is set to hours (*100 for formatting)
     }
 
@@ -280,49 +284,50 @@ public class ScheduleFragment extends Fragment {
         thisPage.setMinimalDaysInFirstWeek(4);
         thisPage.setTimeInMillis(currentDayInMillis);
 
-        if (rightNow.get(Calendar.DAY_OF_YEAR) != thisPage.get(Calendar.DAY_OF_YEAR)) {
-            return false;
-        }
-        return true;
+        return rightNow.get(Calendar.DAY_OF_YEAR) == thisPage.get(Calendar.DAY_OF_YEAR);
     }
 
     private void setTitleDate() {
         // Set calendar
-        Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        calendar.setMinimalDaysInFirstWeek(4);
-        calendar.setTimeInMillis(currentDayInMillis);
+        Calendar thisPage = Calendar.getInstance();
+        thisPage.setFirstDayOfWeek(Calendar.MONDAY);
+        thisPage.setMinimalDaysInFirstWeek(4);
+        thisPage.setTimeInMillis(currentDayInMillis);
 
+        // Get TextViews for the title
         TextView monthView = (TextView) rootView.findViewById(R.id.month);
         TextView dayOfMonthView = (TextView) rootView.findViewById(R.id.dayOfMonth);
         TextView dayOfWeekView = (TextView) rootView.findViewById(R.id.dayOfWeek);
 
-        String dayOfMonth = "" + calendar.get(Calendar.DAY_OF_MONTH);
+        // Get month, day of month and day of week in string format
+        String dayOfMonth = "" + thisPage.get(Calendar.DAY_OF_MONTH);
         String[] month_array = getResources().getStringArray(R.array.months);
         String[] day_array = getResources().getStringArray(R.array.days);
-        String month = month_array[calendar.get(Calendar.MONTH)];
-        String year = "" + calendar.get(Calendar.YEAR);
-        String dayOfWeek = day_array[calendar.get(Calendar.DAY_OF_WEEK) - 1];
+        String month = month_array[thisPage.get(Calendar.MONTH)];
+        String dayOfWeek = day_array[thisPage.get(Calendar.DAY_OF_WEEK) - 1];
 
+        // Set the text
         monthView.setText(month);
         dayOfMonthView.setText(dayOfMonth);
         dayOfWeekView.setText(dayOfWeek);
     }
 
     private long calculateCurrentMillis() {
-        Calendar calendarNow = Calendar.getInstance();
-        calendarNow.setFirstDayOfWeek(Calendar.MONDAY);
-        calendarNow.setMinimalDaysInFirstWeek(4);
-        calendarNow.set(Calendar.YEAR, academicYear);
-        calendarNow.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        calendarNow.set(Calendar.WEEK_OF_YEAR, 36);
+        // Make calendar instance of the first academic day
+        Calendar firstAcademicDay = Calendar.getInstance();
+        firstAcademicDay.setFirstDayOfWeek(Calendar.MONDAY);
+        firstAcademicDay.setMinimalDaysInFirstWeek(4);
+        firstAcademicDay.set(Calendar.YEAR, academicYear);
+        firstAcademicDay.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        firstAcademicDay.set(Calendar.WEEK_OF_YEAR, 36);
 
-        long millisFirstDay = calendarNow.getTimeInMillis();
-        long currentMillis = millisFirstDay + position * MILLIS_IN_DAY;
-        return currentMillis;
+        // Calculate the milliseconds of the current view
+        long millisFirstDay = firstAcademicDay.getTimeInMillis();
+        return (millisFirstDay + position * MILLIS_IN_DAY);
     }
 
     private int dpToPx(float dp) {
+        // Convert dp into pixels
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getResources().getDisplayMetrics());
         return (int) px;
@@ -331,8 +336,7 @@ public class ScheduleFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // Draw the timeLine at the current time
         drawTimeLine();
     }
-
-
 }

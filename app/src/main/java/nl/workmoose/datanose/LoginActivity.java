@@ -49,6 +49,7 @@ public class LoginActivity extends ActionBarActivity {
             if (sharedPref.contains("studentId")) {
                 String studentId = sharedPref.getString("studentId", "");
                 if (!studentId.equals("")) {
+                    System.out.println("Currently logged in: " + studentId);
                     Intent i = new Intent(context, ScheduleActivity.class);
                     startActivity(i);
                     overridePendingTransition(R.anim.slide_up, R.anim.do_nothing);
@@ -121,42 +122,9 @@ public class LoginActivity extends ActionBarActivity {
         progressBar.setVisibility(View.VISIBLE);
         progressBar.restartAnimation();
 
-
-        /*
-         *http://nl.wikipedia.org/wiki/NEN_2772
-         *De norm schrijft voor dat de eerste week van het jaar die week is die vier of meer dagen in dat jaar heeft.
-         *Vuistregels om de weeknummering van een jaar te bepalen:
-         *1 februari valt altijd in week 5
-         *4 januari valt altijd in week 1
-         *28 december valt altijd in de laatste week van het jaar
-         */
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-//        calendar.setMinimalDaysInFirstWeek(4);
-//
-//        // week: 0 for the first week of the academic year, 1 for the next, ..
-//        // year: the academic year, so not always the current year
-//        // the first week of the acatemic year is ALWAYS week 36
-//        int week = calendar.get(Calendar.WEEK_OF_YEAR);
-//        int year = calendar.get(Calendar.YEAR);
-//        if (week >= 36) {
-//            week -= 36;
-//        } else {
-//            if (calendar.get(Calendar.DAY_OF_MONTH) < 15) {
-//                // If week is in the new calendar year
-//                year -= 1;
-//            }
-//            // Calculate the academic week
-//            Calendar tempCal = Calendar.getInstance();
-//            tempCal.setFirstDayOfWeek(Calendar.MONDAY);
-//            tempCal.setMinimalDaysInFirstWeek(4);
-//            tempCal.set(year, Calendar.DECEMBER, 28);
-//            int totalWeeksInYear = tempCal.get(Calendar.WEEK_OF_YEAR);
-//            week = week + (totalWeeksInYear - 36);
-//        }
-
         // Get last signed in information
         if (sharedPref.contains("studentId")) {
+
                 if (!sharedPref.getString("studentId", "-1").equals(studentId)) {
                 // If the input student ID is different from the previous one
                 System.out.println("New student ID, check new ID");
@@ -166,6 +134,7 @@ public class LoginActivity extends ActionBarActivity {
                 System.out.println("Same student ID as before, don't download file");
                 // The student number is the same as before
                 // Dont download but continue
+                System.out.println("Currently logged in: " + studentId);
                 enableBack = false;
                 // Delay the start of ScheduleActivity for aesthetic reasons
                 new Handler().postDelayed(new Runnable() {

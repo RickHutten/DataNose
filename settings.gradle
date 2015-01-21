@@ -1,2 +1,2 @@
-include ':app', ':MaterialDesign'
+include ':app', ':MaterialDesign', ':BetterPickers'
 project(':MaterialDesign').projectDir = new File('libs/MaterialDesign')

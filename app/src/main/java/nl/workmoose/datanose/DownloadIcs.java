@@ -20,7 +20,6 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 
 public class DownloadIcs extends AsyncTask<String, Void, String> {
 
@@ -77,8 +76,9 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
             // Save correct student ID to sharedPreferences
             SharedPreferences s = context.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
             s.edit().putString("studentId", studentId).apply();
+            System.out.println("Currently logged in: " + studentId);
 
-            //  Start ScheduleActivity
+            //  Start Schedul1eActivity
             Intent i = new Intent(context, ScheduleActivity.class);
             LoginActivity currentActivity = (LoginActivity) context;
             currentActivity.startActivity(i);
