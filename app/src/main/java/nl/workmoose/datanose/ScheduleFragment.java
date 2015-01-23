@@ -1,5 +1,6 @@
 package nl.workmoose.datanose;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -35,6 +36,7 @@ public class ScheduleFragment extends Fragment {
     private ScheduleActivity scheduleActivity;
     private RelativeLayout scheduleView;
     private ViewGroup rootView;
+    public EventView expandedEvent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,16 +80,6 @@ public class ScheduleFragment extends Fragment {
         // and adds horizontal lines every hour
         setEmptySchedule();
         drawTimeLine();
-
-//        EventView eventView = new EventView(scheduleActivity);
-//        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-//                dpToPx(120), dpToPx(120));
-//        lp.setMargins(0, dpToPx(DP_OFFSET + 60), 0, 0);
-//        eventView.setLayoutParams(lp);
-//        eventView.setTitle("Quantumfysica 2");
-//        eventView.setLocation("C 1.110");
-//        eventView.setType("Hoorcollege");
-//        scheduleView.addView(eventView);
 
         return rootView;
     }
@@ -222,13 +214,13 @@ public class ScheduleFragment extends Fragment {
                     float width = scheduleView.getWidth();
                     int itemWidth = (int) width / widthList.get(beginHour - 9);
 
-                    EventView eventView = new EventView(scheduleActivity);
+                    EventView eventView = new EventView(scheduleActivity, this);
                     RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                             itemWidth - dpToPx(5), dpToPx(length - 3));
                     lp.setMargins(itemWidth * column + dpToPx(2.5f), dpToPx(1+(DP_OFFSET + (60L * (beginHour - 8)) + beginMinute)), 0, 0);
                     eventView.setLayoutParams(lp);
 
-                    eventView.setEventData(event);
+                    eventView.setEventData(event, offSet);
                     scheduleView.addView(eventView);
 
                     removedEvents.add(event);
@@ -265,12 +257,24 @@ public class ScheduleFragment extends Fragment {
         }
         int lineMargin = (hour - 8) * DP_HOUR_HEIGHT + minute + DP_OFFSET;
 
+        View timeLineBall = rootView.findViewById(R.id.timeLineBall);
         View timeLine = rootView.findViewById(R.id.timeLine);
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+
+        //RelativeLayout.LayoutParams lpBall = new RelativeLayout.LayoutParams(
+        //        dpToPx(16), dpToPx(16));
+        //lpBall.setMargins(
+        //        -(dpToPx(26)),
+        //        dpToPx(lineMargin - 8),
+        //        0, 0);
+
+        RelativeLayout.LayoutParams lpLine = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(2));
-        lp.setMargins(0, dpToPx(lineMargin), 0, 0);
-        timeLine.setLayoutParams(lp);
+        lpLine.setMargins(-10, dpToPx(lineMargin), 0, 0);
+
+        //timeLine.setLayoutParams(lpLine);
+        //timeLineBall.setLayoutParams(lpBall);
         timeLine.setVisibility(View.VISIBLE);
+        timeLineBall.setVisibility(View.VISIBLE);
     }
 
     private Boolean today() {
@@ -329,8 +333,13 @@ public class ScheduleFragment extends Fragment {
     private int dpToPx(float dp) {
         // Convert dp into pixels
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-                getResources().getDisplayMetrics());
+                getActivity().getResources().getDisplayMetrics());
         return (int) px;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        expandedEvent.animateBack();
     }
 
     @Override

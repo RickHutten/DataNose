@@ -213,6 +213,8 @@ public class ScheduleActivity extends ActionBarActivity {
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(dpToPx(30));
         paint.setTypeface(Typeface.DEFAULT_BOLD);
+        paint.setFakeBoldText(true);
+        paint.setAntiAlias(true);
 
         Calendar calendar = Calendar.getInstance();
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);

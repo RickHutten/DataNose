@@ -16,6 +16,7 @@
             android:id="@+id/scheduleContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clipChildren="false"
             android:paddingLeft="10dp"
             android:paddingRight="10dp">
 
@@ -32,12 +33,19 @@
 
             </LinearLayout>
 
-            <!-- Holds the actual items -->
+            <!-- Holds the actual agenda items -->
             <RelativeLayout
                 android:id="@+id/scheduleView"
                 android:layout_toRightOf="@id/timeHolder"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" >
+
+                <View
+                    android:id="@+id/timeLineBall"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:background="@drawable/time_line_ball"
+                    android:visibility="invisible"/>
 
                 <View
                     android:id="@+id/timeLine"

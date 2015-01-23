@@ -5,16 +5,16 @@
     android:background="@drawable/event_background"
     android:id="@+id/eventContainer">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Title"
-        android:gravity="center_horizontal"
-        android:textColor="@color/white"
-        android:layout_centerHorizontal="true"
-        android:textStyle="bold"
-        android:textSize="16sp"/>
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:gravity="center_horizontal"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
 
         <TextView
             android:id="@+id/type"

@@ -26,6 +26,12 @@
             android:theme="@style/ScheduleTheme"
             android:screenOrientation="portrait" >
         </activity>
+
+        <activity
+            android:name=".DetailEventActivity"
+            android:theme="@style/TransparentTheme"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>
