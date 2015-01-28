@@ -23,7 +23,7 @@ public class ScheduleFragment extends Fragment {
 
     private final static long MILLIS_IN_DAY = 86400000; // Milliseconds in a day
     private final static int DP_OFFSET = 38; // Offset for the scrollview
-    private final static int DP_HOUR_HEIGHT = 60; // Height of 1 hour in dp
+    private final static long DP_HOUR_HEIGHT = 60; // Height of 1 hour in dp
     private final static int DP_HOUR_WIDTH = 50; // Width of the hour bar in dp
     private final static int BEGIN_TIME = 0;
     private final static int END_TIME = 1;
@@ -79,7 +79,7 @@ public class ScheduleFragment extends Fragment {
         // Set the left bar where the times are located
         // and adds horizontal lines every hour
         setEmptySchedule();
-        drawTimeLine();
+        //drawTimeLine();
 
         return rootView;
     }
@@ -101,7 +101,7 @@ public class ScheduleFragment extends Fragment {
                     ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(1));
             lp.setMargins(0, dpToPx(DP_OFFSET + i * DP_HOUR_HEIGHT), 0, 0);
             horizontalLine.setLayoutParams(lp);
-            horizontalLine.setBackgroundColor(getResources().getColor(R.color.grey));
+            horizontalLine.setBackgroundColor(getResources().getColor(R.color.gray));
             scheduleView.addView(horizontalLine);
         }
     }
@@ -217,7 +217,9 @@ public class ScheduleFragment extends Fragment {
                     EventView eventView = new EventView(scheduleActivity, this);
                     RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                             itemWidth - dpToPx(5), dpToPx(length - 3));
-                    lp.setMargins(itemWidth * column + dpToPx(2.5f), dpToPx(1+(DP_OFFSET + (60L * (beginHour - 8)) + beginMinute)), 0, 0);
+                    lp.setMargins(itemWidth * column + dpToPx(2.5f),
+                            dpToPx(1 + (DP_OFFSET + (DP_HOUR_HEIGHT * (beginHour - 8)) + beginMinute)),
+                            0, 0);
                     eventView.setLayoutParams(lp);
 
                     eventView.setEventData(event, offSet);
@@ -255,26 +257,15 @@ public class ScheduleFragment extends Fragment {
             // The timeLine falls out of the view
             return;
         }
-        int lineMargin = (hour - 8) * DP_HOUR_HEIGHT + minute + DP_OFFSET;
-
-        View timeLineBall = rootView.findViewById(R.id.timeLineBall);
+        long lineMargin = (hour - 8) * DP_HOUR_HEIGHT + minute + DP_OFFSET;
         View timeLine = rootView.findViewById(R.id.timeLine);
 
-        //RelativeLayout.LayoutParams lpBall = new RelativeLayout.LayoutParams(
-        //        dpToPx(16), dpToPx(16));
-        //lpBall.setMargins(
-        //        -(dpToPx(26)),
-        //        dpToPx(lineMargin - 8),
-        //        0, 0);
-
         RelativeLayout.LayoutParams lpLine = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(2));
-        lpLine.setMargins(-10, dpToPx(lineMargin), 0, 0);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lpLine.setMargins(dpToPx(-12), dpToPx(lineMargin - 6), 0, 0);
 
-        //timeLine.setLayoutParams(lpLine);
-        //timeLineBall.setLayoutParams(lpBall);
+        timeLine.setLayoutParams(lpLine);
         timeLine.setVisibility(View.VISIBLE);
-        timeLineBall.setVisibility(View.VISIBLE);
     }
 
     private Boolean today() {
@@ -332,6 +323,10 @@ public class ScheduleFragment extends Fragment {
 
     private int dpToPx(float dp) {
         // Convert dp into pixels
+        if (!isAdded()) {
+            // If fragment is not added to an activity, return dimension not converted
+            return (int) dp;
+        }
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getActivity().getResources().getDisplayMetrics());
         return (int) px;

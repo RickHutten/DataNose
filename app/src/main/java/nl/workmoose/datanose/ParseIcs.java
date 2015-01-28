@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 public class ParseIcs {
 
-    private Context context;
     final private static String FILE_NAME = "WARNING: DO NOT OPEN, VERY DANGEROUS FILE";
+    private Context context;
 
     public ParseIcs(Context context) {
         this.context = context;

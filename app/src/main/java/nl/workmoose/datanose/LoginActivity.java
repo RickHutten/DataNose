@@ -1,11 +1,11 @@
 package nl.workmoose.datanose;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -20,7 +20,7 @@ import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.gc.materialdesign.widgets.SnackBar;
 
 
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends Activity {
 
     private static final String SHARED_PREF = "prefs";
     private static final int ANIMATION_DURATION = 500;
@@ -90,7 +90,7 @@ public class LoginActivity extends ActionBarActivity {
 
         // Set onClickListener to ok button
         okButton = (ButtonFlat) findViewById(R.id.okButton);
-        okButton.setTextSize(25f);
+        //okButton.setTextSize(25f);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -2,13 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="nl.workmoose.datanose.ScheduleActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
 
     <item android:id="@+id/to_date"
         android:icon="@drawable/to_date"
         android:title="@string/to_date"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item android:id="@+id/to_today"
         android:icon="@drawable/to_today"
@@ -18,7 +21,6 @@
     <item android:id="@+id/sign_out"
         android:icon="@drawable/sign_out"
         android:title="@string/sign_out"
-        app:showAsAction="ifRoom" />
-
+        app:showAsAction="always" />
 
 </menu>

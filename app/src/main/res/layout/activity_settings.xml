@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <RelativeLayout
+        android:id="@+id/fakeSnackBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
+        android:paddingBottom="18dp"
+        android:paddingTop="18dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:layout_alignParentBottom="true"
+        android:clipChildren="false"
+        android:background="@color/dark_gray"
+        android:visibility="invisible">
+
+        <!-- Fake version of the snackbar -->
+        <com.gc.materialdesign.views.ButtonFlat
+            android:id="@+id/syncNowButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="24dp"
+            android:textColor="@color/blue"
+            android:text="@string/save" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/syncNowButton"
+            android:textColor="#FFF"
+            android:text="@string/save_text"/>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/fakeSnackBar">
+
+        <RelativeLayout
+            android:id="@+id/settingsContainer"
+            android:layout_above="@id/fakeSnackBar"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/settingsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="@string/action_settings"
+                android:textSize="35sp"
+                android:textColor="@color/black"
+                android:layout_centerHorizontal="true"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/settingsText"
+                android:layout_marginTop="10dp"
+                android:background="@color/gray" />
+
+            <RelativeLayout
+                android:id="@+id/synchronization"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:layout_below="@id/settingsText">
+
+                <TextView
+                    android:id="@+id/syncTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/sync_title"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_below="@id/syncTitle"
+                    android:background="@color/gray" />
+
+                <RelativeLayout
+                    android:id="@+id/syncCheckContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_below="@id/syncTitle"
+                    android:layout_marginTop="20dp">
+
+                    <com.gc.materialdesign.views.CheckBox
+                        android:id="@+id/syncCheckBox"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginLeft="10dp"
+                        android:background="@color/blue"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@id/syncCheckBox"
+                        android:layout_alignParentLeft="true"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        android:text="@string/sync_text"/>
+
+                </RelativeLayout>
+
+                <com.gc.materialdesign.views.ButtonRectangle
+                    android:id="@+id/colorButton"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@id/syncCheckContainer"
+                    android:layout_width="200dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_height="50dp"
+                    android:text="@string/pick_color"
+                    android:textSize="16sp"
+                    android:background="@color/green"
+                    android:textColor="@color/white"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_below="@id/colorButton"
+                    android:background="@color/gray" />
+
+            </RelativeLayout> <!-- End of synchronization container -->
+
+            <!-- Begin of notification container -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:layout_marginTop="30dp"
+                android:layout_below="@id/synchronization">
+
+                <TextView
+                    android:id="@+id/notiTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/noti_title"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_below="@id/notiTitle"
+                    android:background="@color/gray" />
+
+                <RelativeLayout
+                    android:id="@+id/notiCheckContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_below="@id/notiTitle"
+                    android:layout_marginTop="20dp">
+
+                    <com.gc.materialdesign.views.CheckBox
+                        android:id="@+id/notiCheckBox"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginLeft="10dp"
+                        android:background="@color/blue"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_toLeftOf="@id/notiCheckBox"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        android:text="@string/noti_text"/>
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_below="@id/notiCheckContainer"
+                    android:background="@color/gray" />
+
+            </RelativeLayout> <!-- End of notification container -->
+
+        </RelativeLayout> <!-- End of Settings Container -->
+
+    </ScrollView>
+
+</RelativeLayout>

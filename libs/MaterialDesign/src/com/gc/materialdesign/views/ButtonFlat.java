@@ -36,7 +36,7 @@ public class ButtonFlat extends ButtonRectangle {
 			paint.setAntiAlias(true);
 			if (rippleColor == null) {
 				paint.setColor(Color.parseColor("#88DDDDDD"));
-			}else {
+			} else {
 				paint.setColor(rippleColor);
 			}
 			canvas.drawCircle(x, y, radius, paint);

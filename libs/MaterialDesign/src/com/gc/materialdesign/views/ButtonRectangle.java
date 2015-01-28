@@ -88,7 +88,16 @@ public class ButtonRectangle extends Button {
 				textButton.setTextColor(defaultTextColor);
 			}
 		}
-		textButton.setTypeface(null, Typeface.BOLD);
+
+        String typeface = attrs.getAttributeValue(ANDROIDXML,"textStyle");
+        if (typeface == null || typeface.equals("bold")) {
+            textButton.setTypeface(null, Typeface.BOLD);
+        } else if (typeface.equals("normal")) {
+            textButton.setTypeface(null, Typeface.NORMAL);
+        } else if (typeface.equals("italic")) {
+            textButton.setTypeface(null, Typeface.ITALIC);
+        }
+
 		//textButton.setPadding(5, 5, 5, 5);
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);

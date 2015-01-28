@@ -17,6 +17,13 @@
     <string name="to_today">Go to today</string>
     <string name="to_date">Pick date</string>
     <string name="date_not_in_year">Given date is not in the academic year</string>
+    <string name="pick_color">Pick calendar color</string>
+    <string name="sync_title">Synchronization</string>
+    <string name="sync_text">Synchronise your timetable with your agenda</string>
+    <string name="noti_title">Notifications</string>
+    <string name="noti_text">Receive notifications before class</string>
+    <string name="save_text">Changes detected. \nPress Save to save your settings</string>
+    <string name="save">Save</string>
 
     <string-array name="months">
         <item>Jan</item>

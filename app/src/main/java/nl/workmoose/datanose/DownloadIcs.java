@@ -47,6 +47,7 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
         if (hasInternetConnection(context)) {
             try {
                 // Try to download file
+                System.out.println(urlString);
                 downloadFromUrl(urlString);
                 msg = "File downloaded"; // Temporary, if download successfull
             } catch (SocketTimeoutException e) {
@@ -141,4 +142,3 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
         // The file is downloaded successfully
     }
 }
-

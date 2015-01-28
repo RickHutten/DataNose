@@ -75,7 +75,6 @@ public class ScheduleActivity extends ActionBarActivity {
          */
         // Calculate academic week
         int week = calendar.get(Calendar.WEEK_OF_YEAR);
-        final int year = calendar.get(Calendar.YEAR); // Current year
         academicYear = getAcademicYear();
 
         if (week >= 36) {
@@ -165,7 +164,7 @@ public class ScheduleActivity extends ActionBarActivity {
         dialog.setFirstDayOfWeek(2);
         dialog.setYearRange(academicYear, academicYear+1);
 
-        dialog.show(getSupportFragmentManager(), "DATE_PICKER_TAG");
+        dialog.show(getSupportFragmentManager(), null);
     }
 
     public ArrayList<ArrayList<String>> getEventsOnDate(long milliseconds) {
@@ -232,6 +231,8 @@ public class ScheduleActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
                 break;
             case R.id.sign_out:
                 sharedPref.edit().putBoolean("signed_in", false).commit();
@@ -249,6 +250,28 @@ public class ScheduleActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        // Exit the app:
+        // This is done by restarting the first activity (LoginActivity)
+        // with flag FLAG_ACTIVITY_CLEAR_TOP to kill all other activities.
+        // LoginActivity calls 'finish()' when EXIT == true
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("EXIT", true);
+        startActivity(intent);
+    }
+
+    private int dpToPx(float dp) {
+        // Convert dp into pixels
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+                getResources().getDisplayMetrics());
+        return (int) px;
+    }
+
+    /**
+     * PagerAdapter for the ViewPager
+     */
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
@@ -269,24 +292,5 @@ public class ScheduleActivity extends ActionBarActivity {
         public int getCount() {
             return 365;
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        // Exit the app:
-        // This is done by restarting the first activity (LoginActivity)
-        // with flag FLAG_ACTIVITY_CLEAR_TOP to kill all other activities.
-        // LoginActivity calls 'finish()' when EXIT == true
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra("EXIT", true);
-        startActivity(intent);
-    }
-
-    private int dpToPx(float dp) {
-        // Convert dp into pixels
-        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-                getResources().getDisplayMetrics());
-        return (int) px;
     }
 }

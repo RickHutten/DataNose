@@ -19,7 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 
-public class ColorSelector extends android.app.Dialog implements OnValueChangedListener{
+public class ColorSelector extends android.app.Dialog implements OnValueChangedListener {
 	
 	int color = Color.BLACK;
 	Context context;
