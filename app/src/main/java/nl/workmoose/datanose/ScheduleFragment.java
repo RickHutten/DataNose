@@ -23,6 +23,8 @@ import java.util.TimeZone;
  * Rick Hutten
  * rick.hutten@gmail.com
  * 10189939
+ *
+ * Fragment containing the schedule. Every fragment represents a single day.
  */
  public class ScheduleFragment extends Fragment {
 
@@ -59,6 +61,7 @@ import java.util.TimeZone;
         currentDayInMillis = calculateCurrentMillis();
         events = scheduleActivity.getEventsOnDate(currentDayInMillis);
 
+        // Get scheduleView from the xml resource file
         scheduleView = (RelativeLayout) rootView.findViewById(R.id.scheduleView);
         scheduleView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -79,45 +82,73 @@ import java.util.TimeZone;
                 drawEvents();
             }
         });
+
+        // Set the date (in the top left corner)
         setTitleDate();
 
         // Set the left bar where the times are located
         // and adds horizontal lines every hour
         setEmptySchedule();
 
+        // Return the inflated view
         return rootView;
     }
 
+    /**
+     * Sets the empty schedule, like you would see if you are free today.
+     * Times from 9 to 21 o'clock and lines next to the hours
+     */
     private void setEmptySchedule() {
+        // Get container for the times
         LinearLayout timeHolder = (LinearLayout) rootView.findViewById(R.id.timeHolder);
+
         // Make textView's for the left container displaying the hours of the day (9:00, 10:00,..)
         for (int i=8; i <= 21; i++) {
+            // Create new TextView and set text
             TextView time = new TextView(scheduleActivity);
             time.setText(i + ":00");
+
+            // Make layoutparams
             time.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(DP_HOUR_WIDTH),
                     dpToPx(DP_HOUR_HEIGHT)));
+
+            // Add view to parent
             timeHolder.addView(time);
         }
         // Make horizontal lines to separate the hours
         for (int i=0; i <= 13; i++) {
+            // Make a new line
             View horizontalLine = new View(scheduleActivity);
+
+            // Make layoutparams
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(1));
             lp.setMargins(0, dpToPx(DP_OFFSET + i * DP_HOUR_HEIGHT), 0, 0);
+
+            // Set layoutparams and color
             horizontalLine.setLayoutParams(lp);
             horizontalLine.setBackgroundColor(getResources().getColor(R.color.gray));
+
+            // Add view to parent
             scheduleView.addView(horizontalLine);
         }
     }
 
+    /**
+     * Scrolls to the first item of the day
+     */
     private void scrollTo() {
+        // If there is no event today
         if (events.size() == 0) {
             return;
         }
+        // Get ScrollView
         ScrollView sv = (ScrollView) rootView.findViewById(R.id.scheduleScrollView);
-        int hour;
+
         // Scroll to first event
-        hour = 100; // Yeah its not pretty, but it's the only thing that works that I can think of
+        int hour = 100; // Yeah its not pretty, but it's the only thing that works that I can think of
+
+        // Loop through every event and see which one is the first
         for (ArrayList<String> event : events) {
             int offSet = timeOffset();
             int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
@@ -126,20 +157,33 @@ import java.util.TimeZone;
                 hour = beginHour;
             }
         }
+        // Scroll to the first item
         sv.scrollTo(0, dpToPx((hour - 9) * DP_HOUR_HEIGHT));
     }
 
+    /**
+     * Loops several times through the events to get an understanding
+     * of the distribution of the events. Add all the events of today to the scheduleContainer.
+     */
     private void drawEvents() {
+
+        // Make list to calculate the
         ArrayList<Integer> occupationList = new ArrayList<>(Collections.nCopies(12, 0));
+
+        // Get timezone offset
         int offSet = timeOffset();
+
         // Making the occupationList
         // necessary for determining the width of the events
         for (ArrayList<String> event : events) {
             // Loop through every event
+            // Get begin and end time
             int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
             int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
             int beginHour = (int) Math.floor(beginTime / 100);
             int endHour = (int) Math.ceil(endTime / 100);
+
+            // Set data to ArrayList
             for (int i = beginHour; i < endHour; i++) {
                 occupationList.set(i - 9, occupationList.get(i - 9) + 1);
             }
@@ -148,11 +192,14 @@ import java.util.TimeZone;
         int globalMaxWidth = 1; // The maximum number of events at the same time of the whole day
         for (ArrayList<String> event : events) {
             // Loop through every event.. again
+            // Get begin and end time
             int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
             int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
             int beginHour = (int) Math.floor(beginTime / 100);
             int endHour = (int) Math.ceil(endTime / 100);
             int maxItems = 1;
+
+            // Set data to ArrayList
             for (int i = beginHour; i < endHour; i++) {
                 if (occupationList.get(i - 9) > maxItems) {
                     maxItems = occupationList.get(i - 9);
@@ -161,16 +208,21 @@ import java.util.TimeZone;
                     }
                 }
             }
-            event.add("" + maxItems); // Add the number of events at the same time to the event
+            // Add the number of events at the same time to the event
+            event.add("" + maxItems);
         }
         // Calculate the width of the items per hour
         ArrayList<Integer> widthList = new ArrayList<>(Collections.nCopies(12, 0));
+
+        // Last loop through the events to calculate the final width of the items
         for (ArrayList<String> event : events) {
-            // Loop through every event
+            // Get begin and end time
             int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
             int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
             int beginHour = (int) Math.floor(beginTime / 100);
             int endHour = (int) Math.ceil(endTime / 100);
+
+            // Make final ArrayList
             for (int i = beginHour; i < endHour; i++) {
                 if (Integer.parseInt(event.get(MAX_ITEMS)) > widthList.get(i - 9)) {
                     widthList.set(i - 9, Integer.parseInt(event.get(MAX_ITEMS)));
@@ -180,10 +232,11 @@ import java.util.TimeZone;
 
         ArrayList<Boolean> columnOccupation;
         int column = 0; // The column we want to draw an event in
+
+        // Draw the events to the scheduleView and delete an item if a spot is free to draw to
+        // Try to draw as many items in the first column, then try the second (if there is one)
+        // them the third, etc.
         while (events.size() != 0) {
-            // Draw the events to the scheduleView and delete an item if a spot is free to draw to
-            // Try to draw as many items in the first column, then try the second (if there is one)
-            // them the third, etc.
 
             // Set the Boolean list for the current column
             columnOccupation = new ArrayList<>(Collections.nCopies(12, false));
@@ -196,15 +249,17 @@ import java.util.TimeZone;
                 int beginHour = (int) Math.floor(beginTime / 100);
                 int endHour = (int) Math.ceil(endTime / 100);
 
+                // Set canPlaceEvent initially to true
                 Boolean canPlaceEvent = true;
 
+                // Check if place is already occupied
                 for (int i = beginHour; i < endHour; i++) {
                     if (columnOccupation.get(i - 9)){
-                        // The place is already occupied
                         canPlaceEvent = false;
                         break;
                     }
                 }
+                // If we can place the event, draw it
                 if (canPlaceEvent) {
                     // Set columnOccupation to false for the current event
                     for (int i = beginHour; i < endHour; i++) {
@@ -218,39 +273,56 @@ import java.util.TimeZone;
                     float width = scheduleView.getWidth();
                     int itemWidth = (int) width / widthList.get(beginHour - 9);
 
+                    // Create new EventView
                     EventView eventView = new EventView(scheduleActivity, this);
+
+                    // Set layoutparams
                     RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                             itemWidth - dpToPx(5), dpToPx(length - 3));
                     lp.setMargins(itemWidth * column + dpToPx(2.5f),
                             dpToPx(1 + (DP_OFFSET + (DP_HOUR_HEIGHT * (beginHour - 8)) + beginMinute)),
                             0, 0);
-                    eventView.setLayoutParams(lp);
 
+                    // Add layoutparams to EventView, and set data
+                    eventView.setLayoutParams(lp);
                     eventView.setEventData(event, offSet);
+
+                    // Add view to parent
                     scheduleView.addView(eventView);
 
+                    // Add to removed events
                     removedEvents.add(event);
                 }
                 // End of this event in the loop
             }
+            // Remove the events that are drawn this pass in the while loop
             events.removeAll(removedEvents);
             removedEvents.clear();
             column++; // Go to the next column
         }
     }
 
+    /**
+     * Convert UTC to local timezone, calculate the offSet correction for the timezone
+     * @return: int hour offset * 100
+     */
     private int timeOffset() {
-        // Convert UTC to local timezone
         TimeZone thisTimeZone = TimeZone.getDefault();
         int offSet = thisTimeZone.getOffset(currentDayInMillis); // offSet is in milliseconds
         return (((offSet / 1000) / 60) / 60) * 100; // Here milliseconds is set to hours (*100 for formatting)
     }
 
+    /**
+     * Draws the line at the current time
+     */
     private void drawTimeLine() {
+
+        // If this screen is not today, don't show line at current time
         if (!today()) {
-            // If this screen is not today, don't show line at current time
             return;
         }
+
+        // It is today, make new calendar and get the current time
         Calendar calendar = Calendar.getInstance();
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
         calendar.setMinimalDaysInFirstWeek(4);
@@ -261,31 +333,45 @@ import java.util.TimeZone;
             // The timeLine falls out of the view
             return;
         }
+        // Get the marginTop
         long lineMargin = (hour - 8) * DP_HOUR_HEIGHT + minute + DP_OFFSET;
+
+        // Get the timeLine from resource xml
         View timeLine = rootView.findViewById(R.id.timeLine);
 
+        // Make layoutparams
         RelativeLayout.LayoutParams lpLine = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lpLine.setMargins(dpToPx(-12), dpToPx(lineMargin - 6), 0, 0);
 
+        // Set layoutparams and set visibility to VISIBLE
         timeLine.setLayoutParams(lpLine);
         timeLine.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Returns true or false whether this fragment represents today
+     * @return: Boolean, true if today, false if not.
+     */
     private Boolean today() {
-        // Returns true or false whether this screen represents today
+        // The actual current date
         Calendar rightNow = Calendar.getInstance();
         rightNow.setFirstDayOfWeek(Calendar.MONDAY);
         rightNow.setMinimalDaysInFirstWeek(4);
 
+        // The date of this page
         Calendar thisPage = Calendar.getInstance();
         thisPage.setFirstDayOfWeek(Calendar.MONDAY);
         thisPage.setMinimalDaysInFirstWeek(4);
         thisPage.setTimeInMillis(currentDayInMillis);
 
+        // Return if the two are the same
         return rightNow.get(Calendar.DAY_OF_YEAR) == thisPage.get(Calendar.DAY_OF_YEAR);
     }
 
+    /**
+     * Sets the TextView's of the date (top left of the fragment)
+     */
     private void setTitleDate() {
         // Set calendar
         Calendar thisPage = Calendar.getInstance();
@@ -311,6 +397,10 @@ import java.util.TimeZone;
         dayOfWeekView.setText(dayOfWeek);
     }
 
+    /**
+     * Calculate the milliseconds representing this fragment
+     * @return: time in millis of this fragment
+     */
     private long calculateCurrentMillis() {
         // Make calendar instance of the first academic day
         Calendar firstAcademicDay = Calendar.getInstance();
@@ -325,10 +415,15 @@ import java.util.TimeZone;
         return (millisFirstDay + position * MILLIS_IN_DAY);
     }
 
+    /**
+     * Convert dp into pixels
+     * @param dp: value to convert into pixels
+     * @return: int of the number of pixels
+     */
     private int dpToPx(float dp) {
-        // Convert dp into pixels
         if (!isAdded()) {
             // If fragment is not added to an activity, return dimension not converted
+            // or the app may crash
             return (int) dp;
         }
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
@@ -336,6 +431,12 @@ import java.util.TimeZone;
         return (int) px;
     }
 
+    /**
+     * Gets called when DetailEventActivity is ended. Tell the touched eventview to animate back
+     * @param requestCode: not used
+     * @param resultCode: not used
+     * @param data: not used
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         expandedEvent.animateBack();

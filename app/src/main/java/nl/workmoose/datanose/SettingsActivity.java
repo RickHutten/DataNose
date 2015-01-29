@@ -22,6 +22,8 @@ import com.gc.materialdesign.widgets.ColorSelector;
  * Rick Hutten
  * rick.hutten@gmail.com
  * 10189939
+ *
+ * Activity where the user can set the settings of the synchronization
  */
  public class SettingsActivity extends ActionBarActivity {
 
@@ -37,6 +39,9 @@ import com.gc.materialdesign.widgets.ColorSelector;
     private Boolean sync_saved;
     private Boolean settingsChanged = false;
 
+    /**
+     * Get views from resource xml and sets them to their current state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,11 +68,14 @@ import com.gc.materialdesign.widgets.ColorSelector;
         setOnClickListeners();
     }
 
+    /**
+     * Sets all the onClickListeners in the layout
+     */
     private void setOnClickListeners() {
-        // Sets all the onClickListeners in the layout
         colorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Show the color picker so the user can select a color for the calendar items
                 showColorPicker();
             }
         });
@@ -75,6 +83,7 @@ import com.gc.materialdesign.widgets.ColorSelector;
         syncNowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Hide the snackbar and save the current settings
                 hideFakeSnackBar();
                 saveCurrentSettings();
             }
@@ -83,39 +92,60 @@ import com.gc.materialdesign.widgets.ColorSelector;
         syncCheckBox.setOncheckListener(new CheckBox.OnCheckListener() {
             @Override
             public void onCheck(boolean isChecked) {
+                // To determine if the snackbar should be showed
                 if (isChecked != sync_saved) {
                     showFakeSnackBar();
                 } else {
+                    // Request to hide the snackbar, maybe the color has changed
                     requestHideFakeSnackBar();
                 }
             }
         });
     }
 
+    /**
+     * Shows the ColorSelector so the user can select a color for the agenda items
+     */
     private void showColorPicker() {
+        // Make listener
         ColorSelector.OnColorSelectedListener colorSelectedListener = new ColorSelector.OnColorSelectedListener() {
             @Override
             public void onColorSelected(int color) {
+                // Set the color to the given value
                 agendaColor = color;
+
+                // "Guess" if the text is still readable, otherwise set color to black/white
                 setButtonTextColor();
+
+                // Set the chosen color to the background of the button
                 colorButton.setBackgroundColor(color);
+
+                // If the color is not the same as the previous one, there has been a change
                 if (color != sharedPref.getInt("agendaColor", getResources().getColor(R.color.green))) {
                     if (syncCheckBox.isChecked()) {
+                        // Show the snackbar
                         showFakeSnackBar();
                     }
                 }
             }
         };
 
+        // Create new ColorSelector and add listener
         ColorSelector colorSelector = new ColorSelector(this, agendaColor, colorSelectedListener);
+
+        // Show the ColorSelector
         colorSelector.show();
     }
 
+    /**
+     * Shows the snackbar, translate it into the screen
+     */
     private void showFakeSnackBar() {
         // Shows the fake SnackBar to ask the user to sync the calendar
         if (fakeSnackBar.getVisibility() == View.VISIBLE) {
             return;
         }
+        // Make animation
         Animation translate = new TranslateAnimation(
                 Animation.RELATIVE_TO_SELF, 0,
                 Animation.RELATIVE_TO_SELF, 0,
@@ -124,20 +154,27 @@ import com.gc.materialdesign.widgets.ColorSelector;
         translate.setDuration(ANIMATION_DURATION);
         translate.setInterpolator(new AccelerateDecelerateInterpolator());
 
+        // Set button enabled
         syncNowButton.setEnabled(true);
+
+        // Set visibility and start animation
         fakeSnackBar.setVisibility(View.VISIBLE);
         fakeSnackBar.startAnimation(translate);
-
     }
 
+    /**
+     * Hides the snackbar, translate the snackbar out of the screen
+     */
     private void hideFakeSnackBar() {
-        // Hides the fakeSnackBar
+        // Make new animation
         Animation translate = new TranslateAnimation(
                 Animation.RELATIVE_TO_SELF, 0,
                 Animation.RELATIVE_TO_SELF, 0,
                 Animation.RELATIVE_TO_SELF, 0,
                 Animation.RELATIVE_TO_SELF, 1);
         translate.setDuration(ANIMATION_DURATION);
+
+        // Set animation listener
         translate.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -145,6 +182,7 @@ import com.gc.materialdesign.widgets.ColorSelector;
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                // Set visibility to INVISIBLE if the animation has ended
                 fakeSnackBar.setVisibility(View.INVISIBLE);
             }
 
@@ -154,34 +192,45 @@ import com.gc.materialdesign.widgets.ColorSelector;
         });
         translate.setInterpolator(new AccelerateDecelerateInterpolator());
 
+        // Set the button to disabled and start animation
         syncNowButton.setEnabled(false);
         fakeSnackBar.startAnimation(translate);
     }
 
+    /**
+     * Checks if the snackbar can be hidden or not.
+     * Only hide the fakeSnackBar if all the values are the same as the saved ones
+     */
     private void requestHideFakeSnackBar() {
-        // Only hide the fakeSnackBar if all the values are the same as the saved ones
         if (syncCheckBox.isChecked() != sync_saved) {
+            // Not the same values
             return;
         }
         if (agendaColor != sharedPref.getInt("agendaColor", getResources().getColor(R.color.green))) {
+            // Not the same values
             return;
         }
         // All the values are the same, hide fakeSnackBar
         hideFakeSnackBar();
     }
 
+    /**
+     * Set the values for this current setting
+     */
     private void saveCurrentSettings() {
-        // Set the values for this current setting
         sync_saved = syncCheckBox.isChecked();
+        settingsChanged = true;
+
+        // Save to sharedPreferences
         sharedPref.edit().putBoolean("sync_saved", sync_saved).apply();
         sharedPref.edit().putInt("agendaColor", agendaColor).apply();
-
-        settingsChanged = true;
     }
 
+    /**
+     * Sets the color of the text of the button to black if the color is too bright
+     * and the color to white otherwise
+     */
     private void setButtonTextColor() {
-        // Sets the color of the text of the button to black if the color is too bright
-        // and the color to white otherwise
 
         // Get the saturation and value of the given color to determine the brightness of the color
         float[] hsv = new float[3];

@@ -24,6 +24,11 @@ import com.gc.materialdesign.widgets.SnackBar;
  * Rick Hutten
  * rick.hutten@gmail.com
  * 10189939
+ *
+ * First activity where the user can put in his/her student ID, calls StudentIdChecker
+ * and (possibly) downloads the iCalendar file before the next activity is called.
+ * If the user was already signed in, it skips this acitivity and goes directly
+ * to ScheduleActivity
  */
  public class LoginActivity extends Activity {
 
@@ -40,6 +45,18 @@ import com.gc.materialdesign.widgets.SnackBar;
     private final Context context = this;
     private SharedPreferences sharedPref;
 
+    /**
+     * If the activity is called with the intent "EXIT" = true, the event will quit. This happens
+     * when the user want to quit the app in ScheduleActivity. He/She doesn't go back to this
+     * activity because that will cause him/her to log out, or press the backbutton twice.
+     * "So, why won't you call finish() when you start ScheduleActivity?"
+     * - "Because than I am not possible to the the transition animation used to go back to this
+     * activity when the user signs out.".
+     *
+     * Checks whether the user is aleady signed in. Calls ScheduleActivity if so.
+     *
+     * Slides in the inputContainer on start and shows the keyboard.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,9 +65,11 @@ import com.gc.materialdesign.widgets.SnackBar;
             finish();
             return; // So the code quits and doesn't run ScheduleActivity again
         }
+        // Check whether the user is signed in or not
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
         Boolean signedIn = sharedPref.getBoolean("signed_in", false);
         if (signedIn) {
+            // If the user is signed in, go to ScheduleActivity
             if (sharedPref.contains("studentId")) {
                 String studentId = sharedPref.getString("studentId", "");
                 if (!studentId.equals("")) {
@@ -61,8 +80,10 @@ import com.gc.materialdesign.widgets.SnackBar;
                 }
             }
         }
+        // The user is not signed in, set layout of activity_login.xml
         setContentView(R.layout.activity_login);
-        // Get the height of the screen in px
+
+        // Get the height of the screen in px, needed for animation
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -76,6 +97,8 @@ import com.gc.materialdesign.widgets.SnackBar;
         slideIn.setInterpolator(new AccelerateDecelerateInterpolator());
         slideIn.setFillAfter(true);
         slideIn.setDuration(ANIMATION_DURATION);
+
+        // Set animation listener
         slideIn.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) { }
@@ -89,6 +112,7 @@ import com.gc.materialdesign.widgets.SnackBar;
             @Override
             public void onAnimationRepeat(Animation animation) { }
         });
+        // Set animation
         View inputContainer = findViewById(R.id.inputContainer);
         inputContainer.setAnimation(slideIn);
 
@@ -117,9 +141,14 @@ import com.gc.materialdesign.widgets.SnackBar;
         });
     }
 
+    /**
+     * Gets called when the user presses the "OK" button or presses enter.
+     */
     private void idEntered() {
         // Get the input of the EditText
         String studentId = idInput.getText().toString();
+
+        // If the input is empty, go back.
         if (studentId.equals("")) {
             String message = getResources().getString(R.string.enter_student_id);
             new SnackBar(this, message).show();
@@ -177,16 +206,25 @@ import com.gc.materialdesign.widgets.SnackBar;
         }
     }
 
+    /**
+     * Sets the activity in the state in which it was created
+     */
     public void backToBeginning() {
         // Sets all the settings to defaults
         // slide in inputContainer and set button and EditText enabled
         progressBar.setVisibility(View.INVISIBLE);
         inputContainer = findViewById(R.id.inputContainer);
+
+        // Make animation to slide in the inputContainer
         Animation slideIn = new TranslateAnimation(0, 0, screen_height, 0);
         slideIn.setInterpolator(new AccelerateDecelerateInterpolator());
         slideIn.setDuration(ANIMATION_DURATION);
         slideIn.setFillAfter(true);
+
+        // Set animation
         inputContainer.setAnimation(slideIn);
+
+        // Set EditText and button enabled
         okButton.setEnabled(true);
         idInput.setEnabled(true);
     }
@@ -200,16 +238,13 @@ import com.gc.materialdesign.widgets.SnackBar;
         created = false;
     }
 
+    /**
+     * Don't always let the user go back
+     */
     @Override
     public void onBackPressed() {
         if (enableBack) {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        System.out.println("onDestroy in LoginActivity");
     }
 }

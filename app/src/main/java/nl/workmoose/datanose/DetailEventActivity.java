@@ -26,6 +26,10 @@ import android.widget.TextView;
         }
     };
 
+    /**
+     * Show the activity. Set all the values to the TextViews and set an
+     * OnClickListener to dismiss the activity when the user touches the screen
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

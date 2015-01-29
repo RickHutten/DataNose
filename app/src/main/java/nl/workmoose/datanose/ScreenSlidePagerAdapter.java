@@ -21,15 +21,17 @@ public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         // Create new Fragment and give arguments
         ScheduleFragment scheduleFragment = new ScheduleFragment();
+
+        // Give the fragment the position it is in
         Bundle bundle = new Bundle();
         bundle.putInt("position", position);
-
         scheduleFragment.setArguments(bundle);
         return scheduleFragment;
     }
 
     @Override
     public int getCount() {
+        // The number of days in a year
         return 365;
     }
 }

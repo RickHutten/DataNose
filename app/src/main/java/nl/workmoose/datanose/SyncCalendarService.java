@@ -48,6 +48,8 @@ public class SyncCalendarService extends Service {
         System.out.println("Flags: " + flags);
         notifId = 1;
         final Context context = this;
+
+        // Make new thread to run service in background, prevent the UI thread to freeze
         final Thread t = new Thread() {
             @Override
             public void run() {
@@ -68,9 +70,11 @@ public class SyncCalendarService extends Service {
         return START_STICKY;
     }
 
+    /**
+     * Make an notification.builder object
+     * @return: notification.builder object
+     */
     private Notification.Builder buildNotification(){
-        // The PendingIntent to launch our activity if the user selects
-        // this notification
         CharSequence title = getText(R.string.app_name);
 
         // Make new notification
@@ -80,6 +84,11 @@ public class SyncCalendarService extends Service {
                 .setSmallIcon(R.drawable.datanose_icon_no_border);
     }
 
+    /**
+     * Updates the notification
+     * @param maxProgress: maximum progress
+     * @param progress: the current progress
+     */
     private void updateNotification(int maxProgress, int progress) {
         // This function updates the notification
         Notification.Builder notificationBuilder = buildNotification();
@@ -92,6 +101,7 @@ public class SyncCalendarService extends Service {
             notification = notificationBuilder.build();
         }
 
+        // Notify the user
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(notifId, notification);
     }
@@ -102,8 +112,12 @@ public class SyncCalendarService extends Service {
         return null;
     }
 
+    /**
+     * Start the syncing, parse the iCalendar file and set the events
+     */
     private void startSync() {
         try {
+            // Parse the file
             ParseIcs parseIcs = new ParseIcs(getApplicationContext());
             ArrayList<ArrayList<String>> eventList = parseIcs.readFile();
 
@@ -133,6 +147,9 @@ public class SyncCalendarService extends Service {
         stopSelf();
     }
 
+    /**
+     * Create a new calendar called "DataNose"
+     */
     private void createNewCalendar() {
 
         // Create a new calendar values
@@ -154,6 +171,10 @@ public class SyncCalendarService extends Service {
         getContentResolver().insert(builder.build(), values);
     }
 
+    /**
+     * Set the events to the calendar
+     * @param eventList: all the events
+     */
     private void setEvents(ArrayList<ArrayList<String>> eventList) {
 
         // Loop through data and update every event
@@ -204,9 +225,18 @@ public class SyncCalendarService extends Service {
         }
     }
 
+    /**
+     * Add a single event using the given parameters
+     * @param start: Start time
+     * @param stop: Stop time
+     * @param title: title of the event
+     * @param location: Location of the event
+     * @param description: Description of the event
+     * @param id: Unique identifier of the event
+     */
     private void addEvent(long start, long stop, String title, String location,
                              String description, long id) {
-
+        // Vreate ContentResolver to put in values for the event
         ContentResolver cr = getContentResolver();
         ContentValues values = new ContentValues();
 
@@ -250,6 +280,10 @@ public class SyncCalendarService extends Service {
         }
     }
 
+    /**
+     * Gets all the calendars registered on this device
+     * @return: list of all the calendars
+     */
     private ArrayList<String> readAllCalendars() {
         // Returns an arraylist containing all the names of every calendar on this device
         ArrayList<String> calendars = new ArrayList<>();
@@ -279,6 +313,10 @@ public class SyncCalendarService extends Service {
         return calendars;
     }
 
+    /**
+     * Gets the id of the DataNose calendar
+     * @return: id
+     */
     private long getCalendarId() {
         // Returns the calendar id
         String[] projection = new String[]{
@@ -311,12 +349,20 @@ public class SyncCalendarService extends Service {
         return -1;
     }
 
+    /**
+     * Returns the saved color for the agenda items
+     * @return: int color
+     */
     private int getColor() {
         // Returns the color value saved in sharedPreferences
         SharedPreferences sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
         return sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
     }
 
+    /**
+     * returns whether the items should be invisible or visible
+     * @return: boolean isVisible
+     */
     private Boolean isVisible() {
         // Returns the boolean whether the user wants to sync his/her account
         SharedPreferences sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
