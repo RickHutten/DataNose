@@ -42,6 +42,7 @@
             android:screenOrientation="portrait" />
 
         <service
+            android:enabled="true"
             android:name=".SyncCalendarService"
             android:label="My Service" >
         </service>

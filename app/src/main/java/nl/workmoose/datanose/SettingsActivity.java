@@ -98,7 +98,9 @@ public class SettingsActivity extends ActionBarActivity {
                 setButtonTextColor();
                 colorButton.setBackgroundColor(color);
                 if (color != sharedPref.getInt("agendaColor", getResources().getColor(R.color.green))) {
-                    showFakeSnackBar();
+                    if (syncCheckBox.isChecked()) {
+                        showFakeSnackBar();
+                    }
                 }
             }
         };
@@ -172,7 +174,6 @@ public class SettingsActivity extends ActionBarActivity {
         sharedPref.edit().putBoolean("sync_saved", sync_saved).apply();
         sharedPref.edit().putInt("agendaColor", agendaColor).apply();
 
-        // Set boolean that the settings have changed in this activity
         settingsChanged = true;
     }
 
@@ -212,12 +213,12 @@ public class SettingsActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        super.onPause();
         if (settingsChanged) {
             // The settings have changed, sync the timetable with the current settings
             System.out.println("Sync calendar...");
-            startService(new Intent(this, SyncCalendarService.class));
+            startService(new Intent(getApplicationContext(), SyncCalendarService.class));
         }
     }
 }

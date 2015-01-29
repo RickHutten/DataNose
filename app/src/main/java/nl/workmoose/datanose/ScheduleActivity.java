@@ -235,6 +235,12 @@ public class ScheduleActivity extends ActionBarActivity {
                 startActivity(i);
                 break;
             case R.id.sign_out:
+                // The user logs out, the events in the calendar have to be deleted
+                sharedPref.edit().putBoolean("sync_saved", false).commit();
+                sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green)).commit();
+                System.out.println("Deleting items from calendar...");
+                startService(new Intent(getApplicationContext(), SyncCalendarService.class));
+
                 sharedPref.edit().putBoolean("signed_in", false).commit();
                 // Exit current activity, go back to LoginActivity
                 this.finish();

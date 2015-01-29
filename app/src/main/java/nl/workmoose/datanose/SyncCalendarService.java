@@ -31,14 +31,11 @@ public class SyncCalendarService extends Service {
     private final static int LOCATION = 3;
     private final static int TEACHER = 4;
     private final static int UID = 5;
-    private Intent intent;
 
     public SyncCalendarService() {}
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-
+    public int onStartCommand(Intent intent, int flags, int startId) {
         // Create a new thread to run the syncing off the UI thread
         final Thread t = new Thread() {
             @Override
@@ -48,6 +45,7 @@ public class SyncCalendarService extends Service {
             }
         };
         t.start();
+        return START_STICKY;
     }
 
     @Override
@@ -62,30 +60,28 @@ public class SyncCalendarService extends Service {
             ArrayList<ArrayList<String>> eventList = parseIcs.readFile();
 
             if (readAllCalendars().contains(ACCOUNT_NAME)) {
-
                 // Calendar already exsists, don't create new calendar
                 System.out.println("Calendar already exsists, don't create another");
 
-                // If the calendar already exists, the events also do.
-                // Update the calendar instead of inserting events
-                setEvents(eventList, "update");
-
             } else {
-
                 // Calendar does not already exsists
                 System.out.println("Creating new calendar");
 
-                // Create a new calendar and insert the events for the first time
+                // Create a new calendar
                 createNewCalendar();
-                setEvents(eventList, "insert");
             }
+            // A calendar is present at this point.
+            // Set the events to the calendar.
+            setEvents(eventList);
 
             System.out.println("Sync result: SYNC OK");
         } catch (Exception e) {
+
+            // Something went wrong in setEvents()
             e.printStackTrace();
             System.out.println("Sync result: SYNC ERROR");
         }
-        // Stop service
+        // Stop service, otherwise it will repeat itself
         stopSelf();
     }
 
@@ -110,17 +106,12 @@ public class SyncCalendarService extends Service {
         getContentResolver().insert(builder.build(), values);
     }
 
-    private void setEvents(ArrayList<ArrayList<String>> eventList, String mode) {
+    private void setEvents(ArrayList<ArrayList<String>> eventList) {
 
         // Loop through data and update every event
         int count = 0;
         for (ArrayList<String> event : eventList) {
             count++;
-            if (mode.equals("insert")) {
-                System.out.println("Inserting: " + count + " of " + eventList.size());
-            } else if (mode.equals("update")) {
-                System.out.println("Updating: " + count + " of " + eventList.size());
-            }
 
             // Get values from event
             String begin = event.get(BEGIN_TIME);
@@ -154,55 +145,29 @@ public class SyncCalendarService extends Service {
             endTime.setTimeZone(TimeZone.getTimeZone("UTC"));
             long endMillis = endTime.getTimeInMillis();
 
-            if (mode.equals("insert")) {
-                // Insert event
-                insertEvent(startMillis, endMillis, title, location, description, id);
-            } else if (mode.equals("update")) {
-                // Insert event
-                update(startMillis, endMillis, title, location, description, id);
-            }
+            // Update or insert the event
+            System.out.println("Adding/Updating event: " + count + " of " + eventList.size());
+            addEvent(startMillis, endMillis, title, location, description, id);
         }
     }
 
-    private void insertEvent(long start, long stop, String title, String location,
+    private void addEvent(long start, long stop, String title, String location,
                              String description, long id) {
-        // Set event data
+
         ContentResolver cr = getContentResolver();
-        ContentValues values = new ContentValues();
-        values.put(CalendarContract.Events.DTSTART, start);
-        values.put(CalendarContract.Events.DTEND, stop);
-        values.put(CalendarContract.Events.TITLE, title);
-        values.put(CalendarContract.Events.DESCRIPTION, description);
-        values.put(CalendarContract.Events.CALENDAR_ID, getCalendarId());
-        values.put(CalendarContract.Events.EVENT_COLOR, getColor());
-        values.put(CalendarContract.Events.EVENT_LOCATION, location);
-        values.put(CalendarContract.Events._ID, id);
-        values.put(CalendarContract.Events.EVENT_TIMEZONE, "Europe/Amsterdam");
-
-        // Insert to SQL database
-        Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
-        // Get the event ID that is the last element in the Uri
-        long eventId = Long.parseLong(uri.getLastPathSegment());
-
-        // Check if everything is correct
-        if (eventId != id) {
-            System.out.println("De shit gaat niet goed: eventId, id: " + eventId + " " + id);
-        }
-    }
-
-    public void update(long start, long stop, String title, String location,
-                        String description, long id) {
-        // Update the events with the current settings
         ContentValues values = new ContentValues();
 
         if (isVisible()) {
-            // The new title for the event
+            // Set event data
             values.put(CalendarContract.Events.DTSTART, start);
             values.put(CalendarContract.Events.DTEND, stop);
             values.put(CalendarContract.Events.TITLE, title);
             values.put(CalendarContract.Events.DESCRIPTION, description);
+            values.put(CalendarContract.Events.CALENDAR_ID, getCalendarId());
             values.put(CalendarContract.Events.EVENT_COLOR, getColor());
             values.put(CalendarContract.Events.EVENT_LOCATION, location);
+            values.put(CalendarContract.Events._ID, id);
+            values.put(CalendarContract.Events.EVENT_TIMEZONE, "Europe/Amsterdam");
         } else {
             // I do not have the permission to set the visibility,
             // so that's why I set every value to null or -1
@@ -214,8 +179,22 @@ public class SyncCalendarService extends Service {
             values.put(CalendarContract.Events.EVENT_COLOR, -1);
             values.put(CalendarContract.Events.EVENT_LOCATION, (String) null);
         }
-        Uri updateUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, id);
-        getContentResolver().update(updateUri, values, null, null);
+        try {
+            // Try to insert the event to the SQL database
+            Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
+            // Get the event ID that is the last element in the Uri
+            long eventId = Long.parseLong(uri.getLastPathSegment());
+
+            // Check if everything is correct
+            if (eventId != id) {
+                System.out.println("De shit gaat niet goed: eventId, id: " + eventId + " " + id);
+            }
+
+        } catch (Exception e) {
+            // The ID already exists, update the event
+            Uri updateUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, id);
+            getContentResolver().update(updateUri, values, null, null);
+        }
     }
 
     private ArrayList<String> readAllCalendars() {
