@@ -13,14 +13,19 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.gc.materialdesign.widgets.SnackBar;
 
-
-public class LoginActivity extends Activity {
+/**
+ * Rick Hutten
+ * rick.hutten@gmail.com
+ * 10189939
+ */
+ public class LoginActivity extends Activity {
 
     private static final String SHARED_PREF = "prefs";
     private static final int ANIMATION_DURATION = 500;
@@ -71,6 +76,19 @@ public class LoginActivity extends Activity {
         slideIn.setInterpolator(new AccelerateDecelerateInterpolator());
         slideIn.setFillAfter(true);
         slideIn.setDuration(ANIMATION_DURATION);
+        slideIn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(idInput, InputMethodManager.SHOW_IMPLICIT);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+        });
         View inputContainer = findViewById(R.id.inputContainer);
         inputContainer.setAnimation(slideIn);
 

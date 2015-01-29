@@ -21,7 +21,15 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
-public class DownloadIcs extends AsyncTask<String, Void, String> {
+/**
+ * Rick Hutten
+ * rick.hutten@gmail.com
+ * 10189939
+ *
+ * This class downloads the iCalendar file for the given student ID.
+ * The site is 'https://datanose.nl/' + studentID + '.ics'.
+ */
+ public class DownloadIcs extends AsyncTask<String, Void, String> {
 
     final private static String SHARED_PREF = "prefs";
     final private static String URL_STRING = "https://datanose.nl/";

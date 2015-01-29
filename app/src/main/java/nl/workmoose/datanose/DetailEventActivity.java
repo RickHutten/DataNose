@@ -6,15 +6,32 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class DetailEventActivity extends Activity {
+/**
+ * Rick Hutten
+ * rick.hutten@gmail.com
+ * 10189939
+ *
+ * This class shows detailed information of an event. It is only called when the user
+ * clicks on an event. This is an activity with a transparent background so it doesn't
+ * look like the app went to a different activity.
+ */
+ public class DetailEventActivity extends Activity {
 
-    View.OnClickListener dismissListener;
+    // The whole layout has a onclick listener so wherever
+    // the user clicks, the activity is finished
+    View.OnClickListener dismissListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            finish();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_event_layout);
 
+        // Get information of the event which started this activity
         String title = getIntent().getStringExtra("title");
         String type = getIntent().getStringExtra("type");
         String location = getIntent().getStringExtra("location");
@@ -22,39 +39,31 @@ public class DetailEventActivity extends Activity {
         String beginTime = getIntent().getStringExtra("beginTime");
         String endTime = getIntent().getStringExtra("endTime");
 
-        // Format strings (eg. 1200 -> 12:00)
+        // Format time strings (eg. 1200 -> 12:00)
         beginTime = new StringBuilder(beginTime).insert(beginTime.length()-2, ":").toString();
         endTime = new StringBuilder(endTime).insert(endTime.length()-2, ":").toString();
 
+        // Teacher string frequently is in parenthesis, if so, remove them
         if (teacher.startsWith(" (") && teacher.endsWith(")")) {
             teacher = teacher.substring(2, teacher.length()-1);
         }
 
-        dismissListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        };
-
+        // Set dismissListener to parent
         RelativeLayout uberParent = (RelativeLayout) findViewById(R.id.uberParent);
         uberParent.setOnClickListener(dismissListener);
 
+        // Get views from layout
         TextView titleText = (TextView) findViewById(R.id.title);
-        titleText.setText(title);
-
         TextView typeText = (TextView) findViewById(R.id.type);
-        typeText.setText(type);
-
         TextView timeText = (TextView) findViewById(R.id.time);
-        timeText.setText(beginTime + " - " + endTime);
-
-
         TextView teacherText = (TextView) findViewById(R.id.teacher);
-        teacherText.setText(teacher);
-
         TextView locationText = (TextView) findViewById(R.id.location);
-        locationText.setText(location);
 
+        // Set texts of the views
+        titleText.setText(title);
+        typeText.setText(type);
+        timeText.setText(beginTime + " - " + endTime);
+        teacherText.setText(teacher);
+        locationText.setText(location);
     }
 }

@@ -9,10 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -26,8 +23,12 @@ import com.gc.materialdesign.widgets.SnackBar;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-
-public class ScheduleActivity extends ActionBarActivity {
+/**
+ * Rick Hutten
+ * rick.hutten@gmail.com
+ * 10189939
+ */
+ public class ScheduleActivity extends ActionBarActivity {
 
     private static final String SHARED_PREF = "prefs";
     private static final int BEGIN_TIME = 0;
@@ -273,31 +274,6 @@ public class ScheduleActivity extends ActionBarActivity {
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getResources().getDisplayMetrics());
         return (int) px;
-    }
-
-    /**
-     * PagerAdapter for the ViewPager
-     */
-    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        public ScreenSlidePagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            // Create new Fragment and give arguments
-            ScheduleFragment scheduleFragment = new ScheduleFragment();
-            Bundle bundle = new Bundle();
-            bundle.putInt("position", position);
-
-            scheduleFragment.setArguments(bundle);
-            return scheduleFragment;
-        }
-
-        @Override
-        public int getCount() {
-            return 365;
-        }
     }
 
     @Override

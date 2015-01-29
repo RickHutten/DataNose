@@ -19,7 +19,12 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.TimeZone;
 
-public class ScheduleFragment extends Fragment {
+/**
+ * Rick Hutten
+ * rick.hutten@gmail.com
+ * 10189939
+ */
+ public class ScheduleFragment extends Fragment {
 
     private final static long MILLIS_IN_DAY = 86400000; // Milliseconds in a day
     private final static int DP_OFFSET = 38; // Offset for the scrollview
@@ -37,7 +42,6 @@ public class ScheduleFragment extends Fragment {
     private RelativeLayout scheduleView;
     private ViewGroup rootView;
     public EventView expandedEvent;
-    private ArrayList<EventView> eventsToday = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

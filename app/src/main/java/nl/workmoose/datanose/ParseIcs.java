@@ -7,7 +7,12 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class ParseIcs {
+/**
+ * Rick Hutten
+ * rick.hutten@gmail.com
+ * 10189939
+ */
+ public class ParseIcs {
 
     final private static String FILE_NAME = "WARNING: DO NOT OPEN, VERY DANGEROUS FILE";
     private Context context;

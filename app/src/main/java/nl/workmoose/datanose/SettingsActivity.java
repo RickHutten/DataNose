@@ -19,9 +19,11 @@ import com.gc.materialdesign.views.CheckBox;
 import com.gc.materialdesign.widgets.ColorSelector;
 
 /**
- * Created by Rick on 27-1-2015.
+ * Rick Hutten
+ * rick.hutten@gmail.com
+ * 10189939
  */
-public class SettingsActivity extends ActionBarActivity {
+ public class SettingsActivity extends ActionBarActivity {
 
     private static final String SHARED_PREF = "prefs";
     private static final int ANIMATION_DURATION = 500;
@@ -219,6 +221,7 @@ public class SettingsActivity extends ActionBarActivity {
             // The settings have changed, sync the timetable with the current settings
             System.out.println("Sync calendar...");
             startService(new Intent(getApplicationContext(), SyncCalendarService.class));
+            settingsChanged = false;
         }
     }
 }

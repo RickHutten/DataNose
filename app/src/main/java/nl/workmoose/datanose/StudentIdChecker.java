@@ -11,7 +11,12 @@ import com.gc.materialdesign.widgets.SnackBar;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class StudentIdChecker extends AsyncTask<String, Void, String> {
+/**
+ * Rick Hutten
+ * rick.hutten@gmail.com
+ * 10189939
+ */
+ public class StudentIdChecker extends AsyncTask<String, Void, String> {
 
     private Context context;
     private String studentId;

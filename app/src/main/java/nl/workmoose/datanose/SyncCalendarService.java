@@ -1,5 +1,7 @@
 package nl.workmoose.datanose;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -9,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.IBinder;
 import android.provider.CalendarContract;
 
@@ -17,6 +20,10 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 /**
+ * Rick Hutten
+ * rick.hutten@gmail.com
+ * 10189939
+ *
  * This file creates an calendar to write the events in. It only creates a calendar if there hasn't
  * one been created already. It loads the events into the calendar.
  * If a calendar already exsists, it updates your events
@@ -31,21 +38,62 @@ public class SyncCalendarService extends Service {
     private final static int LOCATION = 3;
     private final static int TEACHER = 4;
     private final static int UID = 5;
+    private int notifId;
 
     public SyncCalendarService() {}
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, final int flags, int startId) {
         // Create a new thread to run the syncing off the UI thread
+        System.out.println("Flags: " + flags);
+        notifId = 1;
+        final Context context = this;
         final Thread t = new Thread() {
             @Override
             public void run() {
+
+                // Set nofitication to keep task runnen even when application is closed
+                if (Build.VERSION.SDK_INT < 16) {
+                    startForeground(notifId, new Notification.Builder(context).getNotification());
+                } else {
+                    startForeground(notifId, new Notification.Builder(context).build());
+                }
+
                 // Starts the syncing process
                 startSync();
             }
         };
         t.start();
+
         return START_STICKY;
+    }
+
+    private Notification.Builder buildNotification(){
+        // The PendingIntent to launch our activity if the user selects
+        // this notification
+        CharSequence title = getText(R.string.app_name);
+
+        // Make new notification
+        return new Notification.Builder(this)
+                .setContentTitle(title)
+                .setContentText("Updating calendar")
+                .setSmallIcon(R.drawable.datanose_icon_no_border);
+    }
+
+    private void updateNotification(int maxProgress, int progress) {
+        // This function updates the notification
+        Notification.Builder notificationBuilder = buildNotification();
+        notificationBuilder.setProgress(maxProgress, progress, false);
+
+        Notification notification;
+        if (Build.VERSION.SDK_INT < 16) {
+            notification = notificationBuilder.getNotification();
+        } else {
+            notification = notificationBuilder.build();
+        }
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(notifId, notification);
     }
 
     @Override
@@ -137,16 +185,21 @@ public class SyncCalendarService extends Service {
             Calendar beginTime = Calendar.getInstance();
             beginTime.set(beginYear, beginMonth, beginDay, beginHour, beginMinute);
             beginTime.setTimeZone(TimeZone.getTimeZone("UTC"));
+            beginTime.set(Calendar.SECOND, 0);
+            beginTime.set(Calendar.MILLISECOND, 0);
             long startMillis = beginTime.getTimeInMillis();
 
             // Calendar instance for end time
             Calendar endTime = Calendar.getInstance();
             endTime.set(endYear, endMonth, endDay, endHour, endMinute);
             endTime.setTimeZone(TimeZone.getTimeZone("UTC"));
+            endTime.set(Calendar.SECOND, 0);
+            endTime.set(Calendar.MILLISECOND, 0);
             long endMillis = endTime.getTimeInMillis();
 
             // Update or insert the event
             System.out.println("Adding/Updating event: " + count + " of " + eventList.size());
+            updateNotification(eventList.size(), count);
             addEvent(startMillis, endMillis, title, location, description, id);
         }
     }

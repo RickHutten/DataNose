@@ -19,9 +19,13 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class EventView extends RelativeLayout {
+/**
+ * Rick Hutten
+ * rick.hutten@gmail.com
+ * 10189939
+ */
+ public class EventView extends RelativeLayout {
 
-    private static final String SHARED_PREF = "prefs";
     private final static int BEGIN_TIME = 0;
     private final static int END_TIME = 1;
     private final static int NAME = 2;
@@ -36,8 +40,6 @@ public class EventView extends RelativeLayout {
     private String endTime;
     private Context context;
     private ScheduleActivity scheduleActivity;
-    private float middleX;
-    private float middleY;
     public Boolean expanded;
     private ScheduleFragment scheduleFragment;
     private float deltaX;
@@ -115,8 +117,8 @@ public class EventView extends RelativeLayout {
         int actionBarOffset = dpToPx(48+20);
 
         // Get middle of current event in px
-        middleX = ((this.getLeft() + this.getRight()) / 2) + leftOffset;
-        middleY = ((this.getTop() + this.getBottom()) / 2) - scrollOffset + actionBarOffset;
+        float middleX = ((this.getLeft() + this.getRight()) / 2) + leftOffset;
+        float middleY = ((this.getTop() + this.getBottom()) / 2) - scrollOffset + actionBarOffset;
 
         // Get width and height of screen
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();

@@ -39,6 +39,7 @@
         <item>Nov</item>
         <item>Dec</item>
     </string-array>
+
     <string-array name="days">
         <item>Sun</item>
         <item>Mon</item>
@@ -48,4 +49,5 @@
         <item>Fri</item>
         <item>Sat</item>
     </string-array>
+
 </resources>
