@@ -1,11 +1,11 @@
 # Datanose
-<img src="https://github.com/RickHutten/DataNose/blob/master/Doc/device-2015-01-09-115922.png" width="250" /><img src="https://github.com/RickHutten/DataNose/blob/master/Doc/device-2015-01-29-153153.png" width="250" /><img src="https://github.com/RickHutten/DataNose/blob/master/Doc/device-2015-01-29-134157.png" width="250" />
+<img src="https://github.com/RickHutten/DataNose/blob/master/Doc/device-2015-01-09-115922.png" width="200" /><img src="https://github.com/RickHutten/DataNose/blob/master/Doc/device-2015-01-29-153153.png" width="200" /><img src="https://github.com/RickHutten/DataNose/blob/master/Doc/device-2015-01-29-134157.png" width="200" />
 
 ### App
 The app lets FNWI students quickly acces their schedule. The user has to enter his or her student ID and the app fetches the schedule from https://datanose.nl/. There is also an option avaiable to sync the schedule to the users local calendar.
 
 
-### Copyright
+### Copyright<img src="https://github.com/RickHutten/DataNose/blob/master/app/src/main/res/drawable/datanose_icon_no_border.png" align="right" width="100" />
 DataNose &copy; by Rick Hutten.
 
 DataNose is licensed under a
