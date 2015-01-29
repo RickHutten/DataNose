@@ -2,7 +2,6 @@ package nl.workmoose.datanose;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -22,6 +21,7 @@ import java.util.Arrays;
 
 public class EventView extends RelativeLayout {
 
+    private static final String SHARED_PREF = "prefs";
     private final static int BEGIN_TIME = 0;
     private final static int END_TIME = 1;
     private final static int NAME = 2;
@@ -49,7 +49,7 @@ public class EventView extends RelativeLayout {
 
     public EventView(Context context, ScheduleFragment scheduleFragment) {
         super(context);
-        LayoutInflater  inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         rootView = inflater.inflate(R.layout.event_layout, this, true);
         this.context = context;
         this.scheduleActivity = (ScheduleActivity) context;
@@ -203,14 +203,10 @@ public class EventView extends RelativeLayout {
         this.startAnimation(animationSet);
     }
 
-
-
     private int dpToPx(float dp) {
         // Convert dp into pixels
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getResources().getDisplayMetrics());
         return (int) px;
     }
-
-
 }

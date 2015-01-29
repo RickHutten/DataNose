@@ -1,6 +1,7 @@
 package nl.workmoose.datanose;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -31,9 +32,8 @@ public class SettingsActivity extends ActionBarActivity {
     private RelativeLayout fakeSnackBar;
     private ButtonFlat syncNowButton;
     private CheckBox syncCheckBox;
-    private CheckBox notiCheckBox;
     private Boolean sync_saved;
-    private Boolean notifications_saved;
+    private Boolean settingsChanged = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,19 +45,24 @@ public class SettingsActivity extends ActionBarActivity {
         colorButton = (ButtonRectangle) findViewById(R.id.colorButton);
         syncNowButton = (ButtonFlat) findViewById(R.id.syncNowButton);
         syncCheckBox = (CheckBox) findViewById(R.id.syncCheckBox);
-        notiCheckBox = (CheckBox) findViewById(R.id.notiCheckBox);
 
+        // Get saved settings
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
         agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
         sync_saved = sharedPref.getBoolean("sync_saved", false);
-        notifications_saved = sharedPref.getBoolean("notifications_saved", false);
-        System.out.println("Sync_saved: " +  sync_saved);
-        System.out.println("notifications_saved: " +  notifications_saved);
 
+        // Set checkboxes to saved state
         syncCheckBox.setChecked(sync_saved);
-        notiCheckBox.setChecked(notifications_saved);
 
+        // Set the color background of the colorButton
         colorButton.setBackgroundColor(agendaColor);
+
+        // Set all the onClickListeners
+        setOnClickListeners();
+    }
+
+    private void setOnClickListeners() {
+        // Sets all the onClickListeners in the layout
         colorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,17 +82,6 @@ public class SettingsActivity extends ActionBarActivity {
             @Override
             public void onCheck(boolean isChecked) {
                 if (isChecked != sync_saved) {
-                    showFakeSnackBar();
-                } else {
-                    requestHideFakeSnackBar();
-                }
-            }
-        });
-
-        notiCheckBox.setOncheckListener(new CheckBox.OnCheckListener() {
-            @Override
-            public void onCheck(boolean isChecked) {
-                if (notiCheckBox.isChecked() != notifications_saved) {
                     showFakeSnackBar();
                 } else {
                     requestHideFakeSnackBar();
@@ -115,7 +109,7 @@ public class SettingsActivity extends ActionBarActivity {
 
     private void showFakeSnackBar() {
         // Shows the fake SnackBar to ask the user to sync the calendar
-        if (fakeSnackBar.getVisibility() == View.VISIBLE){
+        if (fakeSnackBar.getVisibility() == View.VISIBLE) {
             return;
         }
         Animation translate = new TranslateAnimation(
@@ -165,9 +159,6 @@ public class SettingsActivity extends ActionBarActivity {
         if (syncCheckBox.isChecked() != sync_saved) {
             return;
         }
-        if (notiCheckBox.isChecked() != notifications_saved) {
-            return;
-        }
         if (agendaColor != sharedPref.getInt("agendaColor", getResources().getColor(R.color.green))) {
             return;
         }
@@ -178,10 +169,11 @@ public class SettingsActivity extends ActionBarActivity {
     private void saveCurrentSettings() {
         // Set the values for this current setting
         sync_saved = syncCheckBox.isChecked();
-        notifications_saved = notiCheckBox.isChecked();
         sharedPref.edit().putBoolean("sync_saved", sync_saved).apply();
-        sharedPref.edit().putBoolean("notifications_saved", notifications_saved).apply();
         sharedPref.edit().putInt("agendaColor", agendaColor).apply();
+
+        // Set boolean that the settings have changed in this activity
+        settingsChanged = true;
     }
 
     private void setButtonTextColor() {
@@ -212,5 +204,20 @@ public class SettingsActivity extends ActionBarActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (settingsChanged) {
+            // The settings have changed, sync the timetable with the current settings
+            System.out.println("Sync calendar...");
+            startService(new Intent(this, SyncCalendarService.class));
+        }
     }
 }

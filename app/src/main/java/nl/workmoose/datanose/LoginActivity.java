@@ -79,6 +79,7 @@ public class LoginActivity extends Activity {
         idInput.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
+
                 // If the user presses on enter
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
                     idEntered();
@@ -90,7 +91,6 @@ public class LoginActivity extends Activity {
 
         // Set onClickListener to ok button
         okButton = (ButtonFlat) findViewById(R.id.okButton);
-        //okButton.setTextSize(25f);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -187,5 +187,11 @@ public class LoginActivity extends Activity {
         if (enableBack) {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        System.out.println("onDestroy in LoginActivity");
     }
 }

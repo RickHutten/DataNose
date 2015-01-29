@@ -293,4 +293,10 @@ public class ScheduleActivity extends ActionBarActivity {
             return 365;
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        System.out.println("onDestroy in ScheduleActivity");
+    }
 }

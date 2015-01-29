@@ -37,6 +37,7 @@ public class ScheduleFragment extends Fragment {
     private RelativeLayout scheduleView;
     private ViewGroup rootView;
     public EventView expandedEvent;
+    private ArrayList<EventView> eventsToday = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,7 +80,6 @@ public class ScheduleFragment extends Fragment {
         // Set the left bar where the times are located
         // and adds horizontal lines every hour
         setEmptySchedule();
-        //drawTimeLine();
 
         return rootView;
     }
