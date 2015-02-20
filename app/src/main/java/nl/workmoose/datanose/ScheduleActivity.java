@@ -65,8 +65,17 @@ import java.util.Calendar;
         calendarNow.setFirstDayOfWeek(Calendar.MONDAY);
         calendarNow.setMinimalDaysInFirstWeek(4);
 
+        // This line fixes a bug in the calendar API.
+        // If this is not done, on sundays, the calendar will think it is NEXT week sunday
+        calendarNow.set(Calendar.YEAR, calendarNow.get(Calendar.YEAR));
+
         // Calculate current academic day
         currentAcademicDay = calculateAcademicDay(calendarNow);
+
+        if (calendarNow.get(Calendar.HOUR_OF_DAY) == 0) {
+            // This fixes another bug if the time is between 00:00 and 01:00 o'clock
+            currentAcademicDay++;
+        }
 
         //Instantiate a ViewPager and a PagerAdapter.
         viewPager = (ViewPager) findViewById(R.id.pager);
@@ -77,8 +86,8 @@ import java.util.Calendar;
 
     /**
      * Calculate the academic dat given a calendar object
-     * @param calendar: calendar of to calculate
-     * @return: integer that represents the academic day
+     * @param calendar: calendar object of day to calculate
+     * @return int: integer that represents the academic day
      */
     private int calculateAcademicDay(Calendar calendar) {
 
@@ -116,7 +125,7 @@ import java.util.Calendar;
 
     /**
      * Calculates the current academic year
-     * @return: int representing the academic year
+     * @return int: int representing the academic year
      */
     private int getAcademicYear() {
 
@@ -209,7 +218,7 @@ import java.util.Calendar;
      * Returns the events that occur on the date given the time in milliseconds.
      * Loops through the whole events list
      * @param milliseconds: date given in milliseconds of where you want the events from
-     * @return: ArrayList containing the events on the given date
+     * @return ArrayList: ArrayList containing the events on the given date
      */
     public ArrayList<ArrayList<String>> getEventsOnDate(long milliseconds) {
         ArrayList<ArrayList<String>> events = new ArrayList<>();
@@ -256,6 +265,13 @@ import java.util.Calendar;
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_schedule, menu);
 
+        // Set the correct number in the today menu button
+        setTodayButton(menu);
+
+        return true;
+    }
+
+    private void setTodayButton(Menu menu) {
         // Get menu item that needs to be edited
         MenuItem toTodayMenu = menu.findItem(R.id.to_today);
         Drawable iconDrawable = toTodayMenu.getIcon();
@@ -281,7 +297,6 @@ import java.util.Calendar;
 
         // Set the new icon to the button
         toTodayMenu.setIcon(newIcon);
-        return true;
     }
 
     @Override
@@ -297,12 +312,19 @@ import java.util.Calendar;
                 break;
             case R.id.sign_out:
                 // The user logs out, the events in the calendar have to be deleted
-                sharedPref.edit().putBoolean("sync_saved", false).commit();
-                sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green)).commit();
-                System.out.println("Deleting items from calendar...");
-                startService(new Intent(getApplicationContext(), SyncCalendarService.class));
+                Boolean synced = sharedPref.getBoolean("sync_saved", false);
 
-                sharedPref.edit().putBoolean("signed_in", false).commit();
+                if (synced) {
+                    // Delete the items from the users agenda
+                    sharedPref.edit().putBoolean("sync_saved", false).apply();
+                    System.out.println("Deleting items from calendar...");
+                    startService(new Intent(getApplicationContext(), SyncCalendarService.class));
+                } else {
+                    System.out.println("Agenda not synced, don't delete items.");
+                }
+
+                sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green)).apply();
+                sharedPref.edit().putBoolean("signed_in", false).apply();
                 // Exit current activity, go back to LoginActivity
                 this.finish();
                 overridePendingTransition(R.anim.do_nothing, R.anim.slide_down);
@@ -337,7 +359,7 @@ import java.util.Calendar;
     /**
      * Convert the size of dp in pixels
      * @param dp: dp to convert into pixels
-     * @return: the size of dp converted into pixels
+     * @return px: the size of dp converted into pixels
      */
     private int dpToPx(float dp) {
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,

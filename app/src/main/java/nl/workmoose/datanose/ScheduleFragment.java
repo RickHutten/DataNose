@@ -329,7 +329,7 @@ import java.util.TimeZone;
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
-        if (hour > 21 || hour < 8) {
+        if (hour >= 21 || hour < 8) {
             // The timeLine falls out of the view
             return;
         }

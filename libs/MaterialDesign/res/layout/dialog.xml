@@ -66,8 +66,8 @@
                 android:id="@+id/button_accept"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Accept"
-                android:textColor="#1E88E5" />
+                android:text="Continue"
+                android:textColor="#3399FF" />
         </LinearLayout>
     </RelativeLayout>
 

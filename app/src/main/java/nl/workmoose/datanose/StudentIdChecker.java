@@ -5,7 +5,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.view.View;
 
+import com.gc.materialdesign.widgets.Dialog;
 import com.gc.materialdesign.widgets.SnackBar;
 
 import java.net.HttpURLConnection;
@@ -30,10 +32,21 @@ import java.net.URL;
         String msg;
         studentId = params[0];
         if (hasInternetConnection(context)) {
-            if (validStudentNumber(studentId)) {
+            String urlStart =
+                    "http://content.datanose.nl/Timetable.svc/GetCoursesByStudent?id=";
+            String urlString = urlStart + studentId;
+            if (validURL(urlString)) {
                 msg = "Correct";
             } else {
-                msg = context.getString(R.string.invalid_student_id);
+                // Something went wrong
+                // Check whether ODATA stream is available
+                urlString = "http://content.datanose.nl/Timetable.svc";
+                if (validURL(urlString)) {
+                    // The stream is available, so the previous studentId is incorrect
+                    msg = context.getString(R.string.invalid_student_id);
+                } else {
+                    msg = "ODATA error";
+                }
             }
         } else {
             msg = context.getString(R.string.no_internet_connection);
@@ -48,18 +61,54 @@ import java.net.URL;
         if (result.equals("Correct")) {
             DownloadIcs downloadIcs = new DownloadIcs(context);
             downloadIcs.execute(studentId);
+        } else if (result.equals("ODATA error")) {
+            // Called when ODATA is down, show dialog if the user wants to continue
+            // whithout checking the given student ID.
+            showDialog();
         } else {
-            new SnackBar((Activity) context, result).show();
+            new SnackBar((LoginActivity) context, result).show();
             LoginActivity loginActivity = (LoginActivity) context;
             loginActivity.backToBeginning();
         }
     }
 
-    private Boolean validStudentNumber(String studentId) {
-        final String CHECK_URL =
-                "http://content.datanose.nl/Timetable.svc/GetCoursesByStudent?id=";
+    private void showDialog() {
+        Dialog dialog = new Dialog(context, context.getString(R.string.odata_down_title),
+                context.getString(R.string.odata_down_message),
+                context.getString(R.string.button_cancel),
+                context.getString(R.string.button_continue));
+
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+
+        // Set listener for the continue button
+        dialog.setOnAcceptButtonClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DownloadIcs downloadIcs = new DownloadIcs(context);
+                downloadIcs.execute(studentId);
+            }
+        });
+
+        // Set listener for the cancel button
+        dialog.setOnCancelButtonClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LoginActivity loginActivity = (LoginActivity) context;
+                loginActivity.backToBeginning();
+            }
+        });
+
+        // Tell the LoginActivity that this is the dialog
+        ((LoginActivity) context).dialog = dialog;
+
+        // Show the dialog
+        dialog.show();
+    }
+
+    private Boolean validURL(String urlString) {
         try {
-            URL url = new URL(CHECK_URL + studentId);
+            URL url = new URL(urlString);
             HttpURLConnection conn =  (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             return (conn.getResponseCode() == HttpURLConnection.HTTP_OK);

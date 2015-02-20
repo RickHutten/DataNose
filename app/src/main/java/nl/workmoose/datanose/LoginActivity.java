@@ -18,6 +18,7 @@ import android.widget.EditText;
 
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
+import com.gc.materialdesign.widgets.Dialog;
 import com.gc.materialdesign.widgets.SnackBar;
 
 /**
@@ -44,6 +45,7 @@ import com.gc.materialdesign.widgets.SnackBar;
     private int screen_height;
     private final Context context = this;
     private SharedPreferences sharedPref;
+    public Dialog dialog;
 
     /**
      * If the activity is called with the intent "EXIT" = true, the event will quit. This happens
@@ -234,6 +236,10 @@ import com.gc.materialdesign.widgets.SnackBar;
         super.onResume();
         if (!created) {  // Only run when activity is not created
             backToBeginning();
+            if (dialog != null) {
+                dialog.dismiss();
+                dialog = null;
+            }
         }
         created = false;
     }

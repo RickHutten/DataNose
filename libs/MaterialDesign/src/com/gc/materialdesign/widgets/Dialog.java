@@ -24,6 +24,8 @@ public class Dialog extends android.app.Dialog{
 	TextView messageTextView;
 	String title;
 	TextView titleTextView;
+    String cancelText;
+    String acceptText;
 	
 	ButtonFlat buttonAccept;
 	ButtonFlat buttonCancel;
@@ -32,11 +34,13 @@ public class Dialog extends android.app.Dialog{
 	View.OnClickListener onCancelButtonClickListener;
 	
 
-	public Dialog(Context context,String title, String message) {
+	public Dialog(Context context,String title, String message, String cancelText, String acceptText) {
 		super(context, android.R.style.Theme_Translucent);
 		this.context = context;// init Context
 		this.message = message;
 		this.title = title;
+        this.cancelText = cancelText;
+        this.acceptText = acceptText;
 	}
 	
 	@Override
@@ -44,22 +48,9 @@ public class Dialog extends android.app.Dialog{
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.dialog);
-	    
+
 		view = (RelativeLayout)findViewById(R.id.contentDialog);
 		backView = (RelativeLayout)findViewById(R.id.dialog_rootView);
-		backView.setOnTouchListener(new OnTouchListener() {
-			
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getX() < view.getLeft() 
-						|| event.getX() >view.getRight()
-						|| event.getY() > view.getBottom() 
-						|| event.getY() < view.getTop()) {
-					dismiss();
-				}
-				return false;
-			}
-		});
 		
 	    this.titleTextView = (TextView) findViewById(R.id.title);
 	    setTitle(title);
@@ -68,6 +59,7 @@ public class Dialog extends android.app.Dialog{
 	    setMessage(message);
 	    
 	    this.buttonAccept = (ButtonFlat) findViewById(R.id.button_accept);
+        buttonAccept.setText(acceptText);
 	    buttonAccept.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -77,6 +69,7 @@ public class Dialog extends android.app.Dialog{
 			}
 		});
 	    this.buttonCancel = (ButtonFlat) findViewById(R.id.button_cancel);
+        buttonCancel.setText(cancelText);
     	buttonCancel.setOnClickListener(new View.OnClickListener() {
     		
 			@Override
