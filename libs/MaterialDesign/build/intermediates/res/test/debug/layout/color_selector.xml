@@ -47,8 +47,7 @@
                     android:layout_height="wrap_content"
                     android:background="#4D4D4D"
                     materialdesign:max="255"
-                    materialdesign:min="0"
-                    materialdesign:showNumberIndicator="true" />
+                    materialdesign:min="0" />
             </LinearLayout>
 
             <LinearLayout
@@ -72,8 +71,7 @@
                     android:layout_height="wrap_content"
                     android:background="#4D4D4D"
                     materialdesign:max="255"
-                    materialdesign:min="0"
-                    materialdesign:showNumberIndicator="true" />
+                    materialdesign:min="0" />
             </LinearLayout>
 
             <LinearLayout
@@ -97,8 +95,7 @@
                     android:layout_height="wrap_content"
                     android:background="#4D4D4D"
                     materialdesign:max="255"
-                    materialdesign:min="0"
-                    materialdesign:showNumberIndicator="true" />
+                    materialdesign:min="0" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
