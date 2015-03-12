@@ -20,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Calendar;
 
 /**
  * Rick Hutten
@@ -94,15 +95,22 @@ import java.net.UnknownHostException;
         System.out.println("downloadIcs result: " + result);
 
         if (result.equals("File downloaded")) {
+            // Get calendar instance for this time
+            Calendar now = Calendar.getInstance();
 
             // Save correct student ID to sharedPreferences
             SharedPreferences s = context.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
             s.edit().putString("studentId", studentId).apply();
             System.out.println("Currently logged in: " + studentId);
 
+            // Save the time the last iCal was downloaded
+            s.edit().putLong("lastDownloaded", now.getTimeInMillis()).apply();
+
             //  Start Schedul1eActivity
+            System.out.println("Done downloading, start new ScheduleActivity");
             Intent i = new Intent(context, ScheduleActivity.class);
-            LoginActivity currentActivity = (LoginActivity) context;
+            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Activity currentActivity = (Activity) context;
             currentActivity.startActivity(i);
             currentActivity.overridePendingTransition(R.anim.slide_up, R.anim.do_nothing);
 

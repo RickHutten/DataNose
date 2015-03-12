@@ -46,3 +46,5 @@ Temporary Items
 libs/MaterialDesign/build
 gradle
 .gradle
+*.bin
+.idea/workspace.xml

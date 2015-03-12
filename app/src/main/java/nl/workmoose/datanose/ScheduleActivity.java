@@ -16,6 +16,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog;
 import com.gc.materialdesign.widgets.SnackBar;
@@ -34,6 +35,7 @@ import java.util.Calendar;
 
     private static final String SHARED_PREF = "prefs";
     private static final int BEGIN_TIME = 0;
+    private static final long REFRESH_INTERVAL = 1000*2;//60*60*24; // Time in milliseconds
 
     private ViewPager viewPager;
     private ArrayList<ArrayList<String>> eventList;
@@ -41,6 +43,7 @@ import java.util.Calendar;
     private SharedPreferences sharedPref;
     private int currentAcademicDay;
     private ScheduleActivity scheduleActivity;
+    private boolean isRefreshing = false;
 
     /**
      * Calls ParseIcs to parse the file. Than calculates the day of the year and sets
@@ -82,6 +85,8 @@ import java.util.Calendar;
         PagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(currentAcademicDay);
+
+        checkForNewVersion();
     }
 
     /**
@@ -257,6 +262,41 @@ import java.util.Calendar;
     }
 
     /**
+     * Checks if the app needs to refresh and refreshes accordingly by calling DownloadIcs.execute()
+     */
+    public void checkForNewVersion() {
+        if (isRefreshing) {
+            System.out.println("Already refreshing");
+            return;
+        }
+        isRefreshing = true;
+        if (sharedPref.contains("lastDownloaded")) {
+            // Get last saved iCal date
+            long lastDownloaded = sharedPref.getLong("lastDownloaded", 0);
+
+            // Get the current time in millis
+            long nowMillis = Calendar.getInstance().getTimeInMillis();
+            if (nowMillis - lastDownloaded > REFRESH_INTERVAL) {
+                // Get the current signed in student ID
+                String studentId = sharedPref.getString("studentId", "");
+
+                // Get the refreshing container
+                View refreshingContainer = findViewById(R.id.refreshContainer);
+                refreshingContainer.setVisibility(View.VISIBLE);
+
+                // If the iCal is downloaded more than 24 hours ago
+                System.out.println("Downloading new iCalendar file.");
+                DownloadIcs downloadIcs = new DownloadIcs(this);
+                downloadIcs.execute(studentId);
+            } else {
+                // The iCal is downloaded less than 24 hours ago
+                System.out.println("Don't download new iCal file.");
+                isRefreshing = false;
+            }
+        }
+    }
+
+    /**
      * Alters a drawable so that an icon in the actionbar shows the current day of the month
      * as a number in the center of the image
      */
@@ -354,6 +394,15 @@ import java.util.Calendar;
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("EXIT", true);
         startActivity(intent);
+    }
+
+    /**
+     * Refreshes if the application is resumed
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        checkForNewVersion();
     }
 
     /**
