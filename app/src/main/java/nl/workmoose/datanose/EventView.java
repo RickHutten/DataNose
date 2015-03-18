@@ -2,6 +2,8 @@ package nl.workmoose.datanose;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -62,8 +64,10 @@ import java.util.Arrays;
 
         // Inflate layout from XML file
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        rootView = inflater.inflate(R.layout.event_layout, this, true);
+        rootView = inflater.inflate(R.layout.event_layout, this, false);
+        addView(rootView);
         this.context = context;
+
         this.scheduleActivity = (ScheduleActivity) context;
         this.scheduleFragment = scheduleFragment;
     }
@@ -137,6 +141,19 @@ import java.util.Arrays;
                 animateToCenter();
             }
         });
+    }
+
+    public void setColor() {
+        LayerDrawable backgroundDrawable = (LayerDrawable) rootView.getBackground();
+
+        final GradientDrawable shape = (GradientDrawable)
+                backgroundDrawable.findDrawableByLayerId(R.id.event_background_color);
+
+        if (type.equalsIgnoreCase("tentamen") || type.equalsIgnoreCase("hertentamen")) {
+            shape.setColor(context.getResources().getColor(R.color.lavender));
+        } else {
+            shape.setColor(context.getResources().getColor(R.color.green));
+        }
     }
 
     /**

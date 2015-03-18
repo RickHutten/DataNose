@@ -56,7 +56,7 @@ import com.gc.materialdesign.widgets.ColorSelector;
         // Get saved settings
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
         agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
-        sync_saved = sharedPref.getBoolean("sync_saved", false);
+        sync_saved = sharedPref.getBoolean("syncSaved", false);
 
         // Set checkboxes to saved state
         syncCheckBox.setChecked(sync_saved);
@@ -206,8 +206,13 @@ import com.gc.materialdesign.widgets.ColorSelector;
             // Not the same values
             return;
         }
-        if (agendaColor != sharedPref.getInt("agendaColor", getResources().getColor(R.color.green))) {
-            // Not the same values
+        int savedColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
+        if (agendaColor != savedColor) {
+            // The colors are not the same
+            if (!sync_saved && syncCheckBox.isChecked() == sync_saved){
+                // If you changed the color and you don't want to sync
+                hideFakeSnackBar();
+            }
             return;
         }
         // All the values are the same, hide fakeSnackBar
@@ -222,7 +227,7 @@ import com.gc.materialdesign.widgets.ColorSelector;
         settingsChanged = true;
 
         // Save to sharedPreferences
-        sharedPref.edit().putBoolean("sync_saved", sync_saved).apply();
+        sharedPref.edit().putBoolean("syncSaved", sync_saved).apply();
         sharedPref.edit().putInt("agendaColor", agendaColor).apply();
     }
 

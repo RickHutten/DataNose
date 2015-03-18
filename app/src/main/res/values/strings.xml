@@ -9,7 +9,7 @@
     <string name="timeout">Connection timed out</string>
     <string name="connection_error">Failed to connect to server</string>
     <string name="file_not_fount">No schedule found</string>
-    <string name="location_unknown">Location unknown</string>
+    <string name="location_unknown">Locatie onbekend</string>
     <string name="unknown_host">Unable to resolve host</string>
     <string name="unknown_error"> An unknown error occurred</string>
     <string name="action_settings">Settings</string>
@@ -29,6 +29,7 @@
     <string name="button_cancel">Cancel</string>
     <string name="button_continue">Continue</string>
     <string name="refreshing">Refreshing</string>
+    <string name="refresh">Refresh now</string>
 
     <string-array name="months">
         <item>Jan</item>

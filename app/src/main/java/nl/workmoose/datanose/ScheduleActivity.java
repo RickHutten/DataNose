@@ -35,7 +35,7 @@ import java.util.Calendar;
 
     private static final String SHARED_PREF = "prefs";
     private static final int BEGIN_TIME = 0;
-    private static final long REFRESH_INTERVAL = 1000*2;//60*60*24; // Time in milliseconds
+    private static final long REFRESH_INTERVAL = 1000*60*60*24; // Interval in milliseconds
 
     private ViewPager viewPager;
     private ArrayList<ArrayList<String>> eventList;
@@ -61,7 +61,7 @@ import java.util.Calendar;
 
         // Set that the user is signed in
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
-        sharedPref.edit().putBoolean("signed_in", true).apply();
+        sharedPref.edit().putBoolean("signedIn", true).apply();
 
         // Setup calendar
         Calendar calendarNow = Calendar.getInstance();
@@ -86,7 +86,7 @@ import java.util.Calendar;
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(currentAcademicDay);
 
-        checkForNewVersion();
+        checkForNewVersion(false);
     }
 
     /**
@@ -263,8 +263,9 @@ import java.util.Calendar;
 
     /**
      * Checks if the app needs to refresh and refreshes accordingly by calling DownloadIcs.execute()
+     * @param force: Whether to force the app to refresh or not
      */
-    public void checkForNewVersion() {
+    public void checkForNewVersion(Boolean force) {
         if (isRefreshing) {
             System.out.println("Already refreshing");
             return;
@@ -276,7 +277,7 @@ import java.util.Calendar;
 
             // Get the current time in millis
             long nowMillis = Calendar.getInstance().getTimeInMillis();
-            if (nowMillis - lastDownloaded > REFRESH_INTERVAL) {
+            if (nowMillis - lastDownloaded > REFRESH_INTERVAL || force) {
                 // Get the current signed in student ID
                 String studentId = sharedPref.getString("studentId", "");
 
@@ -352,11 +353,11 @@ import java.util.Calendar;
                 break;
             case R.id.sign_out:
                 // The user logs out, the events in the calendar have to be deleted
-                Boolean synced = sharedPref.getBoolean("sync_saved", false);
+                Boolean synced = sharedPref.getBoolean("syncSaved", false);
 
                 if (synced) {
                     // Delete the items from the users agenda
-                    sharedPref.edit().putBoolean("sync_saved", false).apply();
+                    sharedPref.edit().putBoolean("syncSaved", false).apply();
                     System.out.println("Deleting items from calendar...");
                     startService(new Intent(getApplicationContext(), SyncCalendarService.class));
                 } else {
@@ -364,7 +365,7 @@ import java.util.Calendar;
                 }
 
                 sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green)).apply();
-                sharedPref.edit().putBoolean("signed_in", false).apply();
+                sharedPref.edit().putBoolean("signedIn", false).apply();
                 // Exit current activity, go back to LoginActivity
                 this.finish();
                 overridePendingTransition(R.anim.do_nothing, R.anim.slide_down);
@@ -376,6 +377,10 @@ import java.util.Calendar;
             case R.id.to_today:
                 // Set the ViewPager to today
                 viewPager.setCurrentItem(currentAcademicDay, true);
+                break;
+            case R.id.refresh:
+                // Force refresh the iCal file
+                checkForNewVersion(true);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -402,7 +407,7 @@ import java.util.Calendar;
     @Override
     public void onResume() {
         super.onResume();
-        checkForNewVersion();
+        checkForNewVersion(false);
     }
 
     /**

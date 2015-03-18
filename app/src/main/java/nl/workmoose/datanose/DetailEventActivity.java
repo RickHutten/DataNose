@@ -1,6 +1,8 @@
 package nl.workmoose.datanose;
 
 import android.app.Activity;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -57,6 +59,7 @@ import android.widget.TextView;
         uberParent.setOnClickListener(dismissListener);
 
         // Get views from layout
+        View detailContainer = findViewById(R.id.detailContainer);
         TextView titleText = (TextView) findViewById(R.id.title);
         TextView typeText = (TextView) findViewById(R.id.type);
         TextView timeText = (TextView) findViewById(R.id.time);
@@ -69,5 +72,17 @@ import android.widget.TextView;
         timeText.setText(beginTime + " - " + endTime);
         teacherText.setText(teacher);
         locationText.setText(location);
+
+        // Set the background color of the view
+        LayerDrawable backgroundDrawable = (LayerDrawable) detailContainer.getBackground();
+
+        final GradientDrawable shape = (GradientDrawable)
+                backgroundDrawable.findDrawableByLayerId(R.id.event_background_color);
+
+        if (type.equalsIgnoreCase("tentamen") || type.equalsIgnoreCase("hertentamen")) {
+            shape.setColor(getResources().getColor(R.color.lavender));
+        } else {
+            shape.setColor(getResources().getColor(R.color.green));
+        }
     }
 }

@@ -69,7 +69,7 @@ import com.gc.materialdesign.widgets.SnackBar;
         }
         // Check whether the user is signed in or not
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
-        Boolean signedIn = sharedPref.getBoolean("signed_in", false);
+        Boolean signedIn = sharedPref.getBoolean("signedIn", false);
         if (signedIn) {
             // If the user is signed in, go to ScheduleActivity
             if (sharedPref.contains("studentId")) {

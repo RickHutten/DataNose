@@ -290,6 +290,8 @@ import java.util.TimeZone;
                     // Add view to parent
                     scheduleView.addView(eventView);
 
+                    eventView.setColor();
+
                     // Add to removed events
                     removedEvents.add(event);
                 }

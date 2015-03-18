@@ -18,6 +18,10 @@
         android:title="@string/action_settings"
         app:showAsAction="ifRoom"/>
 
+    <item android:id="@+id/refresh"
+        android:title="@string/refresh"
+        app:showAsAction="never" />
+
     <item android:id="@+id/sign_out"
         android:icon="@drawable/sign_out"
         android:title="@string/sign_out"
