@@ -39,6 +39,7 @@ public class SyncCalendarService extends Service {
     private final static int TEACHER = 4;
     private final static int UID = 5;
     private int notifId;
+    private SharedPreferences sharedPref;
 
     public SyncCalendarService() {}
 
@@ -49,11 +50,13 @@ public class SyncCalendarService extends Service {
         notifId = 1;
         final Context context = this;
 
+        sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
+        sharedPref.edit().putBoolean("isSyncing", true).apply();
+
         // Make new thread to run service in background, prevent the UI thread to freeze
         final Thread t = new Thread() {
             @Override
             public void run() {
-
                 // Set nofitication to keep task runnen even when application is closed
                 if (Build.VERSION.SDK_INT < 16) {
                     startForeground(notifId, new Notification.Builder(context).getNotification());
@@ -78,10 +81,17 @@ public class SyncCalendarService extends Service {
         CharSequence title = getText(R.string.app_name);
 
         // Make new notification
-        return new Notification.Builder(this)
-                .setContentTitle(title)
-                .setContentText("Updating calendar")
-                .setSmallIcon(R.drawable.datanose_icon_no_border);
+        if (isVisible() && !sharedPref.getBoolean("refreshing", false)) {
+            return new Notification.Builder(this)
+                    .setContentTitle(title)
+                    .setContentText("Updating calendar")
+                    .setSmallIcon(R.drawable.datanose_icon_2);
+        } else {
+            return new Notification.Builder(this)
+                    .setContentTitle(title)
+                    .setContentText("Deleting calendar")
+                    .setSmallIcon(R.drawable.datanose_icon_2);
+        }
     }
 
     /**
@@ -143,6 +153,19 @@ public class SyncCalendarService extends Service {
             e.printStackTrace();
             System.out.println("Sync result: SYNC ERROR");
         }
+
+        if (sharedPref.getBoolean("refreshing", false)) {
+            // If this sync operation is called for refreshing
+
+            // Change the entry for "refreshing" so that the next time it will skip this step
+            sharedPref.edit().putBoolean("refreshing", false).apply();
+
+            // Call the syncing process again, now it will read the new downloaded file
+            startSync();
+        }
+
+        sharedPref.edit().putBoolean("isSyncing", false).apply();
+
         // Stop service, otherwise it will repeat itself
         stopSelf();
     }
@@ -240,7 +263,7 @@ public class SyncCalendarService extends Service {
         ContentResolver cr = getContentResolver();
         ContentValues values = new ContentValues();
 
-        if (isVisible()) {
+        if (isVisible() && !sharedPref.getBoolean("refreshing", false)) {
             // Set event data
             values.put(CalendarContract.Events.DTSTART, start);
             values.put(CalendarContract.Events.DTEND, stop);
@@ -252,6 +275,7 @@ public class SyncCalendarService extends Service {
             values.put(CalendarContract.Events._ID, id);
             values.put(CalendarContract.Events.EVENT_TIMEZONE, "Europe/Amsterdam");
         } else {
+            // Remove the event
             // I do not have the permission to set the visibility,
             // so that's why I set every value to null or -1
             // because now the event is not shown
@@ -355,7 +379,6 @@ public class SyncCalendarService extends Service {
      */
     private int getColor() {
         // Returns the color value saved in sharedPreferences
-        SharedPreferences sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
         return sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
     }
 
@@ -365,7 +388,6 @@ public class SyncCalendarService extends Service {
      */
     private Boolean isVisible() {
         // Returns the boolean whether the user wants to sync his/her account
-        SharedPreferences sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
-        return sharedPref.getBoolean("sync_saved", true);
+        return sharedPref.getBoolean("syncSaved", true);
     }
 }

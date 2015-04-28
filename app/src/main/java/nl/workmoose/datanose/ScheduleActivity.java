@@ -43,7 +43,7 @@ import java.util.Calendar;
     private SharedPreferences sharedPref;
     private int currentAcademicDay;
     private ScheduleActivity scheduleActivity;
-    private boolean isRefreshing = false;
+    public boolean isRefreshing = false;
 
     /**
      * Calls ParseIcs to parse the file. Than calculates the day of the year and sets
@@ -263,9 +263,9 @@ import java.util.Calendar;
 
     /**
      * Checks if the app needs to refresh and refreshes accordingly by calling DownloadIcs.execute()
-     * @param force: Whether to force the app to refresh or not
+     * @param forceRefresh: Whether to force the app to refresh or not
      */
-    public void checkForNewVersion(Boolean force) {
+    public void checkForNewVersion(Boolean forceRefresh) {
         if (isRefreshing) {
             System.out.println("Already refreshing");
             return;
@@ -277,7 +277,9 @@ import java.util.Calendar;
 
             // Get the current time in millis
             long nowMillis = Calendar.getInstance().getTimeInMillis();
-            if (nowMillis - lastDownloaded > REFRESH_INTERVAL || force) {
+            if (nowMillis - lastDownloaded > REFRESH_INTERVAL || forceRefresh) {
+                // Refresh if the iCal is downloaded more than REFRESH_INTERVAL ago
+
                 // Get the current signed in student ID
                 String studentId = sharedPref.getString("studentId", "");
 
@@ -285,7 +287,17 @@ import java.util.Calendar;
                 View refreshingContainer = findViewById(R.id.refreshContainer);
                 refreshingContainer.setVisibility(View.VISIBLE);
 
-                // If the iCal is downloaded more than 24 hours ago
+                if (sharedPref.getBoolean("syncSaved", false)) {
+                    // Firstly, remove the old items in the current calendar
+                    // and set the events for the new iCal file
+                    System.out.println("Deleting items from calendar for sync...");
+                    sharedPref.edit().putBoolean("refreshing", true).commit();
+                    startService(new Intent(getApplicationContext(), SyncCalendarService.class));
+                }
+
+
+                // Download the iCalendar file again. DownloadIcs will create
+                // a new scheduleActivity.
                 System.out.println("Downloading new iCalendar file.");
                 DownloadIcs downloadIcs = new DownloadIcs(this);
                 downloadIcs.execute(studentId);
@@ -294,6 +306,10 @@ import java.util.Calendar;
                 System.out.println("Don't download new iCal file.");
                 isRefreshing = false;
             }
+        } else {
+            // If sharedPreferences doesn't contain "lastDownloaded",
+            // but this isn't supposed to happen.
+            isRefreshing = false;
         }
     }
 
@@ -340,6 +356,28 @@ import java.util.Calendar;
         toTodayMenu.setIcon(newIcon);
     }
 
+    /**
+     * The user logs out, the events in the calendar have to be deleted
+     */
+    private void signOut() {
+        Boolean synced = sharedPref.getBoolean("syncSaved", false);
+
+        if (synced) {
+            // Delete the items from the users agenda
+            sharedPref.edit().putBoolean("syncSaved", false).apply();
+            System.out.println("Deleting items from calendar...");
+            startService(new Intent(getApplicationContext(), SyncCalendarService.class));
+        } else {
+            System.out.println("Agenda not synced, don't delete items.");
+        }
+
+        sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green)).apply();
+        sharedPref.edit().putBoolean("signedIn", false).apply();
+        // Exit current activity, go back to LoginActivity
+        this.finish();
+        overridePendingTransition(R.anim.do_nothing, R.anim.slide_down);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -347,28 +385,27 @@ import java.util.Calendar;
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_settings:
-                // Start SettingsActivity
-                Intent i = new Intent(this, SettingsActivity.class);
-                startActivity(i);
+                // Check if the system is syncing at the moment
+                if (sharedPref.getBoolean("isSyncing", false)) {
+                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
+                } else if (isRefreshing) {
+                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
+                } else {
+                    // If the system is not syncing at the moment, start SettingsActivity
+                    Intent i = new Intent(this, SettingsActivity.class);
+                    startActivity(i);
+                }
                 break;
             case R.id.sign_out:
-                // The user logs out, the events in the calendar have to be deleted
-                Boolean synced = sharedPref.getBoolean("syncSaved", false);
-
-                if (synced) {
-                    // Delete the items from the users agenda
-                    sharedPref.edit().putBoolean("syncSaved", false).apply();
-                    System.out.println("Deleting items from calendar...");
-                    startService(new Intent(getApplicationContext(), SyncCalendarService.class));
+                // Check if the system is syncing at the moment
+                if (sharedPref.getBoolean("isSyncing", false)) {
+                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
+                } else if (isRefreshing) {
+                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
                 } else {
-                    System.out.println("Agenda not synced, don't delete items.");
+                    // If the system is not syncing at the moment, sign out
+                    signOut();
                 }
-
-                sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green)).apply();
-                sharedPref.edit().putBoolean("signedIn", false).apply();
-                // Exit current activity, go back to LoginActivity
-                this.finish();
-                overridePendingTransition(R.anim.do_nothing, R.anim.slide_down);
                 break;
             case R.id.to_date:
                 // Show the DatePickerDialog
@@ -379,8 +416,15 @@ import java.util.Calendar;
                 viewPager.setCurrentItem(currentAcademicDay, true);
                 break;
             case R.id.refresh:
-                // Force refresh the iCal file
-                checkForNewVersion(true);
+                // Check if the system is syncing at the moment
+                if (sharedPref.getBoolean("isSyncing", false)) {
+                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
+                } else if (isRefreshing) {
+                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
+                } else {
+                    // If the system is not syncing at the moment, force refresh the iCal file
+                    checkForNewVersion(true);
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);

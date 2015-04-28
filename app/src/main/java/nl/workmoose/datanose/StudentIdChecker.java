@@ -111,7 +111,11 @@ import java.net.URL;
             URL url = new URL(urlString);
             HttpURLConnection conn =  (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            return (conn.getResponseCode() == HttpURLConnection.HTTP_OK);
+            System.out.println("Checking URL: " + urlString);
+            System.out.println("Response code: " + conn.getResponseCode());
+
+            // Response code "307" if for the url "http://content.datanose.nl/Timetable.svc"
+            return (conn.getResponseCode() == HttpURLConnection.HTTP_OK || conn.getResponseCode() == 307);
         } catch (Exception e) {
             e.printStackTrace();
         }

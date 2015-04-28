@@ -223,6 +223,22 @@ import com.gc.materialdesign.widgets.SnackBar;
         slideIn.setDuration(ANIMATION_DURATION);
         slideIn.setFillAfter(true);
 
+        // Set animation listener
+        slideIn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(idInput, InputMethodManager.SHOW_IMPLICIT);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+        });
+
+
         // Set animation
         inputContainer.setAnimation(slideIn);
 

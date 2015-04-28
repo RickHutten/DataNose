@@ -30,6 +30,8 @@
     <string name="button_continue">Continue</string>
     <string name="refreshing">Refreshing</string>
     <string name="refresh">Refresh now</string>
+    <string name="busy_syncing">Please wait until the sync operation is finished</string>
+    <string name="busy_refreshing">Please wait while the app is refreshing</string>
 
     <string-array name="months">
         <item>Jan</item>

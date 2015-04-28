@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Check kleur naam op: http://hex-color.com/code/70C78B -->
     <color name="black">#000</color>
-    <color name="dark_gray">#333333</color>
-    <color name="gray">#ddd</color>
+    <color name="dark_gray">#333333</color> <!-- DarkSlateGray -->
+    <color name="gray">#ddd</color> <!-- Gainsboro -->
     <color name="white">#fff</color>
-    <color name="transparent">#00000000</color>
-    <color name="blue">#3399FF</color>
-    <color name="green">#70C78B</color>
-    <color name="lavender">#3399FF</color>
+    <color name="transparent">#0000</color>
+
+    <color name="blue">#3399FF</color> <!-- DodgerBlue -->
+    <color name="green">#70C78B</color> <!-- DarkSeaGreen -->
+    <color name="medium_aquamarine">#70C7B6</color> <!-- MediumAquamarine -->
+    <color name="rosy_brown">#C78B70</color> <!-- RosyBrown -->
+    <color name="medium_orchid">#B670C7</color> <!-- MediumOrchid -->
+    <color name="pale_violet_red">#C77080</color> <!-- PaleVioletRed -->
+    <color name="exam_color">#C77080</color> <!-- Color for exams -->
 </resources>

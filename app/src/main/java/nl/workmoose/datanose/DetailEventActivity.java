@@ -79,8 +79,10 @@ import android.widget.TextView;
         final GradientDrawable shape = (GradientDrawable)
                 backgroundDrawable.findDrawableByLayerId(R.id.event_background_color);
 
-        if (type.equalsIgnoreCase("tentamen") || type.equalsIgnoreCase("hertentamen")) {
-            shape.setColor(getResources().getColor(R.color.lavender));
+        if (type.equalsIgnoreCase("tentamen") ||
+                type.equalsIgnoreCase("hertentamen") ||
+                type.equalsIgnoreCase("tussentoets")) {
+            shape.setColor(getResources().getColor(R.color.exam_color));
         } else {
             shape.setColor(getResources().getColor(R.color.green));
         }

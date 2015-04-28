@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.view.View;
 
 import com.gc.materialdesign.widgets.SnackBar;
 
@@ -119,8 +120,19 @@ import java.util.Calendar;
             // There was an error during download
             // Show the user what error occurred
             new SnackBar((Activity) context, result).show();
-            LoginActivity loginActivity = (LoginActivity) context;
-            loginActivity.backToBeginning();
+            try {
+                LoginActivity loginActivity = (LoginActivity) context;
+                loginActivity.backToBeginning();
+            } catch (ClassCastException e) {
+                // The calling Activity is not LoginActivity but ScheduleActivity
+                ScheduleActivity scheduleActivity = (ScheduleActivity) context;
+                scheduleActivity.isRefreshing = false;
+
+                // Hide the refreshing container
+                View refreshingContainer = scheduleActivity.findViewById(R.id.refreshContainer);
+                refreshingContainer.setVisibility(View.INVISIBLE);
+
+            }
         }
     }
 
