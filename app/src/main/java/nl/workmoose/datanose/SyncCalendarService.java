@@ -39,15 +39,9 @@ public class SyncCalendarService extends Service {
     private final static int TEACHER = 4;
     private final static int UID = 5;
     private int notifId;
-    private long calendarId;
+    private long calendarId = -1;
     private int agendaColor;
     private SharedPreferences sharedPref;
-    private double totaltime = 0;
-    private double parsing = 0;
-    private double notification = 0;
-    private double totaladdevent = 0;
-    private double update = 0;
-    private double contentresolver = 0;
 
     public SyncCalendarService() {}
 
@@ -93,12 +87,12 @@ public class SyncCalendarService extends Service {
             return new Notification.Builder(this)
                     .setContentTitle(title)
                     .setContentText("Updating calendar")
-                    .setSmallIcon(R.drawable.datanose_icon_2);
+                    .setSmallIcon(R.drawable.datanose_logo_notification_small);
         } else {
             return new Notification.Builder(this)
                     .setContentTitle(title)
                     .setContentText("Deleting calendar")
-                    .setSmallIcon(R.drawable.datanose_icon_2);
+                    .setSmallIcon(R.drawable.datanose_logo_notification_small);
         }
     }
 
@@ -131,7 +125,7 @@ public class SyncCalendarService extends Service {
         notificationBuilder = new Notification.Builder(this)
                 .setContentTitle(title)
                 .setContentText(getText(R.string.wait_for_schedule))
-                .setSmallIcon(R.drawable.datanose_icon_2);
+                .setSmallIcon(R.drawable.datanose_logo_notification_small);
 
         // This function updates the notification
         notificationBuilder.setProgress(0, 100, true);
@@ -158,7 +152,6 @@ public class SyncCalendarService extends Service {
      * Start the syncing, parse the iCalendar file and set the events
      */
     private void startSync() {
-        totaltime = startTime(totaltime);
         try {
             // Parse the file
             ParseIcs parseIcs = new ParseIcs(getApplicationContext());
@@ -176,8 +169,10 @@ public class SyncCalendarService extends Service {
                 createNewCalendar();
             }
 
-            calendarId = getCalendarId();
-            agendaColor = getColor();
+            if (calendarId == -1) {
+                calendarId = getCalendarId();
+                agendaColor = getColor();
+            }
 
             // A calendar is present at this point.
             // Set the events to the calendar.
@@ -214,15 +209,6 @@ public class SyncCalendarService extends Service {
         }
 
         sharedPref.edit().putBoolean("isSyncing", false).apply();
-
-        totaltime = endTime(totaltime);
-        System.out.println("Total time taken by parsing:" + parsing);
-        System.out.println("Total time taken by notification:" + notification);
-        System.out.println("Total time taken by totaladdevent:" + totaladdevent);
-        System.out.println("Total time taken by update:" + update);
-        System.out.println("Total time taken by contentresolver:" + contentresolver);
-        System.out.println("Total time taken by totaltime:" + totaltime);
-        //System.out.println("Total time taken by :" + );
 
         // Stop service, otherwise it will repeat itself
         stopSelf();
@@ -262,8 +248,6 @@ public class SyncCalendarService extends Service {
         int count = 0;
         for (ArrayList<String> event : eventList) {
             count++;
-
-            parsing = startTime(parsing);
 
             // Get values from event
             String begin = event.get(BEGIN_TIME);
@@ -309,15 +293,10 @@ public class SyncCalendarService extends Service {
                 System.out.println("Deleting event: " + count + " of " + eventList.size());
             }
 
-            parsing = endTime(parsing);
-            notification = startTime(notification);
             if (count % 10 == 0) {
                 updateNotification(eventList.size(), count);
             }
-            notification = endTime(notification);
-            totaladdevent = startTime(totaladdevent);
             addEvent(startMillis, endMillis, title, location, description, id);
-            totaladdevent = endTime(totaladdevent);
         }
     }
 
@@ -332,7 +311,6 @@ public class SyncCalendarService extends Service {
      */
     private void addEvent(long start, long stop, String title, String location,
                              String description, long id) {
-        contentresolver = startTime(contentresolver);
         // Vreate ContentResolver to put in values for the event
         ContentResolver cr = getContentResolver();
         ContentValues values = new ContentValues();
@@ -343,11 +321,12 @@ public class SyncCalendarService extends Service {
             values.put(CalendarContract.Events.DTEND, stop);
             values.put(CalendarContract.Events.TITLE, title);
             values.put(CalendarContract.Events.DESCRIPTION, description);
-            values.put(CalendarContract.Events.CALENDAR_ID, calendarId);
-            values.put(CalendarContract.Events.EVENT_COLOR, agendaColor);
+            values.put(CalendarContract.Events.CALENDAR_ID, getCalendarId());
+            values.put(CalendarContract.Events.EVENT_COLOR, getColor());
             values.put(CalendarContract.Events.EVENT_LOCATION, location);
             values.put(CalendarContract.Events._ID, id);
             values.put(CalendarContract.Events.EVENT_TIMEZONE, "Europe/Amsterdam");
+
         } else {
             // Remove the event
             // I do not have the permission to set the visibility,
@@ -360,17 +339,15 @@ public class SyncCalendarService extends Service {
             values.put(CalendarContract.Events.EVENT_COLOR, -1);
             values.put(CalendarContract.Events.EVENT_LOCATION, (String) null);
         }
-        contentresolver = endTime(contentresolver);
-        update = startTime(update);
-        if (isVisible() && !sharedPref.getBoolean("refreshing", false)) {
-            // Update the event
-            cr.insert(CalendarContract.Events.CONTENT_URI, values);
-        } else {
-            // Delete the event
-//            Uri updateUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, id);
-            cr.update(CalendarContract.Events.CONTENT_URI, values, null, null);
+        try {
+            // This try/catch is the way to go, don't fuck this up
+            Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
+            long eventId = Long.parseLong(uri.getLastPathSegment());
+        } catch (Exception e) {
+            // The ID already exists, update the event
+            Uri updateUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, id);
+            getContentResolver().update(updateUri, values, null, null);
         }
-        update = endTime(update);
     }
 
     /**
@@ -459,18 +436,5 @@ public class SyncCalendarService extends Service {
     private Boolean isVisible() {
         // Returns the boolean whether the user wants to sync his/her account
         return sharedPref.getBoolean("syncSaved", true);
-    }
-
-    private double startTime(double timer) {
-        if (timer < 0) {
-            return timer;
-        }
-        timer -= Calendar.getInstance().getTimeInMillis()/1000.;
-        return timer;
-    }
-
-    private double endTime(double timer) {
-        timer += Calendar.getInstance().getTimeInMillis()/1000.;
-        return timer;
     }
 }
