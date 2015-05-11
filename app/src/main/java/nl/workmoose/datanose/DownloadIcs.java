@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.gc.materialdesign.widgets.SnackBar;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -37,11 +38,12 @@ import java.util.Calendar;
     final private static String URL_STRING = "https://datanose.nl/";
     final private static String EXTENSION = ".ics";
     final private static String FILE_NAME = "WARNING: DO NOT OPEN, VERY DANGEROUS FILE";
-    final private static int READ_TIMEOUT = 15000;
-    final private static int CONN_TIMEOUT = 20000;
+    final private static int READ_TIMEOUT = 25000;
+    final private static int CONN_TIMEOUT = 25000;
 
     private Context context;
     private String studentId;
+    private SharedPreferences sharedPref;
 
     public DownloadIcs(Context context) {
         this.context = context;
@@ -59,6 +61,8 @@ import java.util.Calendar;
         studentId = params[0];  // The param that is given using .execute(param)
         String urlString = URL_STRING + studentId + EXTENSION;
         System.out.println("Downloading file for student: " + studentId);
+        sharedPref = context.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
+        sharedPref.edit().putBoolean("isDownloading", true).apply();
 
         if (hasInternetConnection(context)) {
             try {
@@ -67,12 +71,16 @@ import java.util.Calendar;
                 downloadFromUrl(urlString);
                 msg = "File downloaded";
             } catch (SocketTimeoutException e) {
+                e.printStackTrace();
                 msg = context.getString(R.string.timeout);
             } catch (FileNotFoundException e) {
+                e.printStackTrace();
                 msg = context.getString(R.string.file_not_fount);
             } catch (ConnectException e) {
+                e.printStackTrace();
                 msg = context.getString(R.string.connection_error);
             } catch (UnknownHostException e) {
+                e.printStackTrace();
                 msg = context.getString(R.string.unknown_host);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -94,39 +102,60 @@ import java.util.Calendar;
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
         System.out.println("downloadIcs result: " + result);
+        sharedPref.edit().putBoolean("isDownloading", false).apply();
+
 
         if (result.equals("File downloaded")) {
             // Get calendar instance for this time
             Calendar now = Calendar.getInstance();
 
             // Save correct student ID to sharedPreferences
-            SharedPreferences s = context.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
-            s.edit().putString("studentId", studentId).apply();
+            sharedPref.edit().putString("studentId", studentId).apply();
             System.out.println("Currently logged in: " + studentId);
 
             // Save the time the last iCal was downloaded
-            s.edit().putLong("lastDownloaded", now.getTimeInMillis()).apply();
+            sharedPref.edit().putLong("lastDownloaded", now.getTimeInMillis()).apply();
 
-            //  Start Schedul1eActivity
-            System.out.println("Done downloading, start new ScheduleActivity");
-            Intent i = new Intent(context, ScheduleActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            Activity currentActivity = (Activity) context;
-            currentActivity.startActivity(i);
-            currentActivity.overridePendingTransition(R.anim.slide_up, R.anim.do_nothing);
+            try{
+                //  Start ScheduleActivity
+                Activity currentActivity = (Activity) context;
+                System.out.println("Done downloading, start new ScheduleActivity");
+
+                if (!sharedPref.getBoolean("syncSaved", false)) {
+                    // If the file is only being downloaded without syncing, set refreshing to false
+                    sharedPref.edit().putBoolean("refreshing", false).apply();
+                }
+
+                Intent intent = new Intent(context, ScheduleActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                currentActivity.startActivity(intent);
+                currentActivity.overridePendingTransition(R.anim.slide_up, R.anim.do_nothing);
+            } catch (Exception e) {
+                // When called from receiver
+                System.out.println("Done downloading");
+                if (!sharedPref.getBoolean("syncSaved", false)) {
+                    // If the file is only being downloaded without syncing, set refreshing to false
+                    sharedPref.edit().putBoolean("refreshing", false).apply();
+                }
+            }
 
         } else {
 
             // There was an error during download
             // Show the user what error occurred
-            new SnackBar((Activity) context, result).show();
+            try {
+                new SnackBar((Activity) context, result).show();
+            } catch (Exception e) {
+                // Called from the receiver (alarm)
+                // TODO: notify the user that the schedule is not updated
+            }
             try {
                 LoginActivity loginActivity = (LoginActivity) context;
                 loginActivity.backToBeginning();
             } catch (ClassCastException e) {
                 // The calling Activity is not LoginActivity but ScheduleActivity
                 ScheduleActivity scheduleActivity = (ScheduleActivity) context;
-                scheduleActivity.isRefreshing = false;
+                sharedPref.edit().putBoolean("refreshing", false).apply();
 
                 // Hide the refreshing container
                 View refreshingContainer = scheduleActivity.findViewById(R.id.refreshContainer);
@@ -166,6 +195,7 @@ import java.util.Calendar;
             conn.setConnectTimeout(CONN_TIMEOUT);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
+            System.out.println("Response code: " + conn.getResponseCode());
 
             // Start the connection
             conn.connect();
@@ -174,7 +204,7 @@ import java.util.Calendar;
 
             // Get content from the server
             // This one line is the piece of code that takes a while
-            is = conn.getInputStream();
+            is = new BufferedInputStream(conn.getInputStream());
 
             // Make new file
             File file = new File(context.getFilesDir(), FILE_NAME);

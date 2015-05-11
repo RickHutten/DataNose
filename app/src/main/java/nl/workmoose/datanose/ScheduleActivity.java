@@ -1,5 +1,7 @@
 package nl.workmoose.datanose;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +12,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -23,6 +26,8 @@ import com.gc.materialdesign.widgets.SnackBar;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Rick Hutten
@@ -43,7 +48,6 @@ import java.util.Calendar;
     private SharedPreferences sharedPref;
     private int currentAcademicDay;
     private ScheduleActivity scheduleActivity;
-    public boolean isRefreshing = false;
 
     /**
      * Calls ParseIcs to parse the file. Than calculates the day of the year and sets
@@ -75,8 +79,11 @@ import java.util.Calendar;
         // Calculate current academic day
         currentAcademicDay = calculateAcademicDay(calendarNow);
 
-        if (calendarNow.get(Calendar.HOUR_OF_DAY) == 0) {
+        System.out.println("In daylight saving: " + TimeZone.getDefault().inDaylightTime( new Date() ));
+
+        if (calendarNow.get(Calendar.HOUR_OF_DAY) == 0 && !TimeZone.getDefault().inDaylightTime(new Date())) {
             // This fixes another bug if the time is between 00:00 and 01:00 o'clock
+            // when not in daylight saving
             currentAcademicDay++;
         }
 
@@ -86,7 +93,7 @@ import java.util.Calendar;
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(currentAcademicDay);
 
-        checkForNewVersion(false);
+        checkForNewVersion(this, false);
     }
 
     /**
@@ -265,12 +272,18 @@ import java.util.Calendar;
      * Checks if the app needs to refresh and refreshes accordingly by calling DownloadIcs.execute()
      * @param forceRefresh: Whether to force the app to refresh or not
      */
-    public void checkForNewVersion(Boolean forceRefresh) {
-        if (isRefreshing) {
+    public void checkForNewVersion(Context context, Boolean forceRefresh) {
+        sharedPref = context.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
+
+        if (sharedPref.getBoolean("refreshing", false) || sharedPref.getBoolean("isSyncing", false)) {
             System.out.println("Already refreshing");
             return;
         }
-        isRefreshing = true;
+        if (!sharedPref.getBoolean("signedIn", false)) {
+            System.out.println("User signed out, don't do anything");
+            return;
+        }
+        sharedPref.edit().putBoolean("refreshing", true).apply();
         if (sharedPref.contains("lastDownloaded")) {
             // Get last saved iCal date
             long lastDownloaded = sharedPref.getLong("lastDownloaded", 0);
@@ -283,33 +296,46 @@ import java.util.Calendar;
                 // Get the current signed in student ID
                 String studentId = sharedPref.getString("studentId", "");
 
-                // Get the refreshing container
-                View refreshingContainer = findViewById(R.id.refreshContainer);
-                refreshingContainer.setVisibility(View.VISIBLE);
+                try {
+                    // Get the refreshing container
+                    View refreshingContainer = findViewById(R.id.refreshContainer);
+                    refreshingContainer.setVisibility(View.VISIBLE);
+                } catch (Exception e) {
+                    // When called from the receiver
+                }
 
                 if (sharedPref.getBoolean("syncSaved", false)) {
                     // Firstly, remove the old items in the current calendar
                     // and set the events for the new iCal file
                     System.out.println("Deleting items from calendar for sync...");
-                    sharedPref.edit().putBoolean("refreshing", true).commit();
-                    startService(new Intent(getApplicationContext(), SyncCalendarService.class));
+                    context.startService(new Intent(context, SyncCalendarService.class));
                 }
 
+                // Make final variables needed for the handler
+                final String studentId_copy = studentId;
+                final Context contextCopy = context;
 
                 // Download the iCalendar file again. DownloadIcs will create
-                // a new scheduleActivity.
-                System.out.println("Downloading new iCalendar file.");
-                DownloadIcs downloadIcs = new DownloadIcs(this);
-                downloadIcs.execute(studentId);
+                // a new scheduleActivity. But wait like half a second to give
+                // the parseIcs some time to finish before downloading the new file
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("Downloading new iCalendar file.");
+                        DownloadIcs downloadIcs = new DownloadIcs(contextCopy);
+                        downloadIcs.execute(studentId_copy);
+                    }
+                }, 500); // Half a second before run() is exucuted (500 milliseconds)
+
             } else {
-                // The iCal is downloaded less than 24 hours ago
+                // The iCal is downloaded less than REFRESH_INTERVAL ago
                 System.out.println("Don't download new iCal file.");
-                isRefreshing = false;
+                sharedPref.edit().putBoolean("refreshing", false).apply();
             }
         } else {
             // If sharedPreferences doesn't contain "lastDownloaded",
-            // but this isn't supposed to happen.
-            isRefreshing = false;
+            // but this isn't ever supposed to happen.
+            sharedPref.edit().putBoolean("refreshing", false).apply();
         }
     }
 
@@ -356,6 +382,45 @@ import java.util.Calendar;
         toTodayMenu.setIcon(newIcon);
     }
 
+    public void setAlarm(Context context) {
+        System.out.println("Setting alarm");
+        // Set the alarm to start at approx 14:00
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 17);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        long repeatTime = AlarmManager.INTERVAL_DAY;
+
+        long timeNow = System.currentTimeMillis();
+        long nextAlarmTime = calendar.getTimeInMillis();
+        if (timeNow < nextAlarmTime) {
+            // The alarm has yet to go off
+            // No need to change the alarm time
+            System.out.println("The alarm has yet to go off");
+        } else {
+            // The alarm should have already gone off
+            // change the nextAlarmTime
+            System.out.println("The alarm should have already gone off");
+        }
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, SyncReceiver.class);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(
+                context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        alarmManager.setRepeating(AlarmManager.RTC, nextAlarmTime,
+                repeatTime, alarmIntent);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Set the alarm
+        setAlarm(this);
+    }
+
     /**
      * The user logs out, the events in the calendar have to be deleted
      */
@@ -388,7 +453,7 @@ import java.util.Calendar;
                 // Check if the system is syncing at the moment
                 if (sharedPref.getBoolean("isSyncing", false)) {
                     new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
-                } else if (isRefreshing) {
+                } else if (sharedPref.getBoolean("refreshing", false)) {
                     new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
                 } else {
                     // If the system is not syncing at the moment, start SettingsActivity
@@ -400,7 +465,7 @@ import java.util.Calendar;
                 // Check if the system is syncing at the moment
                 if (sharedPref.getBoolean("isSyncing", false)) {
                     new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
-                } else if (isRefreshing) {
+                } else if (sharedPref.getBoolean("refreshing", false)) {
                     new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
                 } else {
                     // If the system is not syncing at the moment, sign out
@@ -419,11 +484,11 @@ import java.util.Calendar;
                 // Check if the system is syncing at the moment
                 if (sharedPref.getBoolean("isSyncing", false)) {
                     new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
-                } else if (isRefreshing) {
+                } else if (sharedPref.getBoolean("refreshing", false)) {
                     new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
                 } else {
                     // If the system is not syncing at the moment, force refresh the iCal file
-                    checkForNewVersion(true);
+                    checkForNewVersion(this, true);
                 }
                 break;
         }
@@ -451,7 +516,7 @@ import java.util.Calendar;
     @Override
     public void onResume() {
         super.onResume();
-        checkForNewVersion(false);
+        checkForNewVersion(this, false);
     }
 
     /**
