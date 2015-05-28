@@ -9,8 +9,7 @@ There is a bug when the user syncs his/her schedule, signs out, logs in with a d
 
 ### Credits
 
-App icon downloaded from http://www.graphicsfuel.com/2012/02/calendar-icon-psd/.
-Other icons downloaded from https://developer.android.com/design/downloads/index.html.
+Icons downloaded from https://developer.android.com/design/downloads/index.html.
 
 Some elements including buttons, checkboxes, colorpicker and circular progress bar belong to the MaterialDesign library (https://github.com/navasmdc/MaterialDesignLibrary).
 
@@ -18,7 +17,7 @@ The date picker belongs to the Betterpickers library (https://github.com/derekbr
 
 ---
 
-### Copyright<img src="https://github.com/RickHutten/DataNose/blob/master/app/src/main/res/drawable/datanose_icon_no_border.png" align="right" width="100" />
+### Copyright<img src="https://github.com/RickHutten/DataNose/blob/master/app/src/main/res/drawable/datanose_logo_small.png" align="right" width="100" />
 DataNose &copy; by Rick Hutten.
 
 DataNose is licensed under a
