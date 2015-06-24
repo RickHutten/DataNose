@@ -9,7 +9,6 @@
     <string name="timeout">Connection timed out</string>
     <string name="connection_error">Failed to connect to server</string>
     <string name="file_not_fount">No schedule found</string>
-    <string name="location_unknown">Locatie onbekend</string>
     <string name="unknown_host">Unable to resolve host</string>
     <string name="unknown_error"> An unknown error occurred</string>
     <string name="action_settings">Settings</string>

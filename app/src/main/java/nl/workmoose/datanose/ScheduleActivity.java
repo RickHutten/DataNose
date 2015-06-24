@@ -40,7 +40,9 @@ import java.util.TimeZone;
 
     private static final String SHARED_PREF = "prefs";
     private static final int BEGIN_TIME = 0;
-    private static final long REFRESH_INTERVAL = 1000*60*60*24; // Interval in milliseconds
+    private static final long REFRESH_INTERVAL = 1000*60*60*24; // Refresh interval in milliseconds
+    private static final long MAX_REFRESH_TIME = 1000*60*1; // 1 minute
+    private static final long MAX_SYNC_TIME = 1000*60*5; // 5 minutes
 
     private ViewPager viewPager;
     private ArrayList<ArrayList<String>> eventList;
@@ -275,14 +277,15 @@ import java.util.TimeZone;
     public void checkForNewVersion(Context context, Boolean forceRefresh) {
         sharedPref = context.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
 
-        if (sharedPref.getBoolean("refreshing", false) || sharedPref.getBoolean("isSyncing", false)) {
-            System.out.println("Already refreshing");
+        if (checkIfSyncing()) {
+            System.out.println("Already syncing");
             return;
         }
         if (!sharedPref.getBoolean("signedIn", false)) {
             System.out.println("User signed out, don't do anything");
             return;
         }
+
         sharedPref.edit().putBoolean("refreshing", true).apply();
         if (sharedPref.contains("lastDownloaded")) {
             // Get last saved iCal date
@@ -290,8 +293,10 @@ import java.util.TimeZone;
 
             // Get the current time in millis
             long nowMillis = Calendar.getInstance().getTimeInMillis();
+
             if (nowMillis - lastDownloaded > REFRESH_INTERVAL || forceRefresh) {
-                // Refresh if the iCal is downloaded more than REFRESH_INTERVAL ago
+                // Refresh if the iCal is downloaded more than REFRESH_INTERVAL ago or forceRefresh
+                sharedPref.edit().putLong("lastRefresh", Calendar.getInstance().getTimeInMillis()).apply();
 
                 // Get the current signed in student ID
                 String studentId = sharedPref.getString("studentId", "");
@@ -328,7 +333,7 @@ import java.util.TimeZone;
                 }, 500); // Half a second before run() is exucuted (500 milliseconds)
 
             } else {
-                // The iCal is downloaded less than REFRESH_INTERVAL ago
+                // The iCal is downloaded less than REFRESH_INTERVAL ago or it is forceRefresh == true
                 System.out.println("Don't download new iCal file.");
                 sharedPref.edit().putBoolean("refreshing", false).apply();
             }
@@ -359,7 +364,7 @@ import java.util.TimeZone;
         MenuItem toTodayMenu = menu.findItem(R.id.to_today);
         Drawable iconDrawable = toTodayMenu.getIcon();
         Bitmap iconBitmap = ((BitmapDrawable) iconDrawable).getBitmap(); // Converts drawable into bitmap
-        iconBitmap = iconBitmap.copy(Bitmap.Config.ARGB_4444, true);
+        iconBitmap = iconBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
         // Set paint for the text
         Paint paint = new Paint();
@@ -443,6 +448,65 @@ import java.util.TimeZone;
         overridePendingTransition(R.anim.do_nothing, R.anim.slide_down);
     }
 
+    /**
+     * Checks if the app is syncing. If the app IS syncing but the sync has started too long ago,
+     * something has gone wrong so this function corrects that as well.
+     *
+     * @return Returns boolean whether the app is syncing or not.
+     */
+    private boolean checkIfSyncing() {
+        if (!sharedPref.getBoolean("isSyncing", false)) {
+            // The app is not syncing
+            return false;
+        } else {
+            // The app thinks it's syncing but it might not be
+            long timeNow = Calendar.getInstance().getTimeInMillis();
+            long timeSinceLastCheck = timeNow - sharedPref.getLong("lastRefresh", timeNow);
+            if (timeSinceLastCheck > MAX_SYNC_TIME) {
+                // The app was syncing quite a while ago. Something is wrong.
+                // Put the values back
+                System.out.println("Syncing took too long! Resetting value in SharedPreferences");
+                sharedPref.edit().putBoolean("isSyncing", false).apply();
+                return false;
+            } else {
+                // The app was syncing not too long ago. It's probably alright
+                System.out.println("Last sync was " + timeSinceLastCheck/1000 + " seconds ago.");
+                return true;
+            }
+        }
+    }
+
+    /**
+     * Checks if the app is refreshing. If the app IS refreshing but it has started too long ago,
+     * something has gone wrong so this function corrects that as well.
+     *
+     * Note: If the users has synced the agenda, the refreshing is surpressed by isSyncing. But
+     * if the user has not synced the agenda, this is the only check if the user is refreshing.
+     *
+     * @return Returns boolean whether the app is refreshing or not.
+     */
+    private boolean checkIfRefreshing() {
+        if (!sharedPref.getBoolean("refreshing", false)) {
+            // The app is not syncing
+            return false;
+        } else {
+            // The app thinks it's syncing but it might not be
+            long timeNow = Calendar.getInstance().getTimeInMillis();
+            long timeSinceLastCheck = timeNow - sharedPref.getLong("lastRefresh", timeNow);
+            if (timeSinceLastCheck > MAX_REFRESH_TIME) {
+                // The app was syncing quite a while ago. Something is wrong.
+                // Put the values back
+                System.out.println("Refreshing took too long! Resetting value in SharedPreferences");
+                sharedPref.edit().putBoolean("refreshing", false).apply();
+                return false;
+            } else {
+                // The app was syncing not too long ago. It's probably alright
+                System.out.println("Last refresh was " + timeSinceLastCheck/1000 + " seconds ago.");
+                return true;
+            }
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -451,9 +515,9 @@ import java.util.TimeZone;
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // Check if the system is syncing at the moment
-                if (sharedPref.getBoolean("isSyncing", false)) {
+                if (checkIfSyncing()) {
                     new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
-                } else if (sharedPref.getBoolean("refreshing", false)) {
+                } else if (checkIfRefreshing()) {
                     new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
                 } else {
                     // If the system is not syncing at the moment, start SettingsActivity
@@ -463,9 +527,9 @@ import java.util.TimeZone;
                 break;
             case R.id.sign_out:
                 // Check if the system is syncing at the moment
-                if (sharedPref.getBoolean("isSyncing", false)) {
+                if (checkIfSyncing()) {
                     new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
-                } else if (sharedPref.getBoolean("refreshing", false)) {
+                } else if (checkIfRefreshing()) {
                     new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
                 } else {
                     // If the system is not syncing at the moment, sign out
@@ -482,9 +546,9 @@ import java.util.TimeZone;
                 break;
             case R.id.refresh:
                 // Check if the system is syncing at the moment
-                if (sharedPref.getBoolean("isSyncing", false)) {
+                if (checkIfSyncing()) {
                     new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
-                } else if (sharedPref.getBoolean("refreshing", false)) {
+                } else if (checkIfRefreshing()) {
                     new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
                 } else {
                     // If the system is not syncing at the moment, force refresh the iCal file

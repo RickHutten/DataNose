@@ -237,13 +237,15 @@ import com.gc.materialdesign.widgets.ColorSelector;
      */
     private void setButtonTextColor() {
 
-        // Get the saturation and value of the given color to determine the brightness of the color
-        float[] hsv = new float[3];
-        Color.colorToHSV(agendaColor, hsv);
-        float s = hsv[1];
-        float v = hsv[2];
+        // Get the rgb vales of the given color to determine the brightness
+        int r = Color.red(agendaColor);
+        int g = Color.green(agendaColor);
+        int b = Color.blue(agendaColor);
 
-        if (s <= 0.20 && v >= 0.90) {
+        // Calculate the brightness. This is called the HSP model
+        int brightness = (int) Math.pow(0.299 * Math.pow(r, 2) + 0.587 * Math.pow(g, 2) + 0.114 * Math.pow(b, 2), 0.5);
+
+        if (brightness > 220) {
             // If the color is very light, set the color of the text to black
             colorButton.setTextColor(getResources().getColor(R.color.black));
         } else {
@@ -276,6 +278,9 @@ import com.gc.materialdesign.widgets.ColorSelector;
             System.out.println("Sync calendar...");
             startService(new Intent(getApplicationContext(), SyncCalendarService.class));
             settingsChanged = false;
+            // Quit from the activity. The user sould not be able to see this page while
+            // the app is syncing.
+            this.finish();
         }
     }
 }

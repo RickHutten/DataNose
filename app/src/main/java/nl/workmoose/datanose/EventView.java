@@ -12,6 +12,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.RelativeLayout;
@@ -202,7 +204,7 @@ import java.util.Arrays;
         // Create animationset
         AnimationSet animationSet = new AnimationSet(true);
         animationSet.setFillAfter(true);
-        animationSet.setInterpolator(new AccelerateDecelerateInterpolator());
+        animationSet.setInterpolator(new DecelerateInterpolator());
 
         // Set translate animation to view
         TranslateAnimation translate = new TranslateAnimation(0, deltaX, 0, deltaY);
@@ -226,7 +228,10 @@ import java.util.Arrays;
         // Set animation listener
         animationSet.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation) { }
+            public void onAnimationStart(Animation animation) {
+                // Set text invisible
+                rootView.findViewById(R.id.textContainer).setVisibility(INVISIBLE);
+            }
 
             @Override
             public void onAnimationEnd(Animation animation) {
@@ -259,6 +264,7 @@ import java.util.Arrays;
         // startActivityForResult calls onActivityResult in ScheduleFragment
         // Which is needed to animate this event back to its place
         scheduleFragment.startActivityForResult(eventDetailIntent, 0);
+        scheduleActivity.overridePendingTransition(R.anim.grow_fade_in_center, R.anim.do_nothing);
     }
 
     /**
@@ -287,6 +293,20 @@ import java.util.Arrays;
         // Add animations to set
         animationSet.addAnimation(scale);
         animationSet.addAnimation(translate);
+
+        animationSet.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                // Set text visible
+                rootView.findViewById(R.id.textContainer).setVisibility(VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+        });
 
         // Start animation
         this.bringToFront();

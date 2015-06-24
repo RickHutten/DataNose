@@ -108,6 +108,7 @@ public class ProgressBarCircularIndeterminate extends CustomView {
 	private int arcO = 270;
     private int iteration = 0;
     private int wait = 0;
+    private float rotateAngle = 0;
 
 	/**
 	 * Draw second animation of view
@@ -150,7 +151,9 @@ public class ProgressBarCircularIndeterminate extends CustomView {
         temp.drawCircle(getWidth() / 2, getHeight() / 2,
                 getWidth() / 2 - Utils.dpToPx(ringWidth, getResources()), transparentPaint);
 
-		canvas.drawBitmap(bitmap, 0, 0, new Paint());
+        rotateAngle += 1.5;
+        canvas.rotate(rotateAngle, getWidth()/2, getHeight()/2);
+		canvas.drawBitmap(bitmap, 0, 0, null);
         if (wait == 0) {
             arcO += 11;
             arcD -= 9;

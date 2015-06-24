@@ -54,6 +54,7 @@ public class SyncCalendarService extends Service {
 
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
         sharedPref.edit().putBoolean("isSyncing", true).apply();
+        sharedPref.edit().putLong("lastRefresh", Calendar.getInstance().getTimeInMillis()).apply();
 
         // Make new thread to run service in background, prevent the UI thread to freeze
         final Thread t = new Thread() {
@@ -76,8 +77,9 @@ public class SyncCalendarService extends Service {
     }
 
     /**
-     * Make an notification.builder object
-     * @return: notification.builder object
+     * Make an notification.builder object.
+     *
+     * @return The notification.builder object.
      */
     private Notification.Builder buildNotification(){
         CharSequence title = getText(R.string.app_name);
@@ -87,19 +89,20 @@ public class SyncCalendarService extends Service {
             return new Notification.Builder(this)
                     .setContentTitle(title)
                     .setContentText("Updating calendar")
-                    .setSmallIcon(R.drawable.datanose_logo_notification_small);
+                    .setSmallIcon(R.drawable.datanose_logo_notification);
         } else {
             return new Notification.Builder(this)
                     .setContentTitle(title)
                     .setContentText("Deleting calendar")
-                    .setSmallIcon(R.drawable.datanose_logo_notification_small);
+                    .setSmallIcon(R.drawable.datanose_logo_notification);
         }
     }
 
     /**
-     * Updates the notification
-     * @param maxProgress: maximum progress
-     * @param progress: the current progress
+     * Updates the notification.
+     *
+     * @param maxProgress: maximum progress.
+     * @param progress: the current progress.
      */
     private void updateNotification(int maxProgress, int progress) {
         // This function updates the notification
@@ -118,6 +121,10 @@ public class SyncCalendarService extends Service {
         mNotificationManager.notify(notifId, notification);
     }
 
+    /**
+     * Sets an notification if the calendar is deleted from the phone but the downloading is not
+     * yet finished.
+     */
     private void setNotificationWaitForDownload() {
         CharSequence title = getText(R.string.app_name);
         Notification.Builder notificationBuilder;
@@ -125,7 +132,7 @@ public class SyncCalendarService extends Service {
         notificationBuilder = new Notification.Builder(this)
                 .setContentTitle(title)
                 .setContentText(getText(R.string.wait_for_schedule))
-                .setSmallIcon(R.drawable.datanose_logo_notification_small);
+                .setSmallIcon(R.drawable.datanose_logo_notification);
 
         // This function updates the notification
         notificationBuilder.setProgress(0, 100, true);
@@ -198,7 +205,7 @@ public class SyncCalendarService extends Service {
 
             while (sharedPref.getBoolean("isDownloading", false)) {
                 try{
-
+                    // Sleep for 1 second and check again
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     // This is necessary
@@ -208,6 +215,7 @@ public class SyncCalendarService extends Service {
             startSync();
         }
 
+        // Tell the system that it is done syncing
         sharedPref.edit().putBoolean("isSyncing", false).apply();
 
         // Stop service, otherwise it will repeat itself
@@ -240,6 +248,7 @@ public class SyncCalendarService extends Service {
 
     /**
      * Set the events to the calendar
+     *
      * @param eventList: all the events
      */
     private void setEvents(ArrayList<ArrayList<String>> eventList) {
@@ -302,6 +311,7 @@ public class SyncCalendarService extends Service {
 
     /**
      * Add a single event using the given parameters
+     *
      * @param start: Start time
      * @param stop: Stop time
      * @param title: title of the event
@@ -321,8 +331,8 @@ public class SyncCalendarService extends Service {
             values.put(CalendarContract.Events.DTEND, stop);
             values.put(CalendarContract.Events.TITLE, title);
             values.put(CalendarContract.Events.DESCRIPTION, description);
-            values.put(CalendarContract.Events.CALENDAR_ID, getCalendarId());
-            values.put(CalendarContract.Events.EVENT_COLOR, getColor());
+            values.put(CalendarContract.Events.CALENDAR_ID, calendarId);
+            values.put(CalendarContract.Events.EVENT_COLOR, agendaColor);
             values.put(CalendarContract.Events.EVENT_LOCATION, location);
             values.put(CalendarContract.Events._ID, id);
             values.put(CalendarContract.Events.EVENT_TIMEZONE, "Europe/Amsterdam");
@@ -342,7 +352,7 @@ public class SyncCalendarService extends Service {
         try {
             // This try/catch is the way to go, don't fuck this up
             Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
-            long eventId = Long.parseLong(uri.getLastPathSegment());
+            long eventId = Long.parseLong(uri.getLastPathSegment()); // This can throw an exception
         } catch (Exception e) {
             // The ID already exists, update the event
             Uri updateUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, id);
@@ -352,7 +362,8 @@ public class SyncCalendarService extends Service {
 
     /**
      * Gets all the calendars registered on this device
-     * @return: list of all the calendars
+     *
+     * @return calendars: list of all the calendars
      */
     private ArrayList<String> readAllCalendars() {
         // Returns an arraylist containing all the names of every calendar on this device
@@ -384,8 +395,9 @@ public class SyncCalendarService extends Service {
     }
 
     /**
-     * Gets the id of the DataNose calendar
-     * @return: id
+     * Gets the id of the DataNose calendar.
+     *
+     * @return The id of the calendar. -1 if 'DataNose' calendar doesn't exist.
      */
     private long getCalendarId() {
         // Returns the calendar id
@@ -421,8 +433,9 @@ public class SyncCalendarService extends Service {
     }
 
     /**
-     * Returns the saved color for the agenda items
-     * @return: int color
+     * Returns the saved color for the agenda items.
+     *
+     * @return Returns the value of the color saved by the user.
      */
     private int getColor() {
         // Returns the color value saved in sharedPreferences
@@ -430,8 +443,9 @@ public class SyncCalendarService extends Service {
     }
 
     /**
-     * returns whether the items should be invisible or visible
-     * @return: boolean isVisible
+     * Returns whether the items should be invisible or visible.
+     *
+     * @return Return boolean if the agenda is visible or not.
      */
     private Boolean isVisible() {
         // Returns the boolean whether the user wants to sync his/her account

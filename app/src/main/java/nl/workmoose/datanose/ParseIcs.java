@@ -88,7 +88,7 @@ import java.util.ArrayList;
                         location = line.split(":")[1];
                     } catch (ArrayIndexOutOfBoundsException e) {
                         // No location is given
-                        location = context.getResources().getString(R.string.location_unknown);
+                        location = " ";
                     }
                     event.add(location);
                 }

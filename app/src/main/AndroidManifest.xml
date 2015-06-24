@@ -13,7 +13,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/datanose_logo_small"
+        android:icon="@drawable/datanose_logo"
         android:label="@string/app_name" >
         <activity
             android:name=".LoginActivity"

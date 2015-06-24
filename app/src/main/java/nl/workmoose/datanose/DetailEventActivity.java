@@ -25,6 +25,7 @@ import android.widget.TextView;
         @Override
         public void onClick(View v) {
             finish();
+            overridePendingTransition(R.anim.do_nothing, R.anim.shrink_fade_out_center);
         }
     };
 
@@ -86,5 +87,11 @@ import android.widget.TextView;
         } else {
             shape.setColor(getResources().getColor(R.color.green));
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        overridePendingTransition(R.anim.do_nothing, R.anim.shrink_fade_out_center);
     }
 }

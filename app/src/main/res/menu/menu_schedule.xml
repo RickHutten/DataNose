@@ -3,14 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="nl.workmoose.datanose.ScheduleActivity">
 
-    <item android:id="@+id/to_date"
-        android:icon="@drawable/to_date"
-        android:title="@string/to_date"
-        app:showAsAction="ifRoom" />
-
     <item android:id="@+id/to_today"
         android:icon="@drawable/to_today"
         android:title="@string/to_today"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/to_date"
+        android:icon="@drawable/to_date"
+        android:title="@string/to_date"
         app:showAsAction="always" />
 
     <item android:id="@+id/action_settings"
@@ -19,12 +19,13 @@
         app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/refresh"
+        android:icon="@drawable/ic_action_refresh"
         android:title="@string/refresh"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 
     <item android:id="@+id/sign_out"
         android:icon="@drawable/sign_out"
         android:title="@string/sign_out"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
 </menu>
