@@ -42,9 +42,11 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+idea
 .idea
 libs/MaterialDesign/build
 gradle
 .gradle
 *.bin
-.idea/workspace.xml
+local.properties
+DataNose.iml
