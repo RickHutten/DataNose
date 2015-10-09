@@ -16,16 +16,16 @@
     <item android:id="@+id/action_settings"
         android:icon="@drawable/ic_action_settings"
         android:title="@string/action_settings"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 
     <item android:id="@+id/refresh"
         android:icon="@drawable/ic_action_refresh"
         android:title="@string/refresh"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
     <item android:id="@+id/sign_out"
         android:icon="@drawable/sign_out"
         android:title="@string/sign_out"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
 </menu>

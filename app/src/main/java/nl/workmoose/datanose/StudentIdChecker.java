@@ -1,6 +1,5 @@
 package nl.workmoose.datanose;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -58,17 +57,21 @@ import java.net.URL;
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
         System.out.println("idChecker result: " + result);
-        if (result.equals("Correct")) {
-            DownloadIcs downloadIcs = new DownloadIcs(context);
-            downloadIcs.execute(studentId);
-        } else if (result.equals("ODATA error")) {
-            // Called when ODATA is down, show dialog if the user wants to continue
-            // whithout checking the given student ID.
-            showDialog();
-        } else {
-            new SnackBar((LoginActivity) context, result).show();
-            LoginActivity loginActivity = (LoginActivity) context;
-            loginActivity.backToBeginning();
+        switch (result) {
+            case "Correct":
+                DownloadIcs downloadIcs = new DownloadIcs(context);
+                downloadIcs.execute(studentId);
+                break;
+            case "ODATA error":
+                // Called when ODATA is down, show dialog if the user wants to continue
+                // whithout checking the given student ID.
+                showDialog();
+                break;
+            default:
+                new SnackBar((LoginActivity) context, result).show();
+                LoginActivity loginActivity = (LoginActivity) context;
+                loginActivity.backToBeginning();
+                break;
         }
     }
 

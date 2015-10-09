@@ -64,6 +64,9 @@ import com.gc.materialdesign.widgets.ColorSelector;
         // Set the color background of the colorButton
         colorButton.setBackgroundColor(agendaColor);
 
+        // Set the color of the text
+        setButtonTextColor();
+
         // Set all the onClickListeners
         setOnClickListeners();
     }

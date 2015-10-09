@@ -41,7 +41,7 @@ import java.util.TimeZone;
     private static final String SHARED_PREF = "prefs";
     private static final int BEGIN_TIME = 0;
     private static final long REFRESH_INTERVAL = 1000*60*60*24; // Refresh interval in milliseconds
-    private static final long MAX_REFRESH_TIME = 1000*60*1; // 1 minute
+    private static final long MAX_REFRESH_TIME = 1000*60; // 1 minute
     private static final long MAX_SYNC_TIME = 1000*60*5; // 5 minutes
 
     private ViewPager viewPager;
@@ -415,7 +415,7 @@ import java.util.TimeZone;
         PendingIntent alarmIntent = PendingIntent.getBroadcast(
                 context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        alarmManager.setRepeating(AlarmManager.RTC, nextAlarmTime,
+        alarmManager.setInexactRepeating(AlarmManager.RTC, nextAlarmTime,
                 repeatTime, alarmIntent);
     }
 

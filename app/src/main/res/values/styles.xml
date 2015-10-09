@@ -1,8 +1,14 @@
 <resources>
 
-    <style name="LoginTheme" parent="Theme.AppCompat.NoActionBar"/>
+    <style name="LoginTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:colorPrimaryDark">@color/blue</item>
+    </style>
 
     <style name="MainTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:colorPrimary">@color/white</item>
+        <item name="android:colorPrimaryDark">@color/black</item>
+        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:colorEdgeEffect">@color/edge_effect</item>
         <item name="android:actionBarStyle">@style/ActionbarStyle</item>
         <item name="actionBarStyle">@style/ActionbarStyle</item>
         <item name="android:textColor">@color/black</item>
@@ -29,15 +35,6 @@
 
     <style name="TextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textColor">@color/black</item>
-    </style>
-
-    <style name="TransparentTheme" parent="android:Theme">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:backgroundDimEnabled">false</item>
     </style>
 
     <style name="OverFlow" parent="@android:style/Widget.Holo.ActionButton.Overflow">

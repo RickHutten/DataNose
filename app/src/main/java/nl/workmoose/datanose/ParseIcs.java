@@ -27,7 +27,7 @@ import java.util.ArrayList;
     /**
      * The actual parsing. It reads the file and puts the information in an
      * Arraylist. Call this function from outside to get the wanted data.
-     * @return: ArrayList containing the data from the iCalendar file
+     * @return ArrayList: ArrayList containing the data from the iCalendar file
      */
     public ArrayList<ArrayList<String>> readFile() {
         // To time this function

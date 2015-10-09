@@ -1,6 +1,5 @@
 package nl.workmoose.datanose;
 
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -43,7 +42,6 @@ import java.util.TimeZone;
     private ScheduleActivity scheduleActivity;
     private RelativeLayout scheduleView;
     private ViewGroup rootView;
-    public EventView expandedEvent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -274,7 +272,7 @@ import java.util.TimeZone;
                     int itemWidth = (int) width / widthList.get(beginHour - 9);
 
                     // Create new EventView
-                    EventView eventView = new EventView(scheduleActivity, this);
+                    EventView eventView = new EventView(scheduleActivity);
 
                     // Set layoutparams
                     RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
@@ -286,6 +284,7 @@ import java.util.TimeZone;
                     // Add layoutparams to EventView, and set data
                     eventView.setLayoutParams(lp);
                     eventView.setEventData(event, offSet);
+
 
                     // Add view to parent
                     scheduleView.addView(eventView);
@@ -306,7 +305,7 @@ import java.util.TimeZone;
 
     /**
      * Convert UTC to local timezone, calculate the offSet correction for the timezone
-     * @return: int hour offset * 100
+     * @return int: int hour offset * 100
      */
     private int timeOffset() {
         TimeZone thisTimeZone = TimeZone.getDefault();
@@ -353,7 +352,7 @@ import java.util.TimeZone;
 
     /**
      * Returns true or false whether this fragment represents today
-     * @return: Boolean, true if today, false if not.
+     * @return boolean: Boolean, true if today, false if not.
      */
     private Boolean today() {
         // The actual current date
@@ -401,7 +400,7 @@ import java.util.TimeZone;
 
     /**
      * Calculate the milliseconds representing this fragment
-     * @return: time in millis of this fragment
+     * @return long: time in millis of this fragment
      */
     private long calculateCurrentMillis() {
         // Make calendar instance of the first academic day
@@ -420,7 +419,7 @@ import java.util.TimeZone;
     /**
      * Convert dp into pixels
      * @param dp: value to convert into pixels
-     * @return: int of the number of pixels
+     * @return int: int of the number of pixels
      */
     private int dpToPx(float dp) {
         if (!isAdded()) {
@@ -431,17 +430,6 @@ import java.util.TimeZone;
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getActivity().getResources().getDisplayMetrics());
         return (int) px;
-    }
-
-    /**
-     * Gets called when DetailEventActivity is ended. Tell the touched eventview to animate back
-     * @param requestCode: not used
-     * @param resultCode: not used
-     * @param data: not used
-     */
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        expandedEvent.animateBack();
     }
 
     @Override

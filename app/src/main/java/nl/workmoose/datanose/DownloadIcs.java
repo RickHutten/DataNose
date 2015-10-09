@@ -52,7 +52,7 @@ import java.util.Calendar;
     /**
      *
      * @param params: Only contains exactly 1 argument: the student ID
-     * @return: Message to the user if something went wrong, or "File downloaded"
+     * @return String: Message to the user if something went wrong, or "File downloaded"
      * if everything went good.
      */
     @Override
@@ -168,7 +168,7 @@ import java.util.Calendar;
     /**
      * Check whether the user has an internet connection
      * @param context: activity context to call getSystemService
-     * @return: Boolean, true if the user has a connection, false if not.
+     * @return boolean: Boolean, true if the user has a connection, false if not.
      */
     private boolean hasInternetConnection(Context context) {
         ConnectivityManager connMgr = (ConnectivityManager)

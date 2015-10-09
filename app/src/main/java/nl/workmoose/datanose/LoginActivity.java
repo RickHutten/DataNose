@@ -62,6 +62,7 @@ import com.gc.materialdesign.widgets.SnackBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // Special case when onBackpressed is called, quit the app (not just this activity)
         if (getIntent().getBooleanExtra("EXIT", false)) {
             finish();
@@ -141,6 +142,7 @@ import com.gc.materialdesign.widgets.SnackBar;
                 idEntered();
             }
         });
+
     }
 
     /**
