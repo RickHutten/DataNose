@@ -256,7 +256,6 @@ public class SyncCalendarService extends Service {
         // Loop through data and update every event
         int count = 0;
         for (ArrayList<String> event : eventList) {
-            count++;
 
             // Get values from event
             String begin = event.get(BEGIN_TIME);
@@ -302,10 +301,11 @@ public class SyncCalendarService extends Service {
                 System.out.println("Deleting event: " + count + " of " + eventList.size());
             }
 
-            if (count % 10 == 0) {
+            if (count % 5 == 0) {
                 updateNotification(eventList.size(), count);
             }
             addEvent(startMillis, endMillis, title, location, description, id);
+            count++;
         }
     }
 

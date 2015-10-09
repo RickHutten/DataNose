@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog;
+import com.gc.materialdesign.widgets.Dialog;
 import com.gc.materialdesign.widgets.SnackBar;
 
 import java.util.ArrayList;
@@ -532,8 +533,13 @@ import java.util.TimeZone;
                 } else if (checkIfRefreshing()) {
                     new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
                 } else {
-                    // If the system is not syncing at the moment, sign out
-                    signOut();
+                    // If the system is not syncing at the moment
+                    // Ask the user is he/she really wants to sign out if calendar is synced
+                    if (sharedPref.getBoolean("syncSaved", false)) {
+                        askToSignOut();
+                    } else {
+                        signOut();
+                    }
                 }
                 break;
             case R.id.to_date:
@@ -558,6 +564,48 @@ import java.util.TimeZone;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * Asks the user if he/she really wants to sign out
+     * because the calendar is synced.
+     */
+    private void askToSignOut() {
+        System.out.println("Asking user corfirmation to sign out.");
+        final Dialog dialog = new Dialog(this, getString(R.string.ask_sign_out_title),
+                getString(R.string.ask_sign_out_question),
+                getString(R.string.button_cancel),
+                getString(R.string.sign_out));
+
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(true);
+
+        // Set listener for the continue button
+        dialog.setOnAcceptButtonClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                // Sign out when the dismiss animation of the dialog is finished
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        signOut();
+                    }
+                }, 250);
+            }
+        });
+
+        // Set listener for the cancel button
+        dialog.setOnCancelButtonClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        // Show the dialog
+        dialog.show();
+    }
+
 
     /**
      * Exit the app:

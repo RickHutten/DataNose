@@ -136,12 +136,13 @@ public class ColorSelector extends android.app.Dialog implements OnValueChangedL
 			
 			@Override
 			public void onAnimationEnd(Animation animation) {
-				view.post(new Runnable() {
-					@Override
-					public void run() {
-						ColorSelector.super.dismiss();
-			        }
-			    });
+//				view.post(new Runnable() {
+//					@Override
+//					public void run() {
+//						ColorSelector.super.dismiss();
+//			        }
+//			    });
+				ColorSelector.super.dismiss();
 			}
 		});
 		
