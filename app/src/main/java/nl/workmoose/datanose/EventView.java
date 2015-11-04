@@ -282,6 +282,7 @@ public class EventView extends RelativeLayout {
 
         if (type.equalsIgnoreCase("tentamen") ||
                 type.equalsIgnoreCase("hertentamen") ||
+                type.equalsIgnoreCase("deeltoets") ||
                 type.equalsIgnoreCase("tussentoets")) {
             shape.setColor(context.getResources().getColor(R.color.exam_color));
         } else {
@@ -301,6 +302,13 @@ public class EventView extends RelativeLayout {
         return (int) px;
     }
 
+    /**
+     * Makes an TouchListener for every EventView that is made. It animates the
+     * eventview to the center.
+     *
+     * @param eventView: The view that is clicked on in the ScheduleFragment
+     * @return OnTouchListener: The touchlistener that
+     */
     private OnTouchListener getTouchListener(final EventView eventView) {
         return new OnTouchListener() {
             float x = 0;
@@ -309,35 +317,41 @@ public class EventView extends RelativeLayout {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    // Get x, y coords of original press
                     x = event.getX();
                     y = event.getY();
                     pressed = true;
-                    // Scale the exact opposite as the previous scale animation
+                    // Scale the event to look like its pressed
                     ScaleAnimation scale = new ScaleAnimation(1, 0.95f, 1, 0.95f, getWidth() / 2, getHeight() / 2);
                     scale.setDuration(ANIMATION_SPEED_BUTTON);
                     scale.setFillAfter(true);
                     eventView.startAnimation(scale);
                     return true;
                 } else if (event.getAction() == MotionEvent.ACTION_UP && pressed) {
-                    eventView.setOnTouchListener(null);
-                    animateView();
+                    eventView.setOnTouchListener(null); // Prevent item from being pressed quickly after
+                    animateView(); // Animate view to center
                     pressed = false;
                     return true;
                 } else {
+                    // This event is most likely a move action
                     float new_x = event.getX();
                     float new_y = event.getY();
 
                     // If you move your finger too far
                     if ((Math.abs(x - new_x) > dpToPx(10) || Math.abs(y - new_y) > dpToPx(10)) && pressed) {
+                        // The item is no longer pressed
                         pressed = false;
+                        // Scale item back to original size
                         ScaleAnimation scale = new ScaleAnimation(0.95f, 1, 0.95f, 1, getWidth() / 2, getHeight() / 2);
                         scale.setDuration(ANIMATION_SPEED_BUTTON);
                         scale.setFillAfter(true);
                         eventView.startAnimation(scale);
                     }
                 }
+                // End of if-else statements, return True in onTouch
                 return true;
             }
         };
     }
+
 }

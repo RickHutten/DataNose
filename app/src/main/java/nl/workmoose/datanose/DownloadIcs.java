@@ -150,6 +150,7 @@ import java.util.Calendar;
                 // TODO: notify the user that the schedule is not updated
             }
             try {
+                // Try casting it to LoginActivity
                 LoginActivity loginActivity = (LoginActivity) context;
                 loginActivity.backToBeginning();
             } catch (ClassCastException e) {

@@ -5,8 +5,8 @@
         jar="C:\Users\Gebruiker\AndroidStudioProjects\DataNose\app\build\intermediates\exploded-aar\DataNose\MaterialDesign\unspecified\jars\classes.jar"
         jumboMode="false"
         revision="21.1.0"
-        sha1="277fa9afb5d51ca52ba1f24b7f377d5af3a59090">
-        <dex dex="C:\Users\Gebruiker\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\classes-98347a5afb782355d31d9ac4ff7329b591f6b111.jar" />
+        sha1="9a5519202cb60ac719ec31a4052c42b70e2faf8d">
+        <dex dex="C:\Users\Gebruiker\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\release\classes-98347a5afb782355d31d9ac4ff7329b591f6b111.jar" />
     </item>
 
 </items>

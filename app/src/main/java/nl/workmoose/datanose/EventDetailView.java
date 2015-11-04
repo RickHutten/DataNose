@@ -22,7 +22,7 @@ public class EventDetailView extends RelativeLayout {
     public EventDetailView(Context context) {
         super(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rootView = inflater.inflate(R.layout.test_view, this, false);
+        View rootView = inflater.inflate(R.layout.event_view, this, false);
         addView(rootView);
     }
 
@@ -80,6 +80,7 @@ public class EventDetailView extends RelativeLayout {
 
         if (classType.equalsIgnoreCase("tentamen") ||
                 classType.equalsIgnoreCase("hertentamen") ||
+                classType.equalsIgnoreCase("deeltoets") ||
                 classType.equalsIgnoreCase("tussentoets")) {
             shape.setColor(getResources().getColor(R.color.exam_color));
         } else {

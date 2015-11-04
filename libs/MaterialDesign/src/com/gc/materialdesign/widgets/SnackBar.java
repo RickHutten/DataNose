@@ -166,8 +166,9 @@ public class SnackBar extends Dialog {
 		return super.onKeyDown(keyCode, event);
 	}
 	
-	public void setMessageTextSize(float size) {
+	public SnackBar setMessageTextSize(float size) {
 		textSize = size;
+		return this;
 	}
 	
 	public void setIndeterminate(boolean indeterminate) {

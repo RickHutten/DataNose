@@ -84,12 +84,6 @@ import java.util.TimeZone;
 
         System.out.println("In daylight saving: " + TimeZone.getDefault().inDaylightTime( new Date() ));
 
-        if (calendarNow.get(Calendar.HOUR_OF_DAY) == 0 && !TimeZone.getDefault().inDaylightTime(new Date())) {
-            // This fixes another bug if the time is between 00:00 and 01:00 o'clock
-            // when not in daylight saving
-            currentAcademicDay++;
-        }
-
         //Instantiate a ViewPager and a PagerAdapter.
         viewPager = (ViewPager) findViewById(R.id.pager);
         PagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
@@ -517,9 +511,9 @@ import java.util.TimeZone;
             case R.id.action_settings:
                 // Check if the system is syncing at the moment
                 if (checkIfSyncing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).setMessageTextSize(14).show();
                 } else if (checkIfRefreshing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).setMessageTextSize(14).show();
                 } else {
                     // If the system is not syncing at the moment, start SettingsActivity
                     Intent i = new Intent(this, SettingsActivity.class);
@@ -529,9 +523,9 @@ import java.util.TimeZone;
             case R.id.sign_out:
                 // Check if the system is syncing at the moment
                 if (checkIfSyncing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).setMessageTextSize(14).show();
                 } else if (checkIfRefreshing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).setMessageTextSize(14).show();
                 } else {
                     // If the system is not syncing at the moment
                     // Ask the user is he/she really wants to sign out if calendar is synced
@@ -553,9 +547,9 @@ import java.util.TimeZone;
             case R.id.refresh:
                 // Check if the system is syncing at the moment
                 if (checkIfSyncing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).setMessageTextSize(14).show();
                 } else if (checkIfRefreshing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).setMessageTextSize(14).show();
                 } else {
                     // If the system is not syncing at the moment, force refresh the iCal file
                     checkForNewVersion(this, true);

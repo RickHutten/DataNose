@@ -5,7 +5,7 @@
     <color name="dark_gray">#333333</color> <!-- DarkSlateGray -->
     <color name="gray">#ddd</color> <!-- Gainsboro -->
     <color name="white">#ffffff</color>
-    <color name="transparent">#0000</color>
+    <color name="transparent">#00000000</color>
     <color name="edge_effect">#696969</color>
 
     <color name="blue">#2196F3</color> <!-- Primary Color -->
