@@ -42,7 +42,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/type"
+                    android:id="@+id/typeDetail"
                     android:paddingRight="5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -78,15 +78,18 @@
             android:text="Martijn Stegeman"/>
 
         <TextView
-            android:id="@+id/location"
-            android:layout_centerHorizontal="true"
+            android:id="@+id/locationDetail"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:gravity="center_horizontal"
             android:layout_below="@id/teacher"
+            android:layout_centerHorizontal="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
             android:textSize="18sp"
+            android:layout_marginBottom="12dp"
             android:textStyle="bold"
             android:text="SP A1.30"/>
 

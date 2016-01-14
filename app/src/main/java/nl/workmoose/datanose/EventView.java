@@ -281,6 +281,7 @@ public class EventView extends RelativeLayout {
                 backgroundDrawable.findDrawableByLayerId(R.id.event_background_color);
 
         if (type.equalsIgnoreCase("tentamen") ||
+                type.equalsIgnoreCase("toets") ||
                 type.equalsIgnoreCase("hertentamen") ||
                 type.equalsIgnoreCase("deeltoets") ||
                 type.equalsIgnoreCase("tussentoets")) {

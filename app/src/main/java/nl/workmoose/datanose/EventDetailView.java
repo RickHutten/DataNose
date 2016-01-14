@@ -22,7 +22,7 @@ public class EventDetailView extends RelativeLayout {
     public EventDetailView(Context context) {
         super(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rootView = inflater.inflate(R.layout.event_view, this, false);
+        View rootView = inflater.inflate(R.layout.detail_event_layout, this, false);
         addView(rootView);
     }
 
@@ -60,10 +60,10 @@ public class EventDetailView extends RelativeLayout {
         // Get views from layout
         View detailContainer = findViewById(R.id.detailContainer);
         TextView titleText = (TextView) findViewById(R.id.title);
-        TextView typeText = (TextView) findViewById(R.id.type);
+        TextView typeText = (TextView) findViewById(R.id.typeDetail);
         TextView timeText = (TextView) findViewById(R.id.time);
         TextView teacherText = (TextView) findViewById(R.id.teacher);
-        TextView locationText = (TextView) findViewById(R.id.location);
+        TextView locationText = (TextView) findViewById(R.id.locationDetail);
 
         // Set texts of the views
         titleText.setText(title);
@@ -79,6 +79,7 @@ public class EventDetailView extends RelativeLayout {
                 backgroundDrawable.findDrawableByLayerId(R.id.event_background_color);
 
         if (classType.equalsIgnoreCase("tentamen") ||
+                classType.equalsIgnoreCase("toets") ||
                 classType.equalsIgnoreCase("hertentamen") ||
                 classType.equalsIgnoreCase("deeltoets") ||
                 classType.equalsIgnoreCase("tussentoets")) {

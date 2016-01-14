@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -278,7 +279,7 @@ import com.gc.materialdesign.widgets.ColorSelector;
         super.onPause();
         if (settingsChanged) {
             // The settings have changed, sync the timetable with the current settings
-            System.out.println("Sync calendar...");
+            Log.i("SettingsActivity", "Sync calendar...");
             startService(new Intent(getApplicationContext(), SyncCalendarService.class));
             settingsChanged = false;
             // Quit from the activity. The user sould not be able to see this page while

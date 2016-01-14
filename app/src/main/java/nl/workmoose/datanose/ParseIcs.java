@@ -1,6 +1,7 @@
 package nl.workmoose.datanose;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -33,7 +34,7 @@ import java.util.ArrayList;
         // To time this function
         long startTime = System.currentTimeMillis();
 
-        System.out.println("Parsing file...");
+        Log.i("ParseIcs", "Parsing file...");
 
         // Create variable to store single events in
         ArrayList<String> event = new ArrayList<>();
@@ -107,7 +108,7 @@ import java.util.ArrayList;
                     if (begin.equals("")||end.equals("")||name.equals("")||location.equals("")||
                             teacher.equals("")||uid.equals("")) {
                         // If a variable is not in the calendar item
-                        System.out.println("Parsing went wrong :(");
+                        Log.i("ParseIcs", "Parsing went wrong :(");
                     } else {
                         // Put values in eventList if everything is correct
                         // Use a copy of the event, because if you clear the event,
@@ -120,7 +121,7 @@ import java.util.ArrayList;
         } catch (Exception e) {
             // Parsing went wrong, go back to LoginActivity
             e.printStackTrace();
-            System.out.println("Error parsing file");
+            Log.i("ParseIcs", "Error parsing file");
             ((ScheduleActivity) context).finish();
             ((ScheduleActivity) context).overridePendingTransition(R.anim.do_nothing, R.anim.slide_down);
         }
@@ -128,8 +129,8 @@ import java.util.ArrayList;
         // Log the time parsing took
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime);
-        System.out.println("Done parsing");
-        System.out.println("Parsed in " + duration + " milliseconds");
+        Log.i("ParseIcs", "Done parsing");
+        Log.i("ParseIcs", "Parsed in " + duration + " milliseconds");
 
         // Return all the events
         return eventList;

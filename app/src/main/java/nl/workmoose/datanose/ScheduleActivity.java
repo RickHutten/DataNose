@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -82,15 +83,13 @@ import java.util.TimeZone;
         // Calculate current academic day
         currentAcademicDay = calculateAcademicDay(calendarNow);
 
-        System.out.println("In daylight saving: " + TimeZone.getDefault().inDaylightTime( new Date() ));
+        Log.i("ScheduleActivity", "In daylight saving: " + TimeZone.getDefault().inDaylightTime( new Date() ));
 
         //Instantiate a ViewPager and a PagerAdapter.
         viewPager = (ViewPager) findViewById(R.id.pager);
         PagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(currentAcademicDay);
-
-        checkForNewVersion(this, false);
     }
 
     /**
@@ -125,7 +124,7 @@ import java.util.TimeZone;
         // 'year' is just the current year
         int currentDayInWeek = calendar.get(Calendar.DAY_OF_WEEK); // sun = 1, mon = 2, .., sat = 7
         currentDayInWeek -= 2;
-        System.out.println("Academic week: " + week );
+        Log.i("ScheduleActivity", "Academic week: " + week );
 
         // Reformat the day
         if (currentDayInWeek < 0) { currentDayInWeek += 7; }  // mon = 0, tue = 2, .., sun = 6
@@ -273,11 +272,11 @@ import java.util.TimeZone;
         sharedPref = context.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
 
         if (checkIfSyncing()) {
-            System.out.println("Already syncing");
+            Log.i("ScheduleActivity", "Already syncing");
             return;
         }
         if (!sharedPref.getBoolean("signedIn", false)) {
-            System.out.println("User signed out, don't do anything");
+            Log.i("ScheduleActivity", "User signed out, don't do anything");
             return;
         }
 
@@ -307,7 +306,7 @@ import java.util.TimeZone;
                 if (sharedPref.getBoolean("syncSaved", false)) {
                     // Firstly, remove the old items in the current calendar
                     // and set the events for the new iCal file
-                    System.out.println("Deleting items from calendar for sync...");
+                    Log.i("ScheduleActivity", "Deleting items from calendar for sync...");
                     context.startService(new Intent(context, SyncCalendarService.class));
                 }
 
@@ -321,7 +320,7 @@ import java.util.TimeZone;
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        System.out.println("Downloading new iCalendar file.");
+                        Log.i("ScheduleActivity", "Downloading new iCalendar file.");
                         DownloadIcs downloadIcs = new DownloadIcs(contextCopy);
                         downloadIcs.execute(studentId_copy);
                     }
@@ -329,7 +328,7 @@ import java.util.TimeZone;
 
             } else {
                 // The iCal is downloaded less than REFRESH_INTERVAL ago or it is forceRefresh == true
-                System.out.println("Don't download new iCal file.");
+                Log.i("ScheduleActivity", "Don't download new iCal file.");
                 sharedPref.edit().putBoolean("refreshing", false).apply();
             }
         } else {
@@ -383,7 +382,7 @@ import java.util.TimeZone;
     }
 
     public void setAlarm(Context context) {
-        System.out.println("Setting alarm");
+        Log.i("ScheduleActivity", "Setting alarm");
         // Set the alarm to start at approx 14:00
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -398,11 +397,11 @@ import java.util.TimeZone;
         if (timeNow < nextAlarmTime) {
             // The alarm has yet to go off
             // No need to change the alarm time
-            System.out.println("The alarm has yet to go off");
+            Log.i("ScheduleActivity", "The alarm has yet to go off");
         } else {
             // The alarm should have already gone off
             // change the nextAlarmTime
-            System.out.println("The alarm should have already gone off");
+            Log.i("ScheduleActivity", "The alarm should have already gone off");
         }
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -430,10 +429,10 @@ import java.util.TimeZone;
         if (synced) {
             // Delete the items from the users agenda
             sharedPref.edit().putBoolean("syncSaved", false).apply();
-            System.out.println("Deleting items from calendar...");
+            Log.i("ScheduleActivity", "Deleting items from calendar...");
             startService(new Intent(getApplicationContext(), SyncCalendarService.class));
         } else {
-            System.out.println("Agenda not synced, don't delete items.");
+            Log.i("ScheduleActivity", "Agenda not synced, don't delete items.");
         }
 
         sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green)).apply();
@@ -460,12 +459,12 @@ import java.util.TimeZone;
             if (timeSinceLastCheck > MAX_SYNC_TIME) {
                 // The app was syncing quite a while ago. Something is wrong.
                 // Put the values back
-                System.out.println("Syncing took too long! Resetting value in SharedPreferences");
+                Log.i("ScheduleActivity", "Syncing took too long! Resetting value in SharedPreferences");
                 sharedPref.edit().putBoolean("isSyncing", false).apply();
                 return false;
             } else {
                 // The app was syncing not too long ago. It's probably alright
-                System.out.println("Last sync was " + timeSinceLastCheck/1000 + " seconds ago.");
+                Log.i("ScheduleActivity", "Last sync was " + timeSinceLastCheck/1000 + " seconds ago.");
                 return true;
             }
         }
@@ -491,12 +490,12 @@ import java.util.TimeZone;
             if (timeSinceLastCheck > MAX_REFRESH_TIME) {
                 // The app was syncing quite a while ago. Something is wrong.
                 // Put the values back
-                System.out.println("Refreshing took too long! Resetting value in SharedPreferences");
+                Log.i("ScheduleActivity", "Refreshing took too long! Resetting value in SharedPreferences");
                 sharedPref.edit().putBoolean("refreshing", false).apply();
                 return false;
             } else {
                 // The app was syncing not too long ago. It's probably alright
-                System.out.println("Last refresh was " + timeSinceLastCheck/1000 + " seconds ago.");
+                Log.i("ScheduleActivity", "Last refresh was " + timeSinceLastCheck/1000 + " seconds ago.");
                 return true;
             }
         }
@@ -564,7 +563,7 @@ import java.util.TimeZone;
      * because the calendar is synced.
      */
     private void askToSignOut() {
-        System.out.println("Asking user corfirmation to sign out.");
+        Log.i("ScheduleActivity", "Asking user corfirmation to sign out.");
         final Dialog dialog = new Dialog(this, getString(R.string.ask_sign_out_title),
                 getString(R.string.ask_sign_out_question),
                 getString(R.string.button_cancel),

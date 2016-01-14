@@ -3,6 +3,7 @@ package nl.workmoose.datanose;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,7 +102,7 @@ import java.util.TimeZone;
         LinearLayout timeHolder = (LinearLayout) rootView.findViewById(R.id.timeHolder);
 
         // Make textView's for the left container displaying the hours of the day (9:00, 10:00,..)
-        for (int i=8; i <= 21; i++) {
+        for (int i=8; i <= 23; i++) {
             // Create new TextView and set text
             TextView time = new TextView(scheduleActivity);
             time.setText(i + ":00");
@@ -114,7 +115,7 @@ import java.util.TimeZone;
             timeHolder.addView(time);
         }
         // Make horizontal lines to separate the hours
-        for (int i=0; i <= 13; i++) {
+        for (int i=0; i <= 15; i++) {
             // Make a new line
             View horizontalLine = new View(scheduleActivity);
 
@@ -165,8 +166,8 @@ import java.util.TimeZone;
      */
     private void drawEvents() {
 
-        // Make list to calculate the
-        ArrayList<Integer> occupationList = new ArrayList<>(Collections.nCopies(12, 0));
+        // Make list for every 5 minutes
+        ArrayList<Integer> occupationList = new ArrayList<>(Collections.nCopies(14*12, 0));
 
         // Get timezone offset
         int offSet = timeOffset();
@@ -178,12 +179,15 @@ import java.util.TimeZone;
             // Get begin and end time
             int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
             int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
+
             int beginHour = (int) Math.floor(beginTime / 100);
             int endHour = (int) Math.ceil(endTime / 100);
+            int beginMinute = beginTime % 100;
+            int endMinute = endTime % 100;
 
             // Set data to ArrayList
-            for (int i = beginHour; i < endHour; i++) {
-                occupationList.set(i - 9, occupationList.get(i - 9) + 1);
+            for (int i = beginHour*12 + beginMinute/5; i < endHour*12 + endMinute/5; i++) {
+                occupationList.set(i - 9*12, occupationList.get(i - 9*12) + 1);
             }
         }
         // Count the number of events at the same time
@@ -195,12 +199,14 @@ import java.util.TimeZone;
             int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
             int beginHour = (int) Math.floor(beginTime / 100);
             int endHour = (int) Math.ceil(endTime / 100);
+            int beginMinute = beginTime % 100;
+            int endMinute = endTime % 100;
             int maxItems = 1;
 
             // Set data to ArrayList
-            for (int i = beginHour; i < endHour; i++) {
-                if (occupationList.get(i - 9) > maxItems) {
-                    maxItems = occupationList.get(i - 9);
+            for (int i = beginHour*12 + beginMinute/5; i < endHour*12 + endMinute/5; i++) {
+                if (occupationList.get(i - 9*12) > maxItems) {
+                    maxItems = occupationList.get(i - 9*12);
                     if (maxItems > globalMaxWidth) {
                         globalMaxWidth = maxItems;
                     }
@@ -209,8 +215,8 @@ import java.util.TimeZone;
             // Add the number of events at the same time to the event
             event.add("" + maxItems);
         }
-        // Calculate the width of the items per hour
-        ArrayList<Integer> widthList = new ArrayList<>(Collections.nCopies(12, 0));
+        // Calculate the width of the items per 5 minutes
+        ArrayList<Integer> widthList = new ArrayList<>(Collections.nCopies(14*12, 0));
 
         // Last loop through the events to calculate the final width of the items
         for (ArrayList<String> event : events) {
@@ -219,11 +225,13 @@ import java.util.TimeZone;
             int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
             int beginHour = (int) Math.floor(beginTime / 100);
             int endHour = (int) Math.ceil(endTime / 100);
+            int beginMinute = beginTime % 100;
+            int endMinute = endTime % 100;
 
             // Make final ArrayList
-            for (int i = beginHour; i < endHour; i++) {
-                if (Integer.parseInt(event.get(MAX_ITEMS)) > widthList.get(i - 9)) {
-                    widthList.set(i - 9, Integer.parseInt(event.get(MAX_ITEMS)));
+            for (int i = beginHour*12 + beginMinute/5; i < endHour*12 + endMinute/5; i++) {
+                if (Integer.parseInt(event.get(MAX_ITEMS)) > widthList.get(i - 9*12)) {
+                    widthList.set(i - 9*12, Integer.parseInt(event.get(MAX_ITEMS)));
                 }
             }
         }
@@ -237,7 +245,7 @@ import java.util.TimeZone;
         while (events.size() != 0) {
 
             // Set the Boolean list for the current column
-            columnOccupation = new ArrayList<>(Collections.nCopies(12, false));
+            columnOccupation = new ArrayList<>(Collections.nCopies(14*12, false));
             ArrayList<ArrayList<String>> removedEvents = new ArrayList<>();
 
             for (ArrayList<String> event : events) {
@@ -246,13 +254,15 @@ import java.util.TimeZone;
                 int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
                 int beginHour = (int) Math.floor(beginTime / 100);
                 int endHour = (int) Math.ceil(endTime / 100);
+                int beginMinute = beginTime % 100;
+                int endMinute = endTime % 100;
 
                 // Set canPlaceEvent initially to true
                 Boolean canPlaceEvent = true;
 
                 // Check if place is already occupied
-                for (int i = beginHour; i < endHour; i++) {
-                    if (columnOccupation.get(i - 9)){
+                for (int i = beginHour*12 + beginMinute/5; i < endHour*12 + endMinute/5; i++) {
+                    if (columnOccupation.get(i - 9*12)){
                         canPlaceEvent = false;
                         break;
                     }
@@ -260,16 +270,14 @@ import java.util.TimeZone;
                 // If we can place the event, draw it
                 if (canPlaceEvent) {
                     // Set columnOccupation to false for the current event
-                    for (int i = beginHour; i < endHour; i++) {
-                        columnOccupation.set(i - 9, true);
+                    for (int i = beginHour*12 + beginMinute/5; i < endHour*12 + endMinute/5; i++) {
+                        columnOccupation.set(i - 9*12, true);
                     }
 
                     // Place the event
-                    long beginMinute = beginTime - beginHour*100L;
-                    long endMinute = endTime - endHour*100L;
                     long length = (endHour*60L + endMinute) - (beginHour * 60L + beginMinute);
                     float width = scheduleView.getWidth();
-                    int itemWidth = (int) width / widthList.get(beginHour - 9);
+                    int itemWidth = (int) width / widthList.get(beginHour*12 - 9*12 + beginMinute/5);
 
                     // Create new EventView
                     EventView eventView = new EventView(scheduleActivity);
@@ -284,7 +292,6 @@ import java.util.TimeZone;
                     // Add layoutparams to EventView, and set data
                     eventView.setLayoutParams(lp);
                     eventView.setEventData(event, offSet);
-
 
                     // Add view to parent
                     scheduleView.addView(eventView);
@@ -330,7 +337,7 @@ import java.util.TimeZone;
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
-        if (hour >= 21 || hour < 8) {
+        if (hour >= 23 || hour < 8) {
             // The timeLine falls out of the view
             return;
         }

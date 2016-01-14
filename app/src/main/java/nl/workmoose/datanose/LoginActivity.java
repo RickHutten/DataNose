@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
@@ -76,7 +77,7 @@ import com.gc.materialdesign.widgets.SnackBar;
             if (sharedPref.contains("studentId")) {
                 String studentId = sharedPref.getString("studentId", "");
                 if (!studentId.equals("")) {
-                    System.out.println("Currently logged in: " + studentId);
+                    Log.i("LoginActivity", "Currently logged in: " + studentId);
                     Intent i = new Intent(context, ScheduleActivity.class);
                     startActivity(i);
                     overridePendingTransition(R.anim.slide_up, R.anim.do_nothing);
@@ -178,14 +179,14 @@ import com.gc.materialdesign.widgets.SnackBar;
 
                 if (!sharedPref.getString("studentId", "-1").equals(studentId)) {
                 // If the input student ID is different from the previous one
-                System.out.println("New student ID, check new ID");
+                Log.i("LoginActivity", "New student ID, check new ID");
                 StudentIdChecker idChecker = new StudentIdChecker(this);
                 idChecker.execute(studentId);
             } else {
-                System.out.println("Same student ID as before, don't download file");
+                Log.i("LoginActivity", "Same student ID as before, don't download file");
                 // The student number is the same as before
                 // Dont download but continue
-                System.out.println("Currently logged in: " + studentId);
+                Log.i("LoginActivity", "Currently logged in: " + studentId);
                 enableBack = false;
                 // Delay the start of ScheduleActivity for aesthetic reasons
                 new Handler().postDelayed(new Runnable() {
@@ -204,7 +205,7 @@ import com.gc.materialdesign.widgets.SnackBar;
             }
         } else {
             // No previous sign in detected
-            System.out.println("First run, download file");
+            Log.i("LoginActivity", "First run, download file");
             StudentIdChecker idChecker = new StudentIdChecker(this);
             idChecker.execute(studentId);
         }

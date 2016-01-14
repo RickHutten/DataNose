@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 
 import com.gc.materialdesign.widgets.Dialog;
@@ -56,7 +57,7 @@ import java.net.URL;
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        System.out.println("idChecker result: " + result);
+        Log.i("StudentIdChecker", "idChecker result: " + result);
         switch (result) {
             case "Correct":
                 DownloadIcs downloadIcs = new DownloadIcs(context);
@@ -114,8 +115,8 @@ import java.net.URL;
             URL url = new URL(urlString);
             HttpURLConnection conn =  (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            System.out.println("Checking URL: " + urlString);
-            System.out.println("Response code: " + conn.getResponseCode());
+            Log.i("StudentIdChecker", "Checking URL: " + urlString);
+            Log.i("StudentIdChecker", "Response code: " + conn.getResponseCode());
 
             // Response code "307" if for the url "http://content.datanose.nl/Timetable.svc"
             return (conn.getResponseCode() == HttpURLConnection.HTTP_OK || conn.getResponseCode() == 307);

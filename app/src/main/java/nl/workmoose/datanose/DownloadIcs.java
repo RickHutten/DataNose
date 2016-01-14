@@ -7,16 +7,19 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 
 import com.gc.materialdesign.widgets.SnackBar;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
@@ -60,14 +63,14 @@ import java.util.Calendar;
         String msg;  // Param that will be passed on to onPostExecute
         studentId = params[0];  // The param that is given using .execute(param)
         String urlString = URL_STRING + studentId + EXTENSION;
-        System.out.println("Downloading file for student: " + studentId);
+        Log.i("DownloadIcs", "Downloading file for student: " + studentId);
         sharedPref = context.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
         sharedPref.edit().putBoolean("isDownloading", true).apply();
 
         if (hasInternetConnection(context)) {
             try {
                 // Try to download file
-                System.out.println(urlString);
+                Log.i("DownloadIcs", urlString);
                 downloadFromUrl(urlString);
                 msg = "File downloaded";
             } catch (SocketTimeoutException e) {
@@ -101,7 +104,7 @@ import java.util.Calendar;
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        System.out.println("downloadIcs result: " + result);
+        Log.i("DownloadIcs", "Result: " + result);
         sharedPref.edit().putBoolean("isDownloading", false).apply();
 
 
@@ -111,7 +114,7 @@ import java.util.Calendar;
 
             // Save correct student ID to sharedPreferences
             sharedPref.edit().putString("studentId", studentId).apply();
-            System.out.println("Currently logged in: " + studentId);
+            Log.i("DownloadIcs", "Currently logged in: " + studentId);
 
             // Save the time the last iCal was downloaded
             sharedPref.edit().putLong("lastDownloaded", now.getTimeInMillis()).apply();
@@ -119,7 +122,7 @@ import java.util.Calendar;
             try{
                 //  Start ScheduleActivity
                 Activity currentActivity = (Activity) context;
-                System.out.println("Done downloading, start new ScheduleActivity");
+                Log.i("DownloadIcs", "Done downloading, start new ScheduleActivity");
 
                 if (!sharedPref.getBoolean("syncSaved", false)) {
                     // If the file is only being downloaded without syncing, set refreshing to false
@@ -132,13 +135,12 @@ import java.util.Calendar;
                 currentActivity.overridePendingTransition(R.anim.slide_up, R.anim.do_nothing);
             } catch (Exception e) {
                 // When called from receiver
-                System.out.println("Done downloading");
+                Log.i("DownloadIcs", "Done downloading");
                 if (!sharedPref.getBoolean("syncSaved", false)) {
                     // If the file is only being downloaded without syncing, set refreshing to false
                     sharedPref.edit().putBoolean("refreshing", false).apply();
                 }
             }
-
         } else {
 
             // There was an error during download
@@ -185,50 +187,35 @@ import java.util.Calendar;
      * @param urlString: The url of the iCalendar file
      */
     private void downloadFromUrl(String urlString) throws IOException {
-        InputStream is = null;
-        try {
-            // Set up the connection to the site
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        // Set up the connection to the site
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-            // Set read- and connection timeout and shit
-            conn.setReadTimeout(READ_TIMEOUT);
-            conn.setConnectTimeout(CONN_TIMEOUT);
-            conn.setRequestMethod("GET");
-            conn.setDoInput(true);
-            System.out.println("Response code: " + conn.getResponseCode());
+        // Set read- and connection timeout and shit
+        conn.setReadTimeout(READ_TIMEOUT);
+        conn.setConnectTimeout(CONN_TIMEOUT);
+        conn.setRequestMethod("GET");
+        conn.setDoInput(true);
 
-            // Start the connection
-            conn.connect();
+        Log.i("DownloadIcs", "Downloading new XML file");
 
-            System.out.println("Downloading new XML file");
+        // Make new file
+        File file = new File(context.getFilesDir(), FILE_NAME);
+        FileOutputStream fileOutput = new FileOutputStream(file);
 
-            // Get content from the server
-            // This one line is the piece of code that takes a while
-            is = new BufferedInputStream(conn.getInputStream());
+        // Get content from the server
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
 
-            // Make new file
-            File file = new File(context.getFilesDir(), FILE_NAME);
-            FileOutputStream fileOutput = new FileOutputStream(file);
-
-            // 1024 is a magic number, don't know why it is used. Stackoverflow.
-            byte[] buffer = new byte[1024];
-            int bufferLength;
-
-            // Write to file
-            while ((bufferLength = is.read(buffer)) > 0) {
-                fileOutput.write(buffer, 0, bufferLength);
-            }
-
-            // Close the fileOutput
-            fileOutput.close();
-        } finally {
-            // Makes sure that the InputStream is closed after the app is
-            // finished using it.
-            if (is != null) {
-                is.close();
-            }
+        // Write to file
+        String line;
+        while ((line = reader.readLine()) != null) {
+            fileOutput.write((line + "\n").getBytes());
         }
+        reader.close();
+
+        // Close the fileOutput
+        fileOutput.close();
+
         // The file is downloaded successfully
     }
 }

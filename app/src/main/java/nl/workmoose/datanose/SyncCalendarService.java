@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.CalendarContract;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,7 +39,7 @@ public class SyncCalendarService extends Service {
     private final static int LOCATION = 3;
     private final static int TEACHER = 4;
     private final static int UID = 5;
-    private int notifId;
+    private int notifId = 1;
     private long calendarId = -1;
     private int agendaColor;
     private SharedPreferences sharedPref;
@@ -48,8 +49,7 @@ public class SyncCalendarService extends Service {
     @Override
     public int onStartCommand(Intent intent, final int flags, int startId) {
         // Create a new thread to run the syncing off the UI thread
-        System.out.println("Flags: " + flags);
-        notifId = 1;
+        Log.i("SyncCalendarService", "Flags: " + flags);
         final Context context = this;
 
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
@@ -166,11 +166,11 @@ public class SyncCalendarService extends Service {
 
             if (readAllCalendars().contains(ACCOUNT_NAME)) {
                 // Calendar already exsists, don't create new calendar
-                System.out.println("Calendar already exsists, don't create another");
+                Log.i("SyncCalendarService", "Calendar already exsists, don't create another");
 
             } else {
                 // Calendar does not already exsists
-                System.out.println("Creating new calendar");
+                Log.i("SyncCalendarService", "Creating new calendar");
 
                 // Create a new calendar
                 createNewCalendar();
@@ -185,12 +185,12 @@ public class SyncCalendarService extends Service {
             // Set the events to the calendar.
             setEvents(eventList);
 
-            System.out.println("Sync result: SYNC OK");
+            Log.i("SyncCalendarService", "Sync result: SYNC OK");
         } catch (Exception e) {
 
             // Something went wrong in setEvents()
             e.printStackTrace();
-            System.out.println("Sync result: SYNC ERROR");
+            Log.i("SyncCalendarService", "Sync result: SYNC ERROR");
         }
 
         if (sharedPref.getBoolean("refreshing", false)) {
@@ -202,13 +202,20 @@ public class SyncCalendarService extends Service {
             if (sharedPref.getBoolean("isDownloading", false)) {
                 setNotificationWaitForDownload();
             }
+            if (sharedPref.getBoolean("isDownloading", false)) {
+                for (int i = 0; i < 30; i++) {
+                    if (!sharedPref.getBoolean("isDownloading", false)) {
+                        // If it stopped downloading
+                        break;
+                    }
 
-            while (sharedPref.getBoolean("isDownloading", false)) {
-                try{
-                    // Sleep for 1 second and check again
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // This is necessary
+                    // Sleep for max 30 seconds
+                    try {
+                        // Sleep for 1 second and check again
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        // This is necessary
+                    }
                 }
             }
             // Call the syncing process again, now it will read the new downloaded file
@@ -295,10 +302,10 @@ public class SyncCalendarService extends Service {
 
             if (isVisible() && !sharedPref.getBoolean("refreshing", false)) {
                 // Update or insert the event
-                System.out.println("Adding/Updating event: " + count + " of " + eventList.size());
+                Log.i("SyncCalendarService", "Adding/Updating event: " + count + " of " + eventList.size());
             } else {
                 // System is removing the events
-                System.out.println("Deleting event: " + count + " of " + eventList.size());
+                Log.i("SyncCalendarService", "Deleting event: " + count + " of " + eventList.size());
             }
 
             if (count % 5 == 0) {
@@ -344,10 +351,10 @@ public class SyncCalendarService extends Service {
             // because now the event is not shown
             values.put(CalendarContract.Events.DTSTART, -1);
             values.put(CalendarContract.Events.DTEND, -1);
-            values.put(CalendarContract.Events.TITLE, (String) null);
-            values.put(CalendarContract.Events.DESCRIPTION, (String) null);
+            values.put(CalendarContract.Events.TITLE, "");
+            values.put(CalendarContract.Events.DESCRIPTION, "");
             values.put(CalendarContract.Events.EVENT_COLOR, -1);
-            values.put(CalendarContract.Events.EVENT_LOCATION, (String) null);
+            values.put(CalendarContract.Events.EVENT_LOCATION, "");
         }
         try {
             // This try/catch is the way to go, don't fuck this up
