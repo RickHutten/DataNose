@@ -15,12 +15,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog;
 import com.gc.materialdesign.widgets.Dialog;
@@ -45,13 +51,18 @@ import java.util.TimeZone;
     private static final long REFRESH_INTERVAL = 1000*60*60*24; // Refresh interval in milliseconds
     private static final long MAX_REFRESH_TIME = 1000*60; // 1 minute
     private static final long MAX_SYNC_TIME = 1000*60*5; // 5 minutes
+    private final static long DP_HOUR_HEIGHT = 60; // Height of 1 hour in dp
+    private final static int DP_HOUR_WIDTH = 50; // Width of the hour bar in dp
 
     private ViewPager viewPager;
+    private ActionBar actionBar;
+    private Menu menu;
     private ArrayList<ArrayList<String>> eventList;
     public int academicYear;
     private SharedPreferences sharedPref;
     private int currentAcademicDay;
     private ScheduleActivity scheduleActivity;
+    public boolean isAnyEventPressed = false;
 
     /**
      * Calls ParseIcs to parse the file. Than calculates the day of the year and sets
@@ -62,6 +73,8 @@ import java.util.TimeZone;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
         scheduleActivity = this;
+
+        actionBar = this.getSupportActionBar();
 
         // Parse the file downloaded
         ParseIcs parseIcs = new ParseIcs(this);
@@ -87,9 +100,55 @@ import java.util.TimeZone;
 
         //Instantiate a ViewPager and a PagerAdapter.
         viewPager = (ViewPager) findViewById(R.id.pager);
-        PagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        viewPager.setPageMargin(-1);  // Visual bug fix
+        PagerAdapter pagerAdapter;
+
+        if (sharedPref.getString("mode", "day").equalsIgnoreCase("day")) {
+            pagerAdapter = new DayPagerAdapter(getSupportFragmentManager());
+        } else {
+            // Mode is week
+            pagerAdapter = new WeekPagerAdapter((getSupportFragmentManager()));
+            RelativeLayout sideContainer = (RelativeLayout) findViewById(R.id.side_container);
+            ((ViewGroup) findViewById(R.id.pagerParent)).bringChildToFront(sideContainer);
+            sideContainer.setVisibility(View.VISIBLE);
+            actionBar.setElevation(0);
+            actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
+        }
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(currentAcademicDay);
+
+        setActivityTimeHolder();
+
+        MyScrollView scrollView = (MyScrollView) findViewById(R.id.timeHolderScrollView);
+        scrollView.setOnScrollChangedListener(new MyScrollView.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged(ScrollView view, int x, int y, int oldx, int oldy) {
+                ((WeekPagerAdapter)viewPager.getAdapter()).scrollTo(y);
+            }
+        });
+    }
+
+    public void setTimeHolderScroll(int y) {
+        findViewById(R.id.timeHolderScrollView).setScrollY(y);
+    }
+
+    private void setActivityTimeHolder() {
+        // Get container for the times
+        LinearLayout timeHolder = (LinearLayout) findViewById(R.id.activityTimeHolder);
+
+        // Make textView's for the left container displaying the hours of the day (9:00, 10:00,..)
+        for (int i=8; i <= 23; i++) {
+            // Create new TextView and set text
+            TextView time = new TextView(scheduleActivity);
+            time.setText(i + ":00");
+
+            // Make layoutparams
+            time.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(DP_HOUR_WIDTH),
+                    dpToPx(DP_HOUR_HEIGHT)));
+
+            // Add view to parent
+            timeHolder.addView(time);
+        }
     }
 
     /**
@@ -344,9 +403,9 @@ import java.util.TimeZone;
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_schedule, menu);
-
         // Set the correct number in the today menu button
         setTodayButton(menu);
 
@@ -502,7 +561,7 @@ import java.util.TimeZone;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -518,6 +577,51 @@ import java.util.TimeZone;
                     Intent i = new Intent(this, SettingsActivity.class);
                     startActivity(i);
                 }
+                break;
+            case R.id.action_show_week:
+                sharedPref.edit().putString("mode", "week").apply();
+                RelativeLayout sideContainer = (RelativeLayout) findViewById(R.id.side_container);
+                ((ViewGroup) findViewById(R.id.pagerParent)).bringChildToFront(sideContainer);
+                sideContainer.setVisibility(View.VISIBLE);
+                viewPager.invalidate();
+                viewPager.requestLayout();
+
+                // Switch to week view
+                actionBar.setElevation(0);
+                actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
+                PagerAdapter WeekAdapter = new WeekPagerAdapter(getSupportFragmentManager());
+                int current_item = viewPager.getCurrentItem();
+                viewPager.setAdapter(WeekAdapter);
+                viewPager.setCurrentItem(current_item);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        item.setVisible(false);  // Set this menu to invisible
+                        menu.findItem(R.id.action_show_day).setVisible(true);
+                    }
+                }, 500);
+                break;
+            case R.id.action_show_day:
+                sharedPref.edit().putString("mode", "day").apply();
+                RelativeLayout mySideContainer = (RelativeLayout) findViewById(R.id.side_container);
+                mySideContainer.setVisibility(View.GONE);
+                viewPager.invalidate();
+                viewPager.requestLayout();
+
+                // Switch to day view
+                actionBar.setElevation(16);
+                actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_day));
+                PagerAdapter DayAdapter = new DayPagerAdapter(getSupportFragmentManager());
+                int current_item_week = viewPager.getCurrentItem();
+                viewPager.setAdapter(DayAdapter);
+                viewPager.setCurrentItem(current_item_week);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        item.setVisible(false);  // Set this menu to invisible
+                        menu.findItem(R.id.action_show_week).setVisible(true);
+                    }
+                }, 500);
                 break;
             case R.id.sign_out:
                 // Check if the system is syncing at the moment
@@ -544,6 +648,7 @@ import java.util.TimeZone;
                 viewPager.setCurrentItem(currentAcademicDay, true);
                 break;
             case R.id.refresh:
+                ((ViewGroup) findViewById(R.id.pagerParent)).bringChildToFront(findViewById(R.id.refreshContainer));
                 // Check if the system is syncing at the moment
                 if (checkIfSyncing()) {
                     new SnackBar(this, getResources().getString(R.string.busy_syncing)).setMessageTextSize(14).show();
@@ -633,5 +738,18 @@ import java.util.TimeZone;
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getResources().getDisplayMetrics());
         return (int) px;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if(sharedPref.getString("mode", "day").equalsIgnoreCase("day")) {
+            MenuItem showWeek = menu.findItem(R.id.action_show_week);
+            showWeek.setVisible(true);
+        }
+        else {
+            MenuItem showDay = menu.findItem(R.id.action_show_day);
+            showDay.setVisible(true);
+        }
+        return true;
     }
 }

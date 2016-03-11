@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/weekScheduleContainer"
+    android:clipChildren="false"
+    android:background="@color/white">
+
+    <nl.workmoose.datanose.MyScrollView
+        android:id="@+id/scheduleScrollView"
+        android:layout_width="match_parent"
+        android:scrollbars="none"
+        android:clipChildren="false"
+        android:layout_height="match_parent"
+        tools:context=".ScheduleActivity">
+
+        <RelativeLayout
+            android:id="@+id/scheduleContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false">
+
+            <!-- Holds the actual agenda items -->
+            <RelativeLayout
+                android:id="@+id/scheduleView"
+                android:clipChildren="false"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <RelativeLayout
+                    android:id="@+id/timeLine"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/blue"
+                    android:visibility="invisible">
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </RelativeLayout>  <!-- Schedule container -->
+
+    </nl.workmoose.datanose.MyScrollView>
+
+    <RelativeLayout
+        android:id="@+id/dateContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <RelativeLayout
+            android:id="@+id/date"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:background="@color/white" >
+
+            <LinearLayout
+                android:id="@+id/month_day"
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/month"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:text="Jan"/>
+
+                <TextView
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/dayOfMonth"
+                    android:textColor="@color/blue"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:text="12"
+                    android:textSize="12sp"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/dayOfWeek"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_below="@id/month_day"
+                android:textSize="10sp"
+                android:text="Mon"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/greyline"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/date"
+            android:background="@color/gray" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_below="@id/greyline"
+            android:background="@drawable/black_gradient" />
+
+    </RelativeLayout> <!-- Date Container -->
+
+</RelativeLayout>

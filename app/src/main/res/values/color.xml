@@ -3,6 +3,7 @@
     <!-- Check kleur naam op: http://hex-color.com/code/70C78B -->
     <color name="black">#000</color>
     <color name="dark_gray">#333333</color> <!-- DarkSlateGray -->
+    <color name="light_gray">#f5f5f5</color>
     <color name="gray">#ddd</color> <!-- Gainsboro -->
     <color name="white">#ffffff</color>
     <color name="transparent">#00000000</color>

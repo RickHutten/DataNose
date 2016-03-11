@@ -12,15 +12,18 @@ import android.support.v4.app.FragmentStatePagerAdapter;
  *
  * PagerAdapter for the ViewPager.
  */
-public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-    public ScreenSlidePagerAdapter(FragmentManager fm) {
+public class DayPagerAdapter extends FragmentStatePagerAdapter {
+
+
+
+    public DayPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
     @Override
     public Fragment getItem(int position) {
         // Create new Fragment and give arguments
-        ScheduleFragment scheduleFragment = new ScheduleFragment();
+        DayScheduleFragment scheduleFragment = new DayScheduleFragment();
 
         // Give the fragment the position it is in
         Bundle bundle = new Bundle();

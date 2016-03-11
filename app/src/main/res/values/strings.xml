@@ -12,6 +12,8 @@
     <string name="unknown_host">Unable to resolve host</string>
     <string name="unknown_error"> An unknown error occurred</string>
     <string name="action_settings">Settings</string>
+    <string name="action_show_week">Week view</string>
+    <string name="action_show_day">Day view</string>
     <string name="sign_out">Sign out</string>
     <string name="to_today">Go to today</string>
     <string name="to_date">Pick date</string>

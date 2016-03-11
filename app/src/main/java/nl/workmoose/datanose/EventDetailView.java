@@ -5,6 +5,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,12 +19,19 @@ public class EventDetailView extends RelativeLayout {
     private final static int NAME = 2;
     private final static int LOCATION = 3;
     private final static int TEACHER = 4;
+    private View rootView;
 
     public EventDetailView(Context context) {
         super(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rootView = inflater.inflate(R.layout.detail_event_layout, this, false);
+        rootView = inflater.inflate(R.layout.detail_event_layout, this, false);
         addView(rootView);
+    }
+
+    public void setWidth(int width) {
+        ViewGroup.LayoutParams params = rootView.findViewById(R.id.uberParent).getLayoutParams();
+        params.width = width;
+        rootView.findViewById(R.id.uberParent).setLayoutParams(params);
     }
 
     public void setData(ArrayList<String> data, int offSet) {
@@ -32,7 +40,7 @@ public class EventDetailView extends RelativeLayout {
         String name = data.get(NAME);
 
         // Split the string because this string containt the title and the type
-        ArrayList<String> nameList = new ArrayList(Arrays.asList(name.split(" ")));
+        ArrayList<String> nameList = new ArrayList<>(Arrays.asList(name.split(" ")));
         String classType = nameList.remove(nameList.size() - 1);
         String className = "";
 

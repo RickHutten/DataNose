@@ -1,6 +1,7 @@
 <resources>
 
     <style name="LoginTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:colorPrimary">@color/blue</item>
         <item name="android:colorPrimaryDark">@color/blue</item>
     </style>
 
@@ -20,8 +21,8 @@
     </style>
 
     <style name="ActionbarStyle" parent="@style/Widget.AppCompat.Light.ActionBar">
-        <item name="android:background">@drawable/actionbar_background</item>
-        <item name="background">@drawable/actionbar_background</item>
+        <item name="android:background">@drawable/actionbar_background_day</item>
+        <item name="background">@drawable/actionbar_background_day</item>
         <item name="android:icon">@color/transparent</item>
         <item name="icon">@color/transparent</item>
         <item name="android:titleTextStyle">@style/TextStyle</item>

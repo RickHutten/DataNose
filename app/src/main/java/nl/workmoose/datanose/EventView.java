@@ -3,15 +3,18 @@ package nl.workmoose.datanose;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
-import android.view.animation.OvershootInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.RelativeLayout;
@@ -34,7 +37,7 @@ public class EventView extends RelativeLayout {
 
     private final static int NAME = 2;
     private final static int LOCATION = 3;
-    private final static int ANIMATION_SPEED = 250;
+    private final static int ANIMATION_SPEED = 175;
     private final static int ANIMATION_SPEED_BUTTON = 100;
     private String title;
     private String type;
@@ -47,6 +50,10 @@ public class EventView extends RelativeLayout {
     private View rootView;
     private ArrayList<String> data;
     private int offSet;
+    private WeekScheduleFragment fragment;
+    private RelativeLayout pagerParent;
+    private ScheduleActivity activity;
+    private final EventView eventView = this;
 
     /**
      * Inflates the layout from event_layout.xml to this view
@@ -58,8 +65,19 @@ public class EventView extends RelativeLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         rootView = inflater.inflate(R.layout.event_layout, this, false);
         addView(rootView);
-
+        activity = (ScheduleActivity) context;
+        pagerParent = (RelativeLayout) activity.findViewById(R.id.pagerParent);
         this.context = context;
+
+        ViewTreeObserver vto = rootView.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (eventView.getWidth() < dpToPx(15)) {
+                    rootView.findViewById(R.id.textContainer).setVisibility(INVISIBLE);
+                }
+            }
+        });
     }
 
     /**
@@ -102,10 +120,8 @@ public class EventView extends RelativeLayout {
         this.offSet = offSet;
         String name = data.get(NAME);
 
-        final EventView eventView = this;
-
         // Split the string because this string containt the title and the type
-        ArrayList<String> nameList = new ArrayList(Arrays.asList(name.split(" ")));
+        ArrayList<String> nameList = new ArrayList<>(Arrays.asList(name.split(" ")));
         String classType = nameList.remove(nameList.size() - 1);
         String className = "";
 
@@ -124,7 +140,7 @@ public class EventView extends RelativeLayout {
         setType();
         setLocation();
 
-        this.setOnTouchListener(getTouchListener(eventView));
+        this.setOnTouchListener(getTouchListener());
     }
 
     private void animateView() {
@@ -132,78 +148,71 @@ public class EventView extends RelativeLayout {
         setColor();
         final EventDetailView eventDetailView = new EventDetailView(context);
         eventDetailView.setData(data, offSet);
-        eventDetailView.setVisibility(INVISIBLE);
+
+        pagerParent.addView(eventDetailView);
 
         // Get elements from xml
         ScrollView scrollView = (ScrollView) getParent().getParent().getParent();
-        final RelativeLayout scheduleFragment = (RelativeLayout) scrollView.getParent();
-        RelativeLayout scheduleView = (RelativeLayout) getParent();
 
+        RelativeLayout detailContainer = (RelativeLayout)eventDetailView.findViewById(R.id.detailContainer);
+        ViewGroup.LayoutParams lp = ((View) detailContainer.getParent()).getLayoutParams();
+        lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        ((View)detailContainer.getParent()).setLayoutParams(lp);
         // Get position of this view
-        int leftOffset = scheduleView.getLeft();
         int scrollOffset = scrollView.getScrollY();
 
         // There is no good way (that I have found) to calculate the height of the actionbar
-        // plus the notification bar. This is an estimate in dp, 48 for actionbar and 20 for
-        // the notification bar
         int actionBarOffset = dpToPx(40);
 
         // Get middle of current event in px
-        float middleX = ((this.getLeft() + this.getRight()) / 2) + leftOffset;
         float middleY = ((this.getTop() + this.getBottom()) / 2) - scrollOffset + actionBarOffset;
+        int[] coords = {0, 0};
+        this.getLocationOnScreen(coords);
+        float middleX = coords[0] + this.getWidth()/2f;
 
         // Get width and height of screen
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        float screenWidth = metrics.widthPixels;
-        float screenHeight = metrics.heightPixels;
+        final float screenWidth = metrics.widthPixels;
+        final float screenHeight = metrics.heightPixels;
 
         // Get the target middle coordinates
-        float screenMiddleX = screenWidth / 2;
+        final float screenMiddleX = screenWidth / 2;
         float screenMiddleY = screenHeight / 2;
 
         // Calculate the difference
-        deltaX = screenMiddleX - middleX;
-        deltaY = screenMiddleY - middleY;
-
-        // Create animationset
-        AnimationSet animationSet = new AnimationSet(true);
-        animationSet.setFillAfter(true);
-        animationSet.setInterpolator(new OvershootInterpolator());
-
-        // Set translate animation to view
-        TranslateAnimation translate = new TranslateAnimation(0, deltaX, 0, deltaY);
-        translate.setDuration(ANIMATION_SPEED);
+        deltaX = middleX - screenMiddleX;
+        deltaY = middleY - screenMiddleY;
 
         factorX = (screenWidth - dpToPx(20)) / getWidth();
         factorY = (float) dpToPx(180) / getHeight();
 
-        // Set scale animation to view
-        ScaleAnimation scale = new ScaleAnimation(
-                1, factorX,
-                1, factorY,
-                getWidth() / 2, getHeight() / 2);
-        scale.setDuration(ANIMATION_SPEED);
-
-        // Add the views to the animationset
-        animationSet.addAnimation(scale);
-        animationSet.addAnimation(translate);
-
-        final EventView eventView = this;
+        // Create animationset
+        final AnimationSet animationSet = new AnimationSet(true);
+        animationSet.setFillAfter(true);
 
         // Set animation listener
         animationSet.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                eventView.findViewById(R.id.textContainer).setVisibility(INVISIBLE);
+                eventView.setAlpha(0f);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                eventDetailView.setVisibility(VISIBLE);
-                AlphaAnimation alpha = new AlphaAnimation(1f, 0f);
-                alpha.setFillAfter(true);
-                alpha.setDuration(100);
-                eventView.startAnimation(alpha);
+                // Add transparent view to capture all touches and animate back eventDetailView
+                eventDetailView.findViewById(R.id.detailTextContainer).setVisibility(VISIBLE);
+                final View captureTouchView = new View(activity);
+                captureTouchView.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                pagerParent.addView(captureTouchView);
+                captureTouchView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        pagerParent.removeView(captureTouchView);
+                        animateBack(eventDetailView);
+                    }
+                });
             }
 
             @Override
@@ -211,52 +220,83 @@ public class EventView extends RelativeLayout {
             }
         });
 
-        scheduleFragment.addView(eventDetailView);
-        eventView.bringToFront();
-        eventView.startAnimation(animationSet);
-
-        eventDetailView.setOnClickListener(new OnClickListener() {
+        ViewTreeObserver vto = eventDetailView.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-            public void onClick(View view) {
-                animateBack(eventDetailView, scheduleFragment);
+            public void onGlobalLayout() {
+                if (eventDetailView.getTag() != "true") {
+                    eventDetailView.setTag("true");
+
+                    eventDetailView.setScaleX(1 / factorX);
+                    eventDetailView.setScaleY(1 / factorY);
+                    eventDetailView.setTranslationY(deltaY);
+                    eventDetailView.setTranslationX(deltaX);
+                    eventDetailView.findViewById(R.id.detailTextContainer).setVisibility(INVISIBLE);
+
+                    eventDetailView.setVisibility(VISIBLE);
+
+                    // Set translate animation to view
+                    TranslateAnimation translate = new TranslateAnimation(0, -deltaX, 0, -deltaY);
+                    translate.setDuration(ANIMATION_SPEED);
+                    translate.setInterpolator(new AccelerateInterpolator());
+
+                    // Set scale animation to view
+                    ScaleAnimation scale = new ScaleAnimation(
+                            1, factorX,
+                            1, factorY,
+                            (eventDetailView.getWidth() / 2), (eventDetailView.getHeight()) / 2);
+                    scale.setDuration(ANIMATION_SPEED);
+                    scale.setInterpolator(new DecelerateInterpolator());
+                    scale.setStartOffset(ANIMATION_SPEED/2);
+
+                    // Add the views to the animationset
+                    animationSet.addAnimation(translate);
+                    animationSet.addAnimation(scale);
+                }
             }
         });
+        eventDetailView.startAnimation(animationSet);
     }
 
-    public void animateBack(final EventDetailView eventDetailView, final RelativeLayout scheduleFragment) {
+    public void animateBack(final EventDetailView eventDetailView) {
+
         final EventView eventView = this;
         // Create new animationset
         AnimationSet animationSet = new AnimationSet(true);
         animationSet.setFillAfter(true);
-        animationSet.setInterpolator(new OvershootInterpolator());
 
         // Translate the exact opposite way as the previous translate animation
-        TranslateAnimation translate = new TranslateAnimation(deltaX, 0, deltaY, 0);
+        TranslateAnimation translate = new TranslateAnimation(-deltaX, 0, -deltaY, 0);
         translate.setDuration(ANIMATION_SPEED);
+        translate.setInterpolator(new DecelerateInterpolator());
+        translate.setStartOffset(ANIMATION_SPEED / 2);
 
         // Scale the exact opposite as the previous scale animation
         ScaleAnimation scale = new ScaleAnimation(
                 factorX, 1,
                 factorY, 1,
-                getWidth() / 2, getHeight() / 2);
+                eventDetailView.getWidth() / 2, eventDetailView.getHeight() / 2);
         scale.setDuration(ANIMATION_SPEED);
+        scale.setInterpolator(new AccelerateInterpolator());
 
         // Add animations to set
-        animationSet.addAnimation(scale);
         animationSet.addAnimation(translate);
+        animationSet.addAnimation(scale);
 
         animationSet.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+                eventDetailView.findViewById(R.id.detailTextContainer).setVisibility(INVISIBLE);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
                 // Set text visible
+                eventView.setAlpha(1f);
                 eventView.findViewById(R.id.textContainer).setVisibility(VISIBLE);
-
+                pagerParent.removeView(eventDetailView);
                 // Set OnClickListener back on the view
-                eventView.setOnTouchListener(getTouchListener(eventView));
+                eventView.setOnTouchListener(getTouchListener());
                 eventView.findViewById(R.id.eventContainer).setBackgroundResource(R.drawable.event_background);
                 setColor();
 
@@ -268,10 +308,7 @@ public class EventView extends RelativeLayout {
         });
 
         // Start animation
-        this.bringToFront();
-        scheduleFragment.removeView(eventDetailView);
-        eventView.setAlpha(1f);
-        this.startAnimation(animationSet);
+        eventDetailView.startAnimation(animationSet);
     }
 
     public void setColor() {
@@ -307,10 +344,9 @@ public class EventView extends RelativeLayout {
      * Makes an TouchListener for every EventView that is made. It animates the
      * eventview to the center.
      *
-     * @param eventView: The view that is clicked on in the ScheduleFragment
      * @return OnTouchListener: The touchlistener that
      */
-    private OnTouchListener getTouchListener(final EventView eventView) {
+    private OnTouchListener getTouchListener() {
         return new OnTouchListener() {
             float x = 0;
             float y = 0;
@@ -326,12 +362,39 @@ public class EventView extends RelativeLayout {
                     ScaleAnimation scale = new ScaleAnimation(1, 0.95f, 1, 0.95f, getWidth() / 2, getHeight() / 2);
                     scale.setDuration(ANIMATION_SPEED_BUTTON);
                     scale.setFillAfter(true);
-                    eventView.startAnimation(scale);
+                    v.startAnimation(scale);
                     return true;
                 } else if (event.getAction() == MotionEvent.ACTION_UP && pressed) {
-                    eventView.setOnTouchListener(null); // Prevent item from being pressed quickly after
+                    if (activity.isAnyEventPressed) {
+                        // Scale item back to original size
+                        ScaleAnimation scale = new ScaleAnimation(0.95f, 1, 0.95f, 1, getWidth() / 2, getHeight() / 2);
+                        scale.setDuration(ANIMATION_SPEED_BUTTON);
+                        scale.setFillAfter(true);
+                        v.startAnimation(scale);
+                        return true;
+                    }
+                    ScaleAnimation scale = new ScaleAnimation(0.95f, 1, 0.95f, 1, getWidth() / 2, getHeight() / 2);
+                    scale.setDuration(ANIMATION_SPEED_BUTTON);
+                    scale.setFillAfter(true);
+                    v.startAnimation(scale);
+                    v.setOnTouchListener(null); // Prevent item from being pressed quickly after
+
+                    if (fragment != null) {
+                        if (fragment.getView() != null) {
+                            fragment.getView().bringToFront();
+                        }
+                    }
+                    // Can only press if no other EventView is pressed
+                    activity.isAnyEventPressed = true;
                     animateView(); // Animate view to center
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            activity.isAnyEventPressed = false;
+                        }
+                    }, 500);
                     pressed = false;
+
                     return true;
                 } else {
                     // This event is most likely a move action
@@ -346,13 +409,17 @@ public class EventView extends RelativeLayout {
                         ScaleAnimation scale = new ScaleAnimation(0.95f, 1, 0.95f, 1, getWidth() / 2, getHeight() / 2);
                         scale.setDuration(ANIMATION_SPEED_BUTTON);
                         scale.setFillAfter(true);
-                        eventView.startAnimation(scale);
+                        v.startAnimation(scale);
                     }
                 }
                 // End of if-else statements, return True in onTouch
                 return true;
             }
         };
+    }
+
+    public void setFragment(WeekScheduleFragment fragment) {
+        this.fragment = fragment;
     }
 
 }
