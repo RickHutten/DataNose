@@ -25,15 +25,17 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Calendar;
 
+import nl.workmoose.datanose.activity.LoginActivity;
+import nl.workmoose.datanose.activity.ScheduleActivity;
+
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
- * 10189939
- *
+ * <p>
  * This class downloads the iCalendar file for the given student ID.
  * The file being downloaded is from 'https://datanose.nl/' + studentID + '.ics'.
  */
- public class DownloadIcs extends AsyncTask<String, Void, String> {
+public class DownloadIcs extends AsyncTask<String, Void, String> {
 
     final private static String SHARED_PREF = "prefs";
     final private static String URL_STRING = "https://datanose.nl/";
@@ -51,7 +53,6 @@ import java.util.Calendar;
     }
 
     /**
-     *
      * @param params: Only contains exactly 1 argument: the student ID
      * @return String: Message to the user if something went wrong, or "File downloaded"
      * if everything went good.
@@ -97,6 +98,7 @@ import java.util.Calendar;
     /**
      * If file is downloaded succesfully, start ScheduleActivity.
      * If file is not downloaded succesfully, notify the user and restart LoginActivity.
+     *
      * @param result: result string returned from doInBackGround.
      */
     @Override
@@ -117,7 +119,7 @@ import java.util.Calendar;
             // Save the time the last iCal was downloaded
             sharedPref.edit().putLong("lastDownloaded", now.getTimeInMillis()).apply();
 
-            try{
+            try {
                 //  Start ScheduleActivity
                 Activity currentActivity = (Activity) context;
                 Log.i("DownloadIcs", "Done downloading, start new ScheduleActivity");
@@ -168,6 +170,7 @@ import java.util.Calendar;
 
     /**
      * Check whether the user has an internet connection
+     *
      * @param context: activity context to call getSystemService
      * @return boolean: Boolean, true if the user has a connection, false if not.
      */
@@ -182,6 +185,7 @@ import java.util.Calendar;
      * Download the file from the given string. Completes without errors if a new .ics file
      * is successfully downloaded else throws error, which is catched by doInBackground
      * and the error will be shown to the user
+     *
      * @param urlString: The url of the iCalendar file
      */
     private void downloadFromUrl(String urlString) throws IOException {

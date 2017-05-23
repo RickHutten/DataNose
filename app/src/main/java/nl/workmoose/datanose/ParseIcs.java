@@ -8,15 +8,16 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import nl.workmoose.datanose.activity.ScheduleActivity;
+
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
- * 10189939
- *
+ * <p>
  * Parses the file that has already been downloaded. The information is
  * saved in an ArrayList.
  */
- public class ParseIcs {
+public class ParseIcs {
 
     final private static String FILE_NAME = "WARNING: DO NOT OPEN, VERY DANGEROUS FILE";
     private Context context;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
     /**
      * The actual parsing. It reads the file and puts the information in an
      * Arraylist. Call this function from outside to get the wanted data.
+     *
      * @return ArrayList: ArrayList containing the data from the iCalendar file
      */
     public ArrayList<ArrayList<String>> readFile() {
@@ -59,7 +61,7 @@ import java.util.ArrayList;
 
             // The actual file reading, it reads line by line.
             while ((line = br.readLine()) != null) {
-                if (line.equals("BEGIN:VEVENT")){
+                if (line.equals("BEGIN:VEVENT")) {
                     // Begin event, clear previous values
                     begin = "";
                     end = "";
@@ -105,8 +107,8 @@ import java.util.ArrayList;
                 }
                 if (line.equals("END:VEVENT")) {
                     // End of event
-                    if (begin.equals("")||end.equals("")||name.equals("")||location.equals("")||
-                            teacher.equals("")||uid.equals("")) {
+                    if (begin.equals("") || end.equals("") || name.equals("") || location.equals("") ||
+                            teacher.equals("") || uid.equals("")) {
                         // If a variable is not in the calendar item
                         Log.i("ParseIcs", "Parsing went wrong :(");
                     } else {

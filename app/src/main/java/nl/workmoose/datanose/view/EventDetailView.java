@@ -1,4 +1,4 @@
-package nl.workmoose.datanose;
+package nl.workmoose.datanose.view;
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import nl.workmoose.datanose.R;
 
 public class EventDetailView extends RelativeLayout {
 
@@ -57,8 +59,8 @@ public class EventDetailView extends RelativeLayout {
         String endTime = "" + (Integer.parseInt(data.get(END_TIME).substring(9, 13)) + offSet);
 
         // Format time strings (eg. 1200 -> 12:00)
-        beginTime = new StringBuilder(beginTime).insert(beginTime.length()-2, ":").toString();
-        endTime = new StringBuilder(endTime).insert(endTime.length()-2, ":").toString();
+        beginTime = new StringBuilder(beginTime).insert(beginTime.length() - 2, ":").toString();
+        endTime = new StringBuilder(endTime).insert(endTime.length() - 2, ":").toString();
 
         // Teacher string frequently is in parenthesis, if so, remove them
         if (teacher.startsWith(" (") && teacher.endsWith(")")) {

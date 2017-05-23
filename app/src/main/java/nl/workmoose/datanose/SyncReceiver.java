@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import nl.workmoose.datanose.activity.ScheduleActivity;
+
 
 public class SyncReceiver extends BroadcastReceiver {
 

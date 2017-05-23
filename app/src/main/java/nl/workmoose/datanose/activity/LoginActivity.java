@@ -1,4 +1,4 @@
-package nl.workmoose.datanose;
+package nl.workmoose.datanose.activity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -22,17 +22,19 @@ import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.gc.materialdesign.widgets.Dialog;
 import com.gc.materialdesign.widgets.SnackBar;
 
+import nl.workmoose.datanose.R;
+import nl.workmoose.datanose.StudentIdChecker;
+
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
- * 10189939
- *
+ * <p>
  * First activity where the user can put in his/her student ID, calls StudentIdChecker
  * and (possibly) downloads the iCalendar file before the next activity is called.
- * If the user was already signed in, it skips this acitivity and goes directly
+ * If the user was already signed in, it skips this activity and goes directly
  * to ScheduleActivity
  */
- public class LoginActivity extends Activity {
+public class LoginActivity extends Activity {
 
     private static final String SHARED_PREF = "prefs";
     private static final int ANIMATION_DURATION = 500;
@@ -55,9 +57,9 @@ import com.gc.materialdesign.widgets.SnackBar;
      * "So, why won't you call finish() when you start ScheduleActivity?"
      * - "Because than I am not possible to the the transition animation used to go back to this
      * activity when the user signs out.".
-     *
+     * <p>
      * Checks whether the user is aleady signed in. Calls ScheduleActivity if so.
-     *
+     * <p>
      * Slides in the inputContainer on start and shows the keyboard.
      */
     @Override
@@ -105,7 +107,8 @@ import com.gc.materialdesign.widgets.SnackBar;
         // Set animation listener
         slideIn.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation) { }
+            public void onAnimationStart(Animation animation) {
+            }
 
             @Override
             public void onAnimationEnd(Animation animation) {
@@ -114,7 +117,8 @@ import com.gc.materialdesign.widgets.SnackBar;
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) { }
+            public void onAnimationRepeat(Animation animation) {
+            }
         });
         // Set animation
         View inputContainer = findViewById(R.id.inputContainer);
@@ -177,7 +181,7 @@ import com.gc.materialdesign.widgets.SnackBar;
         // Get last signed in information
         if (sharedPref.contains("studentId")) {
 
-                if (!sharedPref.getString("studentId", "-1").equals(studentId)) {
+            if (!sharedPref.getString("studentId", "-1").equals(studentId)) {
                 // If the input student ID is different from the previous one
                 Log.i("LoginActivity", "New student ID, check new ID");
                 StudentIdChecker idChecker = new StudentIdChecker(this);
@@ -229,7 +233,8 @@ import com.gc.materialdesign.widgets.SnackBar;
         // Set animation listener
         slideIn.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation) { }
+            public void onAnimationStart(Animation animation) {
+            }
 
             @Override
             public void onAnimationEnd(Animation animation) {
@@ -238,7 +243,8 @@ import com.gc.materialdesign.widgets.SnackBar;
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) { }
+            public void onAnimationRepeat(Animation animation) {
+            }
         });
 
 

@@ -13,12 +13,13 @@ import com.gc.materialdesign.widgets.SnackBar;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import nl.workmoose.datanose.activity.LoginActivity;
+
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
- * 10189939
  */
- public class StudentIdChecker extends AsyncTask<String, Void, String> {
+public class StudentIdChecker extends AsyncTask<String, Void, String> {
 
     private Context context;
     private String studentId;
@@ -113,7 +114,7 @@ import java.net.URL;
     private Boolean validURL(String urlString) {
         try {
             URL url = new URL(urlString);
-            HttpURLConnection conn =  (HttpURLConnection) url.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             Log.i("StudentIdChecker", "Checking URL: " + urlString);
             Log.i("StudentIdChecker", "Response code: " + conn.getResponseCode());

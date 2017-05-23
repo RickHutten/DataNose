@@ -5,15 +5,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import nl.workmoose.datanose.fragment.DayScheduleFragment;
+
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
- * 10189939
- *
+ * <p>
  * PagerAdapter for the ViewPager.
  */
 public class DayPagerAdapter extends FragmentStatePagerAdapter {
-
 
 
     public DayPagerAdapter(FragmentManager fm) {

@@ -1,4 +1,4 @@
-package nl.workmoose.datanose;
+package nl.workmoose.datanose.view;
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
@@ -24,11 +24,14 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import nl.workmoose.datanose.R;
+import nl.workmoose.datanose.activity.ScheduleActivity;
+import nl.workmoose.datanose.fragment.WeekScheduleFragment;
+
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
- * 10189939
- *
+ * <p>
  * Custon view that is being used to show the events in the ScheduleActivity.
  * The user can set the data to this view by calling setEventData(). The given data only
  * effects the text shown of the view, not the width, height or margins etc.
@@ -39,6 +42,7 @@ public class EventView extends RelativeLayout {
     private final static int LOCATION = 3;
     private final static int ANIMATION_SPEED = 175;
     private final static int ANIMATION_SPEED_BUTTON = 100;
+    private final EventView eventView = this;
     private String title;
     private String type;
     private String location;
@@ -53,10 +57,10 @@ public class EventView extends RelativeLayout {
     private WeekScheduleFragment fragment;
     private RelativeLayout pagerParent;
     private ScheduleActivity activity;
-    private final EventView eventView = this;
 
     /**
      * Inflates the layout from event_layout.xml to this view
+     *
      * @param context: activity where this view is placed in (ScheduleActivity)
      */
     public EventView(Context context) {
@@ -112,7 +116,8 @@ public class EventView extends RelativeLayout {
     /**
      * This function sets the data for this view. Calls setTitle, setType
      * and setLocation to customize the text for the given data
-     * @param data: the data associated to this view
+     *
+     * @param data:   the data associated to this view
      * @param offSet: the timeOffset for this timezone
      */
     public void setEventData(ArrayList<String> data, int offSet) {
@@ -154,11 +159,11 @@ public class EventView extends RelativeLayout {
         // Get elements from xml
         ScrollView scrollView = (ScrollView) getParent().getParent().getParent();
 
-        RelativeLayout detailContainer = (RelativeLayout)eventDetailView.findViewById(R.id.detailContainer);
+        RelativeLayout detailContainer = (RelativeLayout) eventDetailView.findViewById(R.id.detailContainer);
         ViewGroup.LayoutParams lp = ((View) detailContainer.getParent()).getLayoutParams();
         lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
         lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-        ((View)detailContainer.getParent()).setLayoutParams(lp);
+        ((View) detailContainer.getParent()).setLayoutParams(lp);
         // Get position of this view
         int scrollOffset = scrollView.getScrollY();
 
@@ -169,7 +174,7 @@ public class EventView extends RelativeLayout {
         float middleY = ((this.getTop() + this.getBottom()) / 2) - scrollOffset + actionBarOffset;
         int[] coords = {0, 0};
         this.getLocationOnScreen(coords);
-        float middleX = coords[0] + this.getWidth()/2f;
+        float middleX = coords[0] + this.getWidth() / 2f;
 
         // Get width and height of screen
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
@@ -247,7 +252,7 @@ public class EventView extends RelativeLayout {
                             (eventDetailView.getWidth() / 2), (eventDetailView.getHeight()) / 2);
                     scale.setDuration(ANIMATION_SPEED);
                     scale.setInterpolator(new DecelerateInterpolator());
-                    scale.setStartOffset(ANIMATION_SPEED/2);
+                    scale.setStartOffset(ANIMATION_SPEED / 2);
 
                     // Add the views to the animationset
                     animationSet.addAnimation(translate);
@@ -330,6 +335,7 @@ public class EventView extends RelativeLayout {
 
     /**
      * Converts the given value of dp in pixels
+     *
      * @param dp: the size in dp
      * @return int: the given value of dp in pixels
      */
@@ -351,6 +357,7 @@ public class EventView extends RelativeLayout {
             float x = 0;
             float y = 0;
             boolean pressed = false;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {

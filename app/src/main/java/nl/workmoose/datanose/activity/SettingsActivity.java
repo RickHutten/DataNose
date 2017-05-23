@@ -1,4 +1,4 @@
-package nl.workmoose.datanose;
+package nl.workmoose.datanose.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,14 +19,16 @@ import com.gc.materialdesign.views.ButtonRectangle;
 import com.gc.materialdesign.views.CheckBox;
 import com.gc.materialdesign.widgets.ColorSelector;
 
+import nl.workmoose.datanose.R;
+import nl.workmoose.datanose.SyncCalendarService;
+
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
- * 10189939
- *
+ * <p>
  * Activity where the user can set the settings of the synchronization
  */
- public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     private static final String SHARED_PREF = "prefs";
     private static final int ANIMATION_DURATION = 500;
@@ -213,7 +215,7 @@ import com.gc.materialdesign.widgets.ColorSelector;
         int savedColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
         if (agendaColor != savedColor) {
             // The colors are not the same
-            if (!sync_saved && syncCheckBox.isChecked() == sync_saved){
+            if (!sync_saved && syncCheckBox.isChecked() == sync_saved) {
                 // If you changed the color and you don't want to sync
                 hideFakeSnackBar();
             }

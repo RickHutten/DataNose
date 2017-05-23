@@ -1,4 +1,4 @@
-package nl.workmoose.datanose;
+package nl.workmoose.datanose.activity;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -37,20 +37,28 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import nl.workmoose.datanose.DayPagerAdapter;
+import nl.workmoose.datanose.DownloadIcs;
+import nl.workmoose.datanose.view.MyScrollView;
+import nl.workmoose.datanose.ParseIcs;
+import nl.workmoose.datanose.R;
+import nl.workmoose.datanose.SyncCalendarService;
+import nl.workmoose.datanose.SyncReceiver;
+import nl.workmoose.datanose.WeekPagerAdapter;
+
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
- * 10189939
- *
+ * <p>
  * Activity to hold the ViewPager in which the schedule is loaded.
  */
- public class ScheduleActivity extends AppCompatActivity {
+public class ScheduleActivity extends AppCompatActivity {
 
     private static final String SHARED_PREF = "prefs";
     private static final int BEGIN_TIME = 0;
-    private static final long REFRESH_INTERVAL = 1000*60*60*24; // Refresh interval in milliseconds
-    private static final long MAX_REFRESH_TIME = 1000*60; // 1 minute
-    private static final long MAX_SYNC_TIME = 1000*60*5; // 5 minutes
+    private static final long REFRESH_INTERVAL = 1000 * 60 * 60 * 24; // Refresh interval in milliseconds
+    private static final long MAX_REFRESH_TIME = 1000 * 60; // 1 minute
+    private static final long MAX_SYNC_TIME = 1000 * 60 * 5; // 5 minutes
     private final static long DP_HOUR_HEIGHT = 60; // Height of 1 hour in dp
     private final static int DP_HOUR_WIDTH = 50; // Width of the hour bar in dp
 
@@ -96,7 +104,7 @@ import java.util.TimeZone;
         // Calculate current academic day
         currentAcademicDay = calculateAcademicDay(calendarNow);
 
-        Log.i("ScheduleActivity", "In daylight saving: " + TimeZone.getDefault().inDaylightTime( new Date() ));
+        Log.i("ScheduleActivity", "In daylight saving: " + TimeZone.getDefault().inDaylightTime(new Date()));
 
         //Instantiate a ViewPager and a PagerAdapter.
         viewPager = (ViewPager) findViewById(R.id.pager);
@@ -123,7 +131,7 @@ import java.util.TimeZone;
         scrollView.setOnScrollChangedListener(new MyScrollView.OnScrollChangedListener() {
             @Override
             public void onScrollChanged(ScrollView view, int x, int y, int oldx, int oldy) {
-                ((WeekPagerAdapter)viewPager.getAdapter()).scrollTo(y);
+                ((WeekPagerAdapter) viewPager.getAdapter()).scrollTo(y);
             }
         });
     }
@@ -137,7 +145,7 @@ import java.util.TimeZone;
         LinearLayout timeHolder = (LinearLayout) findViewById(R.id.activityTimeHolder);
 
         // Make textView's for the left container displaying the hours of the day (9:00, 10:00,..)
-        for (int i=8; i <= 23; i++) {
+        for (int i = 8; i <= 23; i++) {
             // Create new TextView and set text
             TextView time = new TextView(scheduleActivity);
             time.setText(i + ":00");
@@ -153,6 +161,7 @@ import java.util.TimeZone;
 
     /**
      * Calculate the academic dat given a calendar object
+     *
      * @param calendar: calendar object of day to calculate
      * @return int: integer that represents the academic day
      */
@@ -183,15 +192,18 @@ import java.util.TimeZone;
         // 'year' is just the current year
         int currentDayInWeek = calendar.get(Calendar.DAY_OF_WEEK); // sun = 1, mon = 2, .., sat = 7
         currentDayInWeek -= 2;
-        Log.i("ScheduleActivity", "Academic week: " + week );
+        Log.i("ScheduleActivity", "Academic week: " + week);
 
         // Reformat the day
-        if (currentDayInWeek < 0) { currentDayInWeek += 7; }  // mon = 0, tue = 2, .., sun = 6
+        if (currentDayInWeek < 0) {
+            currentDayInWeek += 7;
+        }  // mon = 0, tue = 2, .., sun = 6
         return week * 7 + currentDayInWeek; // Day of the academic year, FINALLY :P
     }
 
     /**
      * Calculates the current academic year
+     *
      * @return int: int representing the academic year
      */
     private int getAcademicYear() {
@@ -275,7 +287,7 @@ import java.util.TimeZone;
         dialog.setFirstDayOfWeek(2);
 
         // Set the year range
-        dialog.setYearRange(academicYear, academicYear+1);
+        dialog.setYearRange(academicYear, academicYear + 1);
 
         // Show dialog
         dialog.show(getSupportFragmentManager(), null);
@@ -284,6 +296,7 @@ import java.util.TimeZone;
     /**
      * Returns the events that occur on the date given the time in milliseconds.
      * Loops through the whole events list
+     *
      * @param milliseconds: date given in milliseconds of where you want the events from
      * @return ArrayList: ArrayList containing the events on the given date
      */
@@ -325,6 +338,7 @@ import java.util.TimeZone;
 
     /**
      * Checks if the app needs to refresh and refreshes accordingly by calling DownloadIcs.execute()
+     *
      * @param forceRefresh: Whether to force the app to refresh or not
      */
     public void checkForNewVersion(Context context, Boolean forceRefresh) {
@@ -433,7 +447,7 @@ import java.util.TimeZone;
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
         // Draw on the image
-        new Canvas(iconBitmap).drawText(""+dayOfMonth, iconBitmap.getWidth()/2, (2*iconBitmap.getHeight())/3, paint);
+        new Canvas(iconBitmap).drawText("" + dayOfMonth, iconBitmap.getWidth() / 2, (2 * iconBitmap.getHeight()) / 3, paint);
         Drawable newIcon = new BitmapDrawable(getResources(), iconBitmap);
 
         // Set the new icon to the button
@@ -523,7 +537,7 @@ import java.util.TimeZone;
                 return false;
             } else {
                 // The app was syncing not too long ago. It's probably alright
-                Log.i("ScheduleActivity", "Last sync was " + timeSinceLastCheck/1000 + " seconds ago.");
+                Log.i("ScheduleActivity", "Last sync was " + timeSinceLastCheck / 1000 + " seconds ago.");
                 return true;
             }
         }
@@ -532,7 +546,7 @@ import java.util.TimeZone;
     /**
      * Checks if the app is refreshing. If the app IS refreshing but it has started too long ago,
      * something has gone wrong so this function corrects that as well.
-     *
+     * <p>
      * Note: If the users has synced the agenda, the refreshing is surpressed by isSyncing. But
      * if the user has not synced the agenda, this is the only check if the user is refreshing.
      *
@@ -554,7 +568,7 @@ import java.util.TimeZone;
                 return false;
             } else {
                 // The app was syncing not too long ago. It's probably alright
-                Log.i("ScheduleActivity", "Last refresh was " + timeSinceLastCheck/1000 + " seconds ago.");
+                Log.i("ScheduleActivity", "Last refresh was " + timeSinceLastCheck / 1000 + " seconds ago.");
                 return true;
             }
         }
@@ -731,6 +745,7 @@ import java.util.TimeZone;
 
     /**
      * Convert the size of dp in pixels
+     *
      * @param dp: dp to convert into pixels
      * @return px: the size of dp converted into pixels
      */
@@ -742,11 +757,10 @@ import java.util.TimeZone;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if(sharedPref.getString("mode", "day").equalsIgnoreCase("day")) {
+        if (sharedPref.getString("mode", "day").equalsIgnoreCase("day")) {
             MenuItem showWeek = menu.findItem(R.id.action_show_week);
             showWeek.setVisible(true);
-        }
-        else {
+        } else {
             MenuItem showDay = menu.findItem(R.id.action_show_day);
             showDay.setVisible(true);
         }

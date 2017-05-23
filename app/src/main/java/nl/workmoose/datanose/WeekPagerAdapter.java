@@ -7,11 +7,12 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
 
+import nl.workmoose.datanose.fragment.WeekScheduleFragment;
+
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
- * 10189939
- *
+ * <p>
  * PagerAdapter for the ViewPager.
  */
 public class WeekPagerAdapter extends FragmentStatePagerAdapter {
@@ -64,6 +65,6 @@ public class WeekPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public float getPageWidth(int position) {
-        return 1/5f;
+        return 1 / 5f;
     }
 }

@@ -8,13 +8,13 @@
     android:clipChildren="false"
     android:background="@color/white">
 
-    <nl.workmoose.datanose.MyScrollView
+    <nl.workmoose.datanose.view.MyScrollView
         android:id="@+id/scheduleScrollView"
         android:layout_width="match_parent"
         android:scrollbars="none"
         android:clipChildren="false"
         android:layout_height="match_parent"
-        tools:context=".ScheduleActivity">
+        tools:context=".activity.ScheduleActivity">
 
         <RelativeLayout
             android:id="@+id/scheduleContainer"
@@ -42,7 +42,7 @@
 
         </RelativeLayout>  <!-- Schedule container -->
 
-    </nl.workmoose.datanose.MyScrollView>
+    </nl.workmoose.datanose.view.MyScrollView>
 
     <RelativeLayout
         android:id="@+id/dateContainer"

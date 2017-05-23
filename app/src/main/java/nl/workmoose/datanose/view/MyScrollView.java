@@ -1,10 +1,12 @@
-package nl.workmoose.datanose;
+package nl.workmoose.datanose.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
 
 public class MyScrollView extends ScrollView {
+
+    private OnScrollChangedListener mOnScrollChangedListener;
 
     public MyScrollView(Context context) {
         super(context);
@@ -13,12 +15,6 @@ public class MyScrollView extends ScrollView {
     public MyScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-
-    interface OnScrollChangedListener {
-        void onScrollChanged(ScrollView view, int x, int y, int oldx, int oldy);
-    }
-
-    private OnScrollChangedListener mOnScrollChangedListener;
 
     public void setOnScrollChangedListener(OnScrollChangedListener listener) {
         mOnScrollChangedListener = listener;
@@ -30,5 +26,9 @@ public class MyScrollView extends ScrollView {
         if (mOnScrollChangedListener != null) {
             mOnScrollChangedListener.onScrollChanged(this, l, t, oldl, oldt);
         }
+    }
+
+    interface OnScrollChangedListener {
+        void onScrollChanged(ScrollView view, int x, int y, int oldx, int oldy);
     }
 }

@@ -24,7 +24,7 @@ import java.util.TimeZone;
  * Rick Hutten
  * rick.hutten@gmail.com
  * 10189939
- *
+ * <p>
  * This file creates an calendar to write the events in. It only creates a calendar if there hasn't
  * one been created already. It loads the events into the calendar.
  * If a calendar already exsists, it updates your events
@@ -32,19 +32,20 @@ import java.util.TimeZone;
 public class SyncCalendarService extends Service {
 
     private static final String SHARED_PREF = "prefs";
-    private static String ACCOUNT_NAME = "DataNose";
     private final static int BEGIN_TIME = 0;
     private final static int END_TIME = 1;
     private final static int NAME = 2;
     private final static int LOCATION = 3;
     private final static int TEACHER = 4;
     private final static int UID = 5;
+    private static String ACCOUNT_NAME = "DataNose";
     private int notifId = 1;
     private long calendarId = -1;
     private int agendaColor;
     private SharedPreferences sharedPref;
 
-    public SyncCalendarService() {}
+    public SyncCalendarService() {
+    }
 
     @Override
     public int onStartCommand(Intent intent, final int flags, int startId) {
@@ -81,7 +82,7 @@ public class SyncCalendarService extends Service {
      *
      * @return The notification.builder object.
      */
-    private Notification.Builder buildNotification(){
+    private Notification.Builder buildNotification() {
         CharSequence title = getText(R.string.app_name);
 
         // Make new notification
@@ -102,7 +103,7 @@ public class SyncCalendarService extends Service {
      * Updates the notification.
      *
      * @param maxProgress: maximum progress.
-     * @param progress: the current progress.
+     * @param progress:    the current progress.
      */
     private void updateNotification(int maxProgress, int progress) {
         // This function updates the notification
@@ -319,15 +320,15 @@ public class SyncCalendarService extends Service {
     /**
      * Add a single event using the given parameters
      *
-     * @param start: Start time
-     * @param stop: Stop time
-     * @param title: title of the event
-     * @param location: Location of the event
+     * @param start:       Start time
+     * @param stop:        Stop time
+     * @param title:       title of the event
+     * @param location:    Location of the event
      * @param description: Description of the event
-     * @param id: Unique identifier of the event
+     * @param id:          Unique identifier of the event
      */
     private void addEvent(long start, long stop, String title, String location,
-                             String description, long id) {
+                          String description, long id) {
         // Vreate ContentResolver to put in values for the event
         ContentResolver cr = getContentResolver();
         ContentValues values = new ContentValues();
@@ -386,7 +387,7 @@ public class SyncCalendarService extends Service {
                 query(CalendarContract.Calendars.CONTENT_URI,
                         projection,
                         CalendarContract.Calendars.VISIBLE + " = 1 OR " +
-                        CalendarContract.Calendars.VISIBLE + " = 0",
+                                CalendarContract.Calendars.VISIBLE + " = 0",
                         null,
                         CalendarContract.Calendars._ID + " ASC");
         if (calCursor.moveToFirst()) {
@@ -419,7 +420,7 @@ public class SyncCalendarService extends Service {
                 query(CalendarContract.Calendars.CONTENT_URI,
                         projection,
                         CalendarContract.Calendars.VISIBLE + " = 1 OR " +
-                        CalendarContract.Calendars.VISIBLE + " = 0",
+                                CalendarContract.Calendars.VISIBLE + " = 0",
                         null,
                         CalendarContract.Calendars._ID + " ASC");
         if (calCursor.moveToFirst()) {
