@@ -1,36 +1,33 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         applicationId "nl.workmoose.datanose"
         minSdkVersion 14
-        targetSdkVersion 21
-        versionCode 3
-        versionName "1.1"
+        targetSdkVersion 25
+        versionCode 5
+        versionName "2.1"
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
 
-configurations {
-    all*.exclude group: 'com.android.support', module: 'support-v4'
-}
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:appcompat-v7:25.3.1'
     compile project(':MaterialDesign')
     compile project(':BetterPickers')
 }

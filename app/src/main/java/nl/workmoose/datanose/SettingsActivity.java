@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +26,7 @@ import com.gc.materialdesign.widgets.ColorSelector;
  *
  * Activity where the user can set the settings of the synchronization
  */
- public class SettingsActivity extends ActionBarActivity {
+ public class SettingsActivity extends AppCompatActivity {
 
     private static final String SHARED_PREF = "prefs";
     private static final int ANIMATION_DURATION = 500;

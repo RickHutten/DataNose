@@ -16,7 +16,7 @@ import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -44,7 +44,7 @@ import java.util.TimeZone;
  *
  * Activity to hold the ViewPager in which the schedule is loaded.
  */
- public class ScheduleActivity extends ActionBarActivity {
+ public class ScheduleActivity extends AppCompatActivity {
 
     private static final String SHARED_PREF = "prefs";
     private static final int BEGIN_TIME = 0;

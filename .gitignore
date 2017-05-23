@@ -46,6 +46,7 @@ idea
 .idea
 libs/MaterialDesign/build
 gradle
+build
 .gradle
 *.bin
 local.properties

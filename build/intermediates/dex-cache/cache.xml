@@ -2,11 +2,184 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Gebruiker\.gradle\caches\modules-2\files-2.1\com.squareup\otto\1.3.8\cf615176cd1177edf71d3c9605f8dc148fede6be\otto-1.3.8.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="cf615176cd1177edf71d3c9605f8dc148fede6be">
-        <dex dex="C:\Users\Gebruiker\AndroidStudioProjects\DataNose\app\build\intermediates\pre-dexed\debug\otto-1.3.8-4683c6f9e67692d085e0cfc15e8560ecb4811193.jar" />
+        is-multidex="true"
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="b9619ebde01dca68084d421c617160546e6f2e05">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_f43529b8f0974c536269b33fe8a62c5091219c0f\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="c82741bc129dd5f99f11a4ab8666ae24262053b6">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_d6c74bb110786a42a6308af00b22fd8339913cd0\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\.android\build-cache\a40e20fc065871a08f06f393c57d1fd51a9ed39a\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="052f5f840f21174a3ecf6544130194e2652cbb73">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_42d93b2871c8efdabfa116478b1101e86f7440c1\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\.android\build-cache\6055127c6c99e80da3c6214013fe4e598795aeff\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="da27a32db6af8954ee8061537c7d476fcb1df46f">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_dc57b373d7b4f29a8ade78604a900a8e66e1b262\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\libs\MaterialDesign\build\intermediates\bundles\default\libs\android-support-v4.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="bb02ab78b0ce74d272f80adf124ed78395aaa27b">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\8\android-support-v4_d7bfb7dff48894d71b9971089429bcfe5211b4ec\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="fd763800cca7d7482dbfd9c0074d6d5acd748d7a">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_f43529b8f0974c536269b33fe8a62c5091219c0f\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\.android\build-cache\23a4a6c522eb78e87133448b2cb7a2883ab6bdd1\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_501f69ca9b001aa3e676eebbb9928c15b108a0d6\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\libs\MaterialDesign\build\intermediates\bundles\default\libs\android-support-v4.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="bb02ab78b0ce74d272f80adf124ed78395aaa27b">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\8\android-support-v4_d7bfb7dff48894d71b9971089429bcfe5211b4ec\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\.android\build-cache\6ed3bb5f27a909682ee92b5f95b5fb08f0a2d244\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="efb8cb62d47d157c29d1521daac7eefd4cb881ee">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_79362312c4669db59008a12bda04a0bc27a959d2\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\.android\build-cache\c92d09634fb06be3993c38324ac3a81aed1b1725\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="cb28346c439e7ff68eec410f64b19032ba394f9c">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_ad67ee56888a3b69c0e132cb787022580f52d1a3\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\libs\MaterialDesign\build\intermediates\bundles\default\libs\nineoldandroids-2.4.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="f086e018e187da53a1432c188023c86d1fa3ff73">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\8\nineoldandroids-2.4.0_09cb560de518d39793bfcb37fc572b722715c47c\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\.android\build-cache\8b4e4759959bf19012c6c22a6ad05bc7e2a03b4d\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="150252b33b00274cc868578ade018fda0d43a3eb">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_5101549a7b38d655bf0860ecfba454ea273ceaef\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\.android\build-cache\812fed9f66fc0b360706e53ee710668e8b0755eb\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="4a26a1154d053ab11aaf4c3967c42a4d66390991">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_0b70cc30f6c0c739934f8d74546f9699d357cfb3\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\.android\build-cache\c92d09634fb06be3993c38324ac3a81aed1b1725\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.2"
+        sha1="cb28346c439e7ff68eec410f64b19032ba394f9c">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_ad67ee56888a3b69c0e132cb787022580f52d1a3\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\.android\build-cache\ebe90388904464ee55839c954def67eef735e718\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="45f697922e6f072daa12f8a2995dc77ab03c11da">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_a48d367789c563ab0b04960aba2a68e562b32b13\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\.android\build-cache\28d35c26b1eb32ed3dcd579c37edc1632ea731b2\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="47635644d0d5c103c1dd8360549eb9ba3225c7d3">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_d6193b513cac0b339e45c4709201c00e567e36bd\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\libs\MaterialDesign\build\intermediates\bundles\default\libs\nineoldandroids-2.4.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="f086e018e187da53a1432c188023c86d1fa3ff73">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\8\nineoldandroids-2.4.0_09cb560de518d39793bfcb37fc572b722715c47c\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\.android\build-cache\000f044673f878b9a26afd161834a11ba6ae626e\output\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="6ef31f1555bb4cc513ec8d52711365a8b89f3600">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_a1d295aba0ef59a4e6f6aa001831ff2b3044b2d3\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\25.3.1\support-annotations-25.3.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="bf8841d29fa39e077730e7a91222c2ce269fa7c9">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-25.3.1_7e146d00a8ad3c36887b8089f791280a3e1c58ed\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.3"
+        sha1="c82741bc129dd5f99f11a4ab8666ae24262053b6">
+        <dex dex="C:\Users\Rick\AndroidStudioProjects\DataNose\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_d6c74bb110786a42a6308af00b22fd8339913cd0\classes.dex" />
     </item>
 
 </items>

@@ -451,11 +451,9 @@ import java.util.TimeZone;
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //This is the NoSaveStateFrameLayout - force it to not clip
-        FrameLayout frameLayout = (FrameLayout) getView();
-        if (frameLayout != null) {
-            frameLayout.setClipChildren(false);
-            frameLayout.setClipToPadding(false);
+        if (rootView != null) {
+            rootView.setClipChildren(false);
+            rootView.setClipToPadding(false);
         }
     }
 }
