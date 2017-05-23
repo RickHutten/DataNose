@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.TimeZone;
 
 import nl.workmoose.datanose.view.EventView;
-import nl.workmoose.datanose.view.MyScrollView;
+import nl.workmoose.datanose.view.OnScrollChangedView;
 import nl.workmoose.datanose.R;
 import nl.workmoose.datanose.WeekPagerAdapter;
 import nl.workmoose.datanose.activity.ScheduleActivity;
@@ -41,7 +41,7 @@ public class WeekScheduleFragment extends Fragment {
 
     private int position;
     private WeekPagerAdapter adapter;
-    private MyScrollView sv;
+    private OnScrollChangedView sv;
     private int academicYear;
     private ArrayList<ArrayList<String>> events;
     private long currentDayInMillis;
@@ -67,9 +67,9 @@ public class WeekScheduleFragment extends Fragment {
         currentDayInMillis = calculateCurrentMillis();
         events = scheduleActivity.getEventsOnDate(currentDayInMillis);
 
-        sv = (MyScrollView) rootView.findViewById(R.id.scheduleScrollView);
+        sv = (OnScrollChangedView) rootView.findViewById(R.id.scheduleScrollView);
 
-        sv.setOnScrollChangedListener(new MyScrollView.OnScrollChangedListener() {
+        sv.setOnScrollChangedListener(new OnScrollChangedView.OnScrollChangedListener() {
             @Override
             public void onScrollChanged(ScrollView view, int x, int y, int oldx, int oldy) {
                 int scroll = sv.getScrollY(); //for verticalScrollView

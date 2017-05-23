@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
-import android.os.Handler;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -38,7 +38,8 @@ public class LoginActivity extends Activity {
 
     private static final String SHARED_PREF = "prefs";
     private static final int ANIMATION_DURATION = 500;
-
+    private final Context context = this;
+    public Dialog dialog;
     private Boolean enableBack = true; // To enable/disable the back button
     private EditText idInput;
     private Boolean created = true;  // Flag if onResume is called when creating the activity
@@ -46,9 +47,7 @@ public class LoginActivity extends Activity {
     private ButtonFlat okButton;
     private View inputContainer;
     private int screen_height;
-    private final Context context = this;
     private SharedPreferences sharedPref;
-    public Dialog dialog;
 
     /**
      * If the activity is called with the intent "EXIT" = true, the event will quit. This happens

@@ -18,9 +18,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.TimeZone;
 
-import nl.workmoose.datanose.view.EventView;
 import nl.workmoose.datanose.R;
 import nl.workmoose.datanose.activity.ScheduleActivity;
+import nl.workmoose.datanose.view.EventView;
 
 /**
  * Rick Hutten

@@ -28,7 +28,8 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog;
+import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
+import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
 import com.gc.materialdesign.widgets.Dialog;
 import com.gc.materialdesign.widgets.SnackBar;
 
@@ -39,12 +40,12 @@ import java.util.TimeZone;
 
 import nl.workmoose.datanose.DayPagerAdapter;
 import nl.workmoose.datanose.DownloadIcs;
-import nl.workmoose.datanose.view.MyScrollView;
 import nl.workmoose.datanose.ParseIcs;
 import nl.workmoose.datanose.R;
 import nl.workmoose.datanose.SyncCalendarService;
 import nl.workmoose.datanose.SyncReceiver;
 import nl.workmoose.datanose.WeekPagerAdapter;
+import nl.workmoose.datanose.view.OnScrollChangedView;
 
 /**
  * Rick Hutten
@@ -61,16 +62,15 @@ public class ScheduleActivity extends AppCompatActivity {
     private static final long MAX_SYNC_TIME = 1000 * 60 * 5; // 5 minutes
     private final static long DP_HOUR_HEIGHT = 60; // Height of 1 hour in dp
     private final static int DP_HOUR_WIDTH = 50; // Width of the hour bar in dp
-
+    public int academicYear;
+    public boolean isAnyEventPressed = false;
     private ViewPager viewPager;
     private ActionBar actionBar;
     private Menu menu;
     private ArrayList<ArrayList<String>> eventList;
-    public int academicYear;
     private SharedPreferences sharedPref;
     private int currentAcademicDay;
     private ScheduleActivity scheduleActivity;
-    public boolean isAnyEventPressed = false;
 
     /**
      * Calls ParseIcs to parse the file. Than calculates the day of the year and sets
@@ -127,8 +127,8 @@ public class ScheduleActivity extends AppCompatActivity {
 
         setActivityTimeHolder();
 
-        MyScrollView scrollView = (MyScrollView) findViewById(R.id.timeHolderScrollView);
-        scrollView.setOnScrollChangedListener(new MyScrollView.OnScrollChangedListener() {
+        OnScrollChangedView scrollView = (OnScrollChangedView) findViewById(R.id.timeHolderScrollView);
+        scrollView.setOnScrollChangedListener(new OnScrollChangedView.OnScrollChangedListener() {
             @Override
             public void onScrollChanged(ScrollView view, int x, int y, int oldx, int oldy) {
                 ((WeekPagerAdapter) viewPager.getAdapter()).scrollTo(y);
@@ -234,11 +234,9 @@ public class ScheduleActivity extends AppCompatActivity {
      * corresponding item in the actionbar
      */
     private void showDatePickerDialog() {
-
-        // Create date picker listener
-        CalendarDatePickerDialog.OnDateSetListener dateSetListener = new CalendarDatePickerDialog.OnDateSetListener() {
+        CalendarDatePickerDialogFragment.OnDateSetListener dateSetListener = new CalendarDatePickerDialogFragment.OnDateSetListener() {
             @Override
-            public void onDateSet(CalendarDatePickerDialog dialog, int year, int monthOfYear, int dayOfMonth) {
+            public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
                 // Set date from user input.
                 Calendar date = Calendar.getInstance();
                 date.setFirstDayOfWeek(Calendar.MONDAY);
@@ -278,16 +276,18 @@ public class ScheduleActivity extends AppCompatActivity {
         };
 
         // Show date picker dialog.
-        CalendarDatePickerDialog dialog = new CalendarDatePickerDialog();
+        CalendarDatePickerDialogFragment dialog = new CalendarDatePickerDialogFragment();
+        dialog.setThemeLight();
 
         // Set listener
         dialog.setOnDateSetListener(dateSetListener);
 
         // Monday is day nr. 2
-        dialog.setFirstDayOfWeek(2);
+        dialog.setFirstDayOfWeek(Calendar.MONDAY);
 
         // Set the year range
-        dialog.setYearRange(academicYear, academicYear + 1);
+        dialog.setDateRange(new MonthAdapter.CalendarDay(academicYear, Calendar.JANUARY, 1),
+                new MonthAdapter.CalendarDay(academicYear + 1, Calendar.DECEMBER, 31));
 
         // Show dialog
         dialog.show(getSupportFragmentManager(), null);
