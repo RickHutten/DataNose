@@ -33,7 +33,7 @@ import nl.workmoose.datanose.fragment.WeekScheduleFragment;
  * Rick Hutten
  * rick.hutten@gmail.com
  * <p>
- * Custon view that is being used to show the events in the ScheduleActivity.
+ * Custom view that is being used to show the events in the ScheduleActivity.
  * The user can set the data to this view by calling setEventData(). The given data only
  * effects the text shown of the view, not the width, height or margins etc.
  */
