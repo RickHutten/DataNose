@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -69,6 +70,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Set the color of the text
         setButtonTextColor();
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setElevation(0f);
+        }
 
         // Set all the onClickListeners
         setOnClickListeners();

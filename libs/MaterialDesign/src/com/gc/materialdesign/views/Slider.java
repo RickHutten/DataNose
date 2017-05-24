@@ -1,9 +1,5 @@
 package com.gc.materialdesign.views;
 
-import com.gc.materialdesign.R;
-import com.gc.materialdesign.utils.Utils;
-import com.nineoldandroids.view.ViewHelper;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -23,417 +19,360 @@ import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.gc.materialdesign.R;
+import com.gc.materialdesign.utils.Utils;
+
 public class Slider extends CustomView {
-	
-	// Event when slider change value
-	public interface OnValueChangedListener {
-		public void onValueChanged(int value);
-	}
-	
-	private Ball ball;
-	public NumberIndicator numberIndicator;
 
-	boolean showNumberIndicator = false;
-	boolean press = false;
+    public NumberIndicator numberIndicator;
+    boolean showNumberIndicator = false;
+    boolean press = false;
+    int value = 0;
+    int max = 100;
+    int min = 0;
+    private Ball ball;
+    private OnValueChangedListener onValueChangedListener;
+    private boolean placedBall = false;
 
-	int value = 0;
-	int max = 100;
-	int min = 0;
+    public Slider(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        setAttributes(attrs);
+    }
 
-	private OnValueChangedListener onValueChangedListener;
+    @Override
+    protected void onInitDefaultValues() {
+        minWidth = 80;// size of view
+        minHeight = 48;
+        backgroundColor = Color.parseColor("#4CAF50");
+        backgroundResId = R.drawable.background_transparent;
+    }
 
-	public Slider(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		setAttributes(attrs);
-	}
+    @Override
+    protected void setAttributes(AttributeSet attrs) {
+        super.setAttributes(attrs);
+        if (!isInEditMode()) {
+            getBackground().setAlpha(0);
+        }
+        showNumberIndicator = attrs.getAttributeBooleanValue(MATERIALDESIGNXML, "showNumberIndicator", false);
+        min = attrs.getAttributeIntValue(MATERIALDESIGNXML, "min", 0);
+        max = attrs.getAttributeIntValue(MATERIALDESIGNXML, "max", 100);// max > min
+        value = attrs.getAttributeIntValue(MATERIALDESIGNXML, "value", min);
 
-	@Override
-	protected void onInitDefaultValues() {
-		minWidth = 80;// size of view
-		minHeight = 48;
-		backgroundColor = Color.parseColor("#4CAF50");
-		backgroundResId = R.drawable.background_transparent;
-	}
-	
-	@Override
-	protected void setAttributes(AttributeSet attrs) {
-		super.setAttributes(attrs);
-		if (!isInEditMode()) {
-			getBackground().setAlpha(0);
-		}
-		showNumberIndicator = attrs.getAttributeBooleanValue(MATERIALDESIGNXML,"showNumberIndicator", false);
-		min = attrs.getAttributeIntValue(MATERIALDESIGNXML, "min", 0);
-		max = attrs.getAttributeIntValue(MATERIALDESIGNXML, "max", 100);// max > min
-		value = attrs.getAttributeIntValue(MATERIALDESIGNXML, "value", min);
+        float size = 20;
+        String thumbSize = attrs.getAttributeValue(MATERIALDESIGNXML, "thumbSize");
+        if (thumbSize != null) {
+            size = Utils.dipOrDpToFloat(thumbSize);
+        }
 
-		float size = 20;
-		String thumbSize = attrs.getAttributeValue(MATERIALDESIGNXML, "thumbSize");
-		if (thumbSize != null) {
-			size = Utils.dipOrDpToFloat(thumbSize);
-		}
+        ball = new Ball(getContext());
+        setBallParams(size);
+        addView(ball);
 
-		ball = new Ball(getContext());
-		setBallParams(size);
-		addView(ball);
+        // Set if slider content number indicator
+        if (showNumberIndicator) {
+            if (!isInEditMode()) {
+                numberIndicator = new NumberIndicator(getContext());
+            }
+        }
+    }
 
-		// Set if slider content number indicator
-		if (showNumberIndicator) {
-			if (!isInEditMode()) {
-				numberIndicator = new NumberIndicator(getContext());
-			}
-		}
-	}
-	
-	private void setBallParams(float size) {
-		RelativeLayout.LayoutParams params = new LayoutParams(
-				Utils.dpToPx(size, getResources()), Utils.dpToPx(size, getResources()));
-		params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-		ball.setLayoutParams(params);
-	}
+    private void setBallParams(float size) {
+        RelativeLayout.LayoutParams params = new LayoutParams(
+                Utils.dpToPx(size, getResources()), Utils.dpToPx(size, getResources()));
+        params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+        ball.setLayoutParams(params);
+    }
 
-	@Override
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-		if (!placedBall) {
-			placeBall();
-		}
-		if (value == min) {
-			// Crop line to transparent effect
-			Bitmap bitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
-			Canvas temp = new Canvas(bitmap);
-			Paint paint = new Paint();
-			paint.setColor(Color.parseColor("#B0B0B0"));
-			paint.setStrokeWidth(Utils.dpToPx(2, getResources()));
-			temp.drawLine(getHeight() / 2, getHeight() / 2, getWidth() - getHeight() / 2, getHeight() / 2, paint);
-			Paint transparentPaint = new Paint();
-			transparentPaint.setColor(getResources().getColor(android.R.color.transparent));
-			transparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-			temp.drawCircle(ViewHelper.getX(ball) + ball.getWidth() / 2,
-					ViewHelper.getY(ball) + ball.getHeight() / 2, 
-					ball.getWidth() / 2, transparentPaint);
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if (!placedBall) {
+            placeBall();
+        }
+        if (value == min) {
+            // Crop line to transparent effect
+            Bitmap bitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas temp = new Canvas(bitmap);
+            Paint paint = new Paint();
+            paint.setColor(Color.parseColor("#B0B0B0"));
+            paint.setStrokeWidth(Utils.dpToPx(2, getResources()));
+            temp.drawLine(getHeight() / 2, getHeight() / 2, getWidth() - getHeight() / 2, getHeight() / 2, paint);
+            Paint transparentPaint = new Paint();
+            transparentPaint.setColor(getResources().getColor(android.R.color.transparent));
+            transparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            temp.drawCircle(ball.getX() + ball.getWidth() / 2,
+                    ball.getY() + ball.getHeight() / 2,
+                    ball.getWidth() / 2, transparentPaint);
 
-			canvas.drawBitmap(bitmap, 0, 0, new Paint());
-		} else {
-			Paint paint = new Paint();
-			paint.setColor(Color.parseColor("#B0B0B0"));
-			paint.setStrokeWidth(Utils.dpToPx(2, getResources()));
-			canvas.drawLine(getHeight() / 2, getHeight() / 2, getWidth() - getHeight() / 2, getHeight() / 2, paint);
-			paint.setColor(backgroundColor);
-			float division = (ball.xFin - ball.xIni) / (max - min);
-			int value = this.value - min;
-			canvas.drawLine(getHeight() / 2, getHeight() / 2, value * division + getHeight() / 2, getHeight() / 2, paint);
-			// init ball's X
-			ViewHelper.setX(ball, value * division + getHeight() / 2 - ball.getWidth() / 2);
-			ball.changeBackground();
-		}
-		if (press && !showNumberIndicator) {
-			/**
-			 * 如果按住，在不显示指示器的状态下，会将ball大小扩大来给用户反馈。
-			 * 最后一个参数：getHeight() / x，表示的是按下去后显示的圆球的半径
-			 * 如果x=2，那么按下后圆球的直径就是这个view的高
-			 * 如果x=3，按下后显示圆球的半径就是这个view高的三分之一
-			 */
-			Paint paint = new Paint();
-			paint.setColor(backgroundColor);
-			paint.setAntiAlias(true);
-			canvas.drawCircle(ViewHelper.getX(ball) + ball.getWidth() / 2, getHeight() / 2, getHeight() / 3, paint);
-		}
-		invalidate();
-	}
+            canvas.drawBitmap(bitmap, 0, 0, new Paint());
+        } else {
+            Paint paint = new Paint();
+            paint.setColor(Color.parseColor("#B0B0B0"));
+            paint.setStrokeWidth(Utils.dpToPx(2, getResources()));
+            canvas.drawLine(getHeight() / 2, getHeight() / 2, getWidth() - getHeight() / 2, getHeight() / 2, paint);
+            paint.setColor(backgroundColor);
+            float division = (ball.xFin - ball.xIni) / (max - min);
+            int value = this.value - min;
+            canvas.drawLine(getHeight() / 2, getHeight() / 2, value * division + getHeight() / 2, getHeight() / 2, paint);
+            // init ball's X
+            ball.setX(value * division + getHeight() / 2 - ball.getWidth() / 2);
+            ball.changeBackground();
+        }
+        if (press && !showNumberIndicator) {
+            Paint paint = new Paint();
+            paint.setColor(backgroundColor);
+            paint.setAntiAlias(true);
+            canvas.drawCircle(ball.getX() + ball.getWidth() / 2, getHeight() / 2, getHeight() / 3, paint);
+        }
+        invalidate();
+    }
 
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		isLastTouch = true;
-		if (isEnabled()) {
-			if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
-				if (numberIndicator != null && numberIndicator.isShowing() == false)
-					numberIndicator.show();// 只要一按下就会冒出指示器
-				if ((event.getX() <= getWidth() && event.getX() >= 0)) {
-					press = true;
-					// calculate value
-					int newValue = 0;
-					float division = (ball.xFin - ball.xIni) / (max - min);
-					if (event.getX() > ball.xFin) {
-						newValue = max;
-					} else if (event.getX() < ball.xIni) {
-						newValue = min;
-					} else {
-						newValue = min + (int) ((event.getX() - ball.xIni) / division);
-					}
-					if (value != newValue) {
-						value = newValue;
-						if (onValueChangedListener != null)
-							onValueChangedListener.onValueChanged(newValue);
-					}
-					// move ball indicator
-					float x = event.getX();
-					x = (x < ball.xIni) ? ball.xIni : x;
-					x = (x > ball.xFin) ? ball.xFin : x;
-					ViewHelper.setX(ball, x);
-					ball.changeBackground();
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        isLastTouch = true;
+        if (isEnabled()) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
+                if (numberIndicator != null && !numberIndicator.isShowing())
+                    numberIndicator.show();// 只要一按下就会冒出指示器
+                if ((event.getX() <= getWidth() && event.getX() >= 0)) {
+                    press = true;
+                    // calculate value
+                    int newValue;
+                    float division = (ball.xFin - ball.xIni) / (max - min);
+                    if (event.getX() > ball.xFin) {
+                        newValue = max;
+                    } else if (event.getX() < ball.xIni) {
+                        newValue = min;
+                    } else {
+                        newValue = min + (int) ((event.getX() - ball.xIni) / division);
+                    }
+                    if (value != newValue) {
+                        value = newValue;
+                        if (onValueChangedListener != null)
+                            onValueChangedListener.onValueChanged(newValue);
+                    }
+                    // move ball indicator
+                    float x = event.getX();
+                    x = (x < ball.xIni) ? ball.xIni : x;
+                    x = (x > ball.xFin) ? ball.xFin : x;
+                    ball.setX(x);
+                    ball.changeBackground();
 
-					// If slider has number indicator
-					if (numberIndicator != null) {
-						// move number indicator
-						numberIndicator.indicator.x = x;
-						// 指示器起始的y坐标是当前控件的顶部Y坐标-当前控件高度的一半，就等于从空间的垂直中心开始。
-						numberIndicator.indicator.finalY = Utils.getRelativeTop(this) - getHeight() ;
-						numberIndicator.indicator.finalSize = getHeight() / 2;
-						numberIndicator.numberIndicator.setText("");
-					}
+                    // If slider has number indicator
+                    if (numberIndicator != null) {
+                        // move number indicator
+                        numberIndicator.indicator.finalY = Utils.getRelativeTop(this) - getHeight();
+                        numberIndicator.indicator.finalSize = getHeight() / 2;
+                        numberIndicator.numberIndicator.setText("");
+                    }
+                } else {
+                    press = false;
+                    isLastTouch = false;
+                    if (numberIndicator != null)
+                        numberIndicator.dismiss();
+                }
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (numberIndicator != null)
+                    numberIndicator.dismiss();
+                isLastTouch = false;
+                press = false;
+            }
+        }
+        return true;
+    }
 
-				} else {
-					press = false;
-					isLastTouch = false;
-					if (numberIndicator != null)
-						numberIndicator.dismiss();
+    private void placeBall() {
+        ball.setX(getHeight() / 2 - ball.getWidth() / 2);
+        ball.xIni = ball.getX();
+        ball.xFin = getWidth() - getHeight() / 2 - ball.getWidth() / 2;
+        placedBall = true;
+    }
 
-				}
+    public void setOnValueChangedListener(
+            OnValueChangedListener onValueChangedListener) {
+        this.onValueChangedListener = onValueChangedListener;
+    }
 
-			} else if (event.getAction() == MotionEvent.ACTION_UP) {
-				if (numberIndicator != null)
-					numberIndicator.dismiss();
-				isLastTouch = false;
-				press = false;
-				if ((event.getX() <= getWidth() && event.getX() >= 0)) {
+    public int getValue() {
+        return value;
+    }
 
-				}
-			}
-		}
-		return true;
-	}
+    public void setValue(int value) {
+        setValue(value, false);
+    }
 
-	private void placeBall() {
-		ViewHelper.setX(ball, getHeight() / 2 - ball.getWidth() / 2);
-		ball.xIni = ViewHelper.getX(ball);
-		ball.xFin = getWidth() - getHeight() / 2 - ball.getWidth() / 2;
-		ball.xCen = getWidth() / 2 - ball.getWidth() / 2;
-		placedBall = true;
-	}
+    public void setValue(int value, boolean inRunnable) {
+        if (value <= min) {
+            value = min;
+        }
+        if (value >= max) {
+            value = max;
+        }
+        setValueInRunnable(value, inRunnable);
+    }
 
-	// GETERS & SETTERS
+    private void setValueInRunnable(final int value, final boolean inRunnable) {
+        if (!placedBall && inRunnable)
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    setValue(value, true);
+                }
+            });
+        else {
+            this.value = value;
+            float division = (ball.xFin - ball.xIni) / max;
+            ball.setX(value * division + getHeight() / 2 - ball.getWidth() / 2);
+            ball.changeBackground();
+        }
+    }
 
-	public OnValueChangedListener getOnValueChangedListener() {
-		return onValueChangedListener;
-	}
+    public int getMax() {
+        return max;
+    }
 
-	public void setOnValueChangedListener(
-			OnValueChangedListener onValueChangedListener) {
-		this.onValueChangedListener = onValueChangedListener;
-	}
-	
-	public void setThumbSize(float size) {
-		setBallParams(size);
-	}
+    public void setMax(int max) {
+        this.max = max;
+    }
 
-	public int getValue() {
-		return value;
-	}
+    @Override
+    public void setBackgroundColor(int color) {
+        backgroundColor = color;
+        if (isEnabled()) {
+            beforeBackground = backgroundColor;
+        }
+    }
 
-	public void setValue(int value) {
-		setValue(value, false);
-	}
-	/**
-	 * @param value
-	 * @param inRunnable 如果为true表示在runnable中跟新进度，否则在主线程中更新
-	 */
-	public void setValue(int value,boolean inRunnable) {
-		if (value <= min) {
-			value = min;
-		}
-		if (value >= max) {
-			value = max;
-		}
-		setValueInRunnable(value,inRunnable);
-	}
-	
-	
-	private void setValueInRunnable(final int value,final boolean inRunnable) {
-		if(placedBall == false && inRunnable == true)
-			post(new Runnable() {
-				@Override
-				public void run() {
-					setValue(value,inRunnable);
-				}
-			});
-		else{
-			this.value = value;
-			float division = (ball.xFin - ball.xIni) / max;
-			ViewHelper.setX(ball,value*division + getHeight()/2 - ball.getWidth()/2);
-			ball.changeBackground();
-		}
-	}
-	
-	public int getMax() {
-		return max;
-	}
+    // Event when slider change value
+    public interface OnValueChangedListener {
+        void onValueChanged(int value);
+    }
 
-	public void setMax(int max) {
-		this.max = max;
-	}
+    private class Ball extends View {
 
-	public int getMin() {
-		return min;
-	}
+        private float xIni, xFin;
 
-	public void setMin(int min) {
-		this.min = min;
-	}
+        public Ball(Context context) {
+            super(context);
+            if (!isInEditMode()) {
+                setBackgroundResource(R.drawable.background_switch_ball_uncheck);
+            } else {
+                setBackgroundResource(android.R.drawable.radiobutton_off_background);
+            }
+        }
 
-	public boolean isShowNumberIndicator() {
-		return showNumberIndicator;
-	}
+        public void changeBackground() {
+            if (!isInEditMode()) {
+                if (value != min) {
+                    setBackgroundResource(R.drawable.background_checkbox);
+                    LayerDrawable layer = (LayerDrawable) getBackground();
+                    GradientDrawable shape = (GradientDrawable) layer
+                            .findDrawableByLayerId(R.id.shape_bacground);
+                    shape.setColor(backgroundColor);
+                } else {
+                    setBackgroundResource(R.drawable.background_switch_ball_uncheck);
+                }
+            }
+        }
+    }
 
-	public void showNumberIndicator(boolean showNumberIndicator) {
-		this.showNumberIndicator = showNumberIndicator;
-		if (!isInEditMode()) {
-			numberIndicator = (showNumberIndicator) ? new NumberIndicator(getContext()) : null;
-		}
-	}
-	
-	@Override
-	public void setBackgroundColor(int color) {
-		backgroundColor = color;
-		if (isEnabled()) {
-			beforeBackground = backgroundColor;
-		}
-	}
+    private class NumberIndicator extends Dialog {
 
-	private boolean placedBall = false;
+        private Indicator indicator;
+        private TextView numberIndicator;
 
-	private class Ball extends View {
+        NumberIndicator(Context context) {
+            super(context, android.R.style.Theme_Translucent);
+        }
 
-		private float xIni, xFin, xCen;
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.number_indicator_spinner);
+            setCanceledOnTouchOutside(false);
 
-		public Ball(Context context) {
-			super(context);
-			if (!isInEditMode()) {
-				setBackgroundResource(R.drawable.background_switch_ball_uncheck);
-			} else {
-				setBackgroundResource(android.R.drawable.radiobutton_off_background);
-			}
-		}
+            RelativeLayout content = (RelativeLayout) this.findViewById(R.id.number_indicator_spinner_content);
+            indicator = new Indicator(this.getContext());
+            content.addView(indicator);
 
-		public void changeBackground() {
-			if (!isInEditMode()) {
-				if (value != min) {
-					setBackgroundResource(R.drawable.background_checkbox);
-					LayerDrawable layer = (LayerDrawable) getBackground();
-					GradientDrawable shape = (GradientDrawable) layer
-							.findDrawableByLayerId(R.id.shape_bacground);
-					shape.setColor(backgroundColor);
-				} else {
-					setBackgroundResource(R.drawable.background_switch_ball_uncheck);
-				}
-			}
-		}
+            numberIndicator = new TextView(getContext());
+            numberIndicator.setTextColor(Color.WHITE);
+            numberIndicator.setGravity(Gravity.CENTER);
+            content.addView(numberIndicator);
 
-	}
+            indicator.setLayoutParams(new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.MATCH_PARENT));
+        }
 
-	// Slider Number Indicator
+        @Override
+        public void dismiss() {
+            super.dismiss();
+            indicator.y = 0;
+            indicator.size = 0;
+            indicator.animate = true;
+        }
 
-	public class NumberIndicator extends Dialog {
+        @Override
+        public void onBackPressed() {
+        }
+    }
 
-		private Indicator indicator;
-		private TextView numberIndicator;
+    private class Indicator extends RelativeLayout {
 
-		public NumberIndicator(Context context) {
-			super(context, android.R.style.Theme_Translucent);
-		}
+        // Position of number indicator
+        private float y = 0;
+        // Size of number indicator
+        private float size = 0;
 
-		@Override
-		protected void onCreate(Bundle savedInstanceState) {
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
-			super.onCreate(savedInstanceState);
-			setContentView(R.layout.number_indicator_spinner);
-			setCanceledOnTouchOutside(false);
+        // Final y position after animation
+        private float finalY = 0;
+        // Final size after animation
+        private float finalSize = 0;
 
-			RelativeLayout content = (RelativeLayout) this.findViewById(R.id.number_indicator_spinner_content);
-			indicator = new Indicator(this.getContext());
-			content.addView(indicator);
+        private boolean animate = true;
 
-			numberIndicator = new TextView(getContext());
-			numberIndicator.setTextColor(Color.WHITE);
-			numberIndicator.setGravity(Gravity.CENTER);
-			content.addView(numberIndicator);
+        private boolean numberIndicatorResize = false;
 
-			indicator.setLayoutParams(new RelativeLayout.LayoutParams(
-					RelativeLayout.LayoutParams.MATCH_PARENT,
-					RelativeLayout.LayoutParams.MATCH_PARENT));
-		}
+        public Indicator(Context context) {
+            super(context);
+            setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        }
 
-		@Override
-		public void dismiss() {
-			super.dismiss();
-			indicator.y = 0;
-			indicator.size = 0;
-			indicator.animate = true;
-		}
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
 
-		@Override
-		public void onBackPressed() {
-			
-		}
+            if (!numberIndicatorResize) {
+                RelativeLayout.LayoutParams params = (LayoutParams) numberIndicator.
+                        numberIndicator.getLayoutParams();
+                params.height = (int) finalSize * 2;
+                params.width = (int) finalSize * 2;
+                numberIndicator.numberIndicator.setLayoutParams(params);
+            }
 
-	}
-
-	private class Indicator extends RelativeLayout {
-
-		// Position of number indicator
-		private float x = 0;
-		private float y = 0;
-		// Size of number indicator
-		private float size = 0;
-
-		// Final y position after animation
-		private float finalY = 0;
-		// Final size after animation
-		private float finalSize = 0;
-
-		private boolean animate = true;
-
-		private boolean numberIndicatorResize = false;
-
-		public Indicator(Context context) {
-			super(context);
-			setBackgroundColor(getResources().getColor(android.R.color.transparent));
-		}
-
-		@Override
-		protected void onDraw(Canvas canvas) {
-			super.onDraw(canvas);
-
-			if (numberIndicatorResize == false) {
-				RelativeLayout.LayoutParams params = (LayoutParams) numberIndicator.
-						numberIndicator.getLayoutParams();
-				params.height = (int) finalSize * 2;
-				params.width = (int) finalSize * 2;
-				numberIndicator.numberIndicator.setLayoutParams(params);
-			}
-
-			Paint paint = new Paint();
-			paint.setAntiAlias(true);
-			paint.setColor(backgroundColor);
-			if (animate) {
-				if (y == 0)
-					y = finalY + finalSize * 2;
-				y -= Utils.dpToPx(6, getResources());
-				size += Utils.dpToPx(2, getResources());
-			}
-			canvas.drawCircle(
-					ViewHelper.getX(ball) + Utils.getRelativeLeft((View) ball.getParent())
-							+ ball.getWidth() / 2, y, size, paint);
-			if (animate && size >= finalSize)
-				animate = false;
-			if (animate == false) {
-				ViewHelper.setX(numberIndicator.numberIndicator, 
-						(ViewHelper.getX(ball) + Utils.getRelativeLeft((View) ball.getParent()) + ball.getWidth() / 2) - size);
-				ViewHelper.setY(numberIndicator.numberIndicator, y - size);
-				numberIndicator.numberIndicator.setText(value + "");
-			}
-			invalidate();
-		}
-
-	}
-
+            Paint paint = new Paint();
+            paint.setAntiAlias(true);
+            paint.setColor(backgroundColor);
+            if (animate) {
+                if (y == 0)
+                    y = finalY + finalSize * 2;
+                y -= Utils.dpToPx(6, getResources());
+                size += Utils.dpToPx(2, getResources());
+            }
+            canvas.drawCircle(
+                    ball.getX() + Utils.getRelativeLeft((View) ball.getParent())
+                            + ball.getWidth() / 2, y, size, paint);
+            if (animate && size >= finalSize)
+                animate = false;
+            if (!animate) {
+                numberIndicator.numberIndicator.setX(
+                        (ball.getX() + Utils.getRelativeLeft((View) ball.getParent()) + ball.getWidth() / 2) - size);
+                numberIndicator.numberIndicator.setY(y - size);
+                numberIndicator.numberIndicator.setText(value);
+            }
+            invalidate();
+        }
+    }
 }

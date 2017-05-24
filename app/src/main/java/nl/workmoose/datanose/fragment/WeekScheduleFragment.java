@@ -18,11 +18,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.TimeZone;
 
-import nl.workmoose.datanose.view.EventView;
-import nl.workmoose.datanose.view.OnScrollChangedView;
 import nl.workmoose.datanose.R;
 import nl.workmoose.datanose.WeekPagerAdapter;
 import nl.workmoose.datanose.activity.ScheduleActivity;
+import nl.workmoose.datanose.view.EventView;
+import nl.workmoose.datanose.view.ListeningScrollView;
 
 /**
  * Rick Hutten
@@ -41,7 +41,7 @@ public class WeekScheduleFragment extends Fragment {
 
     private int position;
     private WeekPagerAdapter adapter;
-    private OnScrollChangedView sv;
+    private ListeningScrollView sv;
     private int academicYear;
     private ArrayList<ArrayList<String>> events;
     private long currentDayInMillis;
@@ -67,9 +67,9 @@ public class WeekScheduleFragment extends Fragment {
         currentDayInMillis = calculateCurrentMillis();
         events = scheduleActivity.getEventsOnDate(currentDayInMillis);
 
-        sv = (OnScrollChangedView) rootView.findViewById(R.id.scheduleScrollView);
+        sv = (ListeningScrollView) rootView.findViewById(R.id.scheduleScrollView);
 
-        sv.setOnScrollChangedListener(new OnScrollChangedView.OnScrollChangedListener() {
+        sv.setOnScrollChangedListener(new ListeningScrollView.OnScrollChangedListener() {
             @Override
             public void onScrollChanged(ScrollView view, int x, int y, int oldx, int oldy) {
                 int scroll = sv.getScrollY(); //for verticalScrollView
@@ -141,7 +141,7 @@ public class WeekScheduleFragment extends Fragment {
     private void drawEvents() {
 
         // Make list for every 5 minutes
-        ArrayList<Integer> occupationList = new ArrayList<>(Collections.nCopies(15 * 12, 0));
+        ArrayList<Integer> occupationList = new ArrayList<>(Collections.nCopies(16 * 12, 0));
 
         // Get timezone offset
         int offSet = timeOffset();
@@ -161,6 +161,10 @@ public class WeekScheduleFragment extends Fragment {
 
             // Set data to ArrayList
             for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
+                if (i < 0) {
+                    // If the time is too early
+                    continue;
+                }
                 occupationList.set(i - 8 * 12, occupationList.get(i - 8 * 12) + 1);
             }
         }
@@ -179,6 +183,10 @@ public class WeekScheduleFragment extends Fragment {
 
             // Set data to ArrayList
             for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
+                if (i < 0) {
+                    // If the time is too early, this workaround will probably result in errors
+                    continue;
+                }
                 if (occupationList.get(i - 8 * 12) > maxItems) {
                     maxItems = occupationList.get(i - 8 * 12);
                     if (maxItems > globalMaxWidth) {
@@ -190,7 +198,7 @@ public class WeekScheduleFragment extends Fragment {
             event.add("" + maxItems);
         }
         // Calculate the width of the items per 5 minutes
-        ArrayList<Integer> widthList = new ArrayList<>(Collections.nCopies(15 * 12, 0));
+        ArrayList<Integer> widthList = new ArrayList<>(Collections.nCopies(16 * 12, 0));
 
         // Last loop through the events to calculate the final width of the items
         for (ArrayList<String> event : events) {
@@ -204,6 +212,10 @@ public class WeekScheduleFragment extends Fragment {
 
             // Make final ArrayList
             for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
+                if (i < 0) {
+                    // If the time is too early
+                    continue;
+                }
                 if (Integer.parseInt(event.get(MAX_ITEMS)) > widthList.get(i - 8 * 12)) {
                     widthList.set(i - 8 * 12, Integer.parseInt(event.get(MAX_ITEMS)));
                 }
@@ -219,11 +231,11 @@ public class WeekScheduleFragment extends Fragment {
         while (events.size() != 0) {
 
             // Set the Boolean list for the current column
-            columnOccupation = new ArrayList<>(Collections.nCopies(15 * 12, false));
+            columnOccupation = new ArrayList<>(Collections.nCopies(16 * 12, false));
             ArrayList<ArrayList<String>> removedEvents = new ArrayList<>();
 
             for (ArrayList<String> event : events) {
-                // Check if the disired place is free
+                // Check if the desired place is free
                 int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
                 int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
                 int beginHour = (int) Math.floor(beginTime / 100);
@@ -236,6 +248,10 @@ public class WeekScheduleFragment extends Fragment {
 
                 // Check if place is already occupied
                 for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
+                    if (i < 0) {
+                        // If the time is too early, this workaround will probably result in errors
+                        continue;
+                    }
                     if (columnOccupation.get(i - 8 * 12)) {
                         canPlaceEvent = false;
                         break;
@@ -441,10 +457,28 @@ public class WeekScheduleFragment extends Fragment {
         drawTimeLine();
 
         // Set the scroll of the fragment: wait for it to load before setting scroll.
+        if (rootView == null) {
+            rootView = (ViewGroup) getView();
+        }
+        if (rootView == null) {
+            throw new NullPointerException("rootView is null, wtf");
+        }
+        if (sv == null) {
+            sv = (ListeningScrollView) rootView.findViewById(R.id.scheduleScrollView);
+        }
+        if (sv == null) {
+            throw new NullPointerException("scrollView is null, wtf");
+        }
         ViewTreeObserver vto = sv.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             public void onGlobalLayout() {
-                sv.setScrollY(adapter.getScrollY());
+                if (sv != null && adapter != null) {
+                    sv.setScrollY(adapter.getScrollY());
+                } else if (sv == null) {
+                    throw new NullPointerException("scrollView is null");
+                } else if (adapter == null) {
+                    throw new NullPointerException("adapter is null");
+                }
             }
         });
         adapter.register(this);
@@ -459,6 +493,10 @@ public class WeekScheduleFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (rootView == null) {
+            rootView = (ViewGroup) getView();
+        }
+
         if (rootView != null) {
             rootView.setClipChildren(false);
             rootView.setClipToPadding(false);

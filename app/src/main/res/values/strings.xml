@@ -20,8 +20,8 @@
     <string name="date_not_in_year">Given date is not in the academic year</string>
     <string name="pick_color">Pick calendar color</string>
     <string name="sync_title">Synchronization</string>
-    <string name="sync_text">Synchronise your timetable with your agenda</string>
-    <string name="save_text">Changes detected. \nPress Save to save your settings</string>
+    <string name="sync_text">Synchronize your timetable with your agenda</string>
+    <string name="save_text">Changes detected. Press Save to save your settings</string>
     <string name="save">Save</string>
     <string name="button_cancel">Cancel</string>
     <string name="refreshing">Refreshing</string>
@@ -31,6 +31,8 @@
     <string name="wait_for_schedule">Waiting for new schedule to download</string>
     <string name="ask_sign_out_title">Warning</string>
     <string name="ask_sign_out_question">If you sign out, the calendar will be erased from your phone. Do you really want to sign out?</string>
+    <string name="if_you_have_questions">If you have questions or are experiencing issues, you can send us an email us at:</string>
+    <string name="email_address">info@workmoose.nl</string>
 
     <string-array name="months">
         <item>Jan</item>

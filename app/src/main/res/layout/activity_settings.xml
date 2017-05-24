@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <RelativeLayout
         android:id="@+id/fakeSnackBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:minHeight="56dp"
         android:paddingBottom="18dp"
         android:paddingTop="18dp"
@@ -47,31 +48,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/settingsText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:text="@string/action_settings"
-                android:textSize="35sp"
-                android:textColor="@color/black"
-                android:layout_centerHorizontal="true"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@id/settingsText"
-                android:layout_marginTop="10dp"
-                android:background="@color/gray" />
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
                 android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:layout_below="@id/settingsText">
+                android:paddingRight="20dp">
 
                 <TextView
                     android:id="@+id/syncTitle"
@@ -130,11 +112,30 @@
                     android:textColor="@color/white"/>
 
                 <View
+                    android:id="@+id/bottomRule"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="12dp"
                     android:layout_below="@id/colorButton"
                     android:background="@color/gray" />
+
+                <TextView
+                    android:id="@+id/experiencing_issues"
+                    android:layout_below="@id/bottomRule"
+                    android:layout_marginTop="12dp"
+                    android:textSize="12sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/if_you_have_questions"/>
+
+                <TextView
+                    android:layout_below="@id/experiencing_issues"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:autoLink="email"
+                    android:textColorLink="@color/blue"
+                    android:text="@string/email_address"/>
 
             </RelativeLayout> <!-- End of synchronization container -->
 

@@ -169,7 +169,7 @@ public class DayScheduleFragment extends Fragment {
     private void drawEvents() {
 
         // Make list for every 5 minutes
-        ArrayList<Integer> occupationList = new ArrayList<>(Collections.nCopies(15 * 12, 0));
+        ArrayList<Integer> occupationList = new ArrayList<>(Collections.nCopies(16 * 12, 0));
 
         // Get timezone offset
         int offSet = timeOffset();
@@ -189,6 +189,10 @@ public class DayScheduleFragment extends Fragment {
 
             // Set data to ArrayList
             for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
+                if (i < 0) {
+                    // If the time is too early, this workaround will probably result in errors
+                    continue;
+                }
                 occupationList.set(i - 8 * 12, occupationList.get(i - 8 * 12) + 1);
             }
         }
@@ -207,6 +211,10 @@ public class DayScheduleFragment extends Fragment {
 
             // Set data to ArrayList
             for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
+                if (i < 0) {
+                    // If the time is too early, this workaround will probably result in errors
+                    continue;
+                }
                 if (occupationList.get(i - 8 * 12) > maxItems) {
                     maxItems = occupationList.get(i - 8 * 12);
                     if (maxItems > globalMaxWidth) {
@@ -218,7 +226,7 @@ public class DayScheduleFragment extends Fragment {
             event.add("" + maxItems);
         }
         // Calculate the width of the items per 5 minutes
-        ArrayList<Integer> widthList = new ArrayList<>(Collections.nCopies(15 * 12, 0));
+        ArrayList<Integer> widthList = new ArrayList<>(Collections.nCopies(16 * 12, 0));
 
         // Last loop through the events to calculate the final width of the items
         for (ArrayList<String> event : events) {
@@ -232,6 +240,10 @@ public class DayScheduleFragment extends Fragment {
 
             // Make final ArrayList
             for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
+                if (i < 0) {
+                    // If the time is too early, this workaround will probably result in errors
+                    continue;
+                }
                 if (Integer.parseInt(event.get(MAX_ITEMS)) > widthList.get(i - 8 * 12)) {
                     widthList.set(i - 8 * 12, Integer.parseInt(event.get(MAX_ITEMS)));
                 }
@@ -247,7 +259,7 @@ public class DayScheduleFragment extends Fragment {
         while (events.size() != 0) {
 
             // Set the Boolean list for the current column
-            columnOccupation = new ArrayList<>(Collections.nCopies(15 * 12, false));
+            columnOccupation = new ArrayList<>(Collections.nCopies(16 * 12, false));
             ArrayList<ArrayList<String>> removedEvents = new ArrayList<>();
 
             for (ArrayList<String> event : events) {
@@ -264,6 +276,10 @@ public class DayScheduleFragment extends Fragment {
 
                 // Check if place is already occupied
                 for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
+                    if (i < 0) {
+                        // If the time is too early, this workaround will probably result in errors
+                        continue;
+                    }
                     if (columnOccupation.get(i - 8 * 12)) {
                         canPlaceEvent = false;
                         break;

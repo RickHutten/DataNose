@@ -7,15 +7,15 @@ import android.widget.ScrollView;
 /**
  * Class that adds the possibility to add a OnScrollChangedListener
  */
-public class OnScrollChangedView extends ScrollView {
+public class ListeningScrollView extends ScrollView {
 
     private OnScrollChangedListener mOnScrollChangedListener;
 
-    public OnScrollChangedView(Context context) {
+    public ListeningScrollView(Context context) {
         super(context);
     }
 
-    public OnScrollChangedView(Context context, AttributeSet attrs) {
+    public ListeningScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

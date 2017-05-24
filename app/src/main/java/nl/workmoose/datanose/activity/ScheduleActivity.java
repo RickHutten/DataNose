@@ -46,7 +46,7 @@ import nl.workmoose.datanose.R;
 import nl.workmoose.datanose.SyncCalendarService;
 import nl.workmoose.datanose.SyncReceiver;
 import nl.workmoose.datanose.WeekPagerAdapter;
-import nl.workmoose.datanose.view.OnScrollChangedView;
+import nl.workmoose.datanose.view.ListeningScrollView;
 
 import static java.util.Calendar.DECEMBER;
 
@@ -86,6 +86,9 @@ public class ScheduleActivity extends AppCompatActivity {
         scheduleActivity = this;
 
         actionBar = this.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setElevation(0);
+        }
 
         // Parse the file downloaded
         eventList = ParseIcs.readFile(this);
@@ -124,12 +127,13 @@ public class ScheduleActivity extends AppCompatActivity {
             RelativeLayout sideContainer = (RelativeLayout) findViewById(R.id.side_container);
             ((ViewGroup) findViewById(R.id.pagerParent)).bringChildToFront(sideContainer);
             sideContainer.setVisibility(View.VISIBLE);
-            actionBar.setElevation(0);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                //noinspection deprecation
-                actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
-            } else {
-                actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week, null));
+            if (actionBar != null) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    //noinspection deprecation
+                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
+                } else {
+                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week, null));
+                }
             }
         }
         viewPager.setAdapter(pagerAdapter);
@@ -137,8 +141,8 @@ public class ScheduleActivity extends AppCompatActivity {
 
         setActivityTimeHolder();
 
-        OnScrollChangedView scrollView = (OnScrollChangedView) findViewById(R.id.timeHolderScrollView);
-        scrollView.setOnScrollChangedListener(new OnScrollChangedView.OnScrollChangedListener() {
+        ListeningScrollView scrollView = (ListeningScrollView) findViewById(R.id.timeHolderScrollView);
+        scrollView.setOnScrollChangedListener(new ListeningScrollView.OnScrollChangedListener() {
             @Override
             public void onScrollChanged(ScrollView view, int x, int y, int oldx, int oldy) {
                 ((WeekPagerAdapter) viewPager.getAdapter()).scrollTo(y);
@@ -594,9 +598,9 @@ public class ScheduleActivity extends AppCompatActivity {
             case R.id.action_settings:
                 // Check if the system is syncing at the moment
                 if (checkIfSyncing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).setMessageTextSize(14).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
                 } else if (checkIfRefreshing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).setMessageTextSize(14).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
                 } else {
                     // If the system is not syncing at the moment, start SettingsActivity
                     Intent i = new Intent(this, SettingsActivity.class);
@@ -612,7 +616,6 @@ public class ScheduleActivity extends AppCompatActivity {
                 viewPager.requestLayout();
 
                 // Switch to week view
-                actionBar.setElevation(0);
                 actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
                 PagerAdapter WeekAdapter = new WeekPagerAdapter(getSupportFragmentManager());
                 int current_item = viewPager.getCurrentItem();
@@ -634,7 +637,6 @@ public class ScheduleActivity extends AppCompatActivity {
                 viewPager.requestLayout();
 
                 // Switch to day view
-                actionBar.setElevation(16);
                 actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_day));
                 PagerAdapter DayAdapter = new DayPagerAdapter(getSupportFragmentManager());
                 int current_item_week = viewPager.getCurrentItem();
@@ -651,9 +653,9 @@ public class ScheduleActivity extends AppCompatActivity {
             case R.id.sign_out:
                 // Check if the system is syncing at the moment
                 if (checkIfSyncing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).setMessageTextSize(14).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
                 } else if (checkIfRefreshing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).setMessageTextSize(14).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
                 } else {
                     // If the system is not syncing at the moment
                     // Ask the user is he/she really wants to sign out if calendar is synced
@@ -676,9 +678,9 @@ public class ScheduleActivity extends AppCompatActivity {
                 ((ViewGroup) findViewById(R.id.pagerParent)).bringChildToFront(findViewById(R.id.refreshContainer));
                 // Check if the system is syncing at the moment
                 if (checkIfSyncing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).setMessageTextSize(14).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
                 } else if (checkIfRefreshing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).setMessageTextSize(14).show();
+                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
                 } else {
                     // If the system is not syncing at the moment, force refresh the iCal file
                     checkForNewVersion(this, true);
