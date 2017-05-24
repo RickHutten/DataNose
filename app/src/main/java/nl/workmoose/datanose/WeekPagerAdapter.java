@@ -17,7 +17,7 @@ import nl.workmoose.datanose.fragment.WeekScheduleFragment;
  */
 public class WeekPagerAdapter extends FragmentStatePagerAdapter {
 
-    private ArrayList<WeekScheduleFragment> activeFragments = new ArrayList<>();
+    private final ArrayList<WeekScheduleFragment> activeFragments = new ArrayList<>();
     private int scrollY = 0;
 
     public WeekPagerAdapter(FragmentManager fm) {

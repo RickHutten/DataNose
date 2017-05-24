@@ -3,9 +3,9 @@ package nl.workmoose.datanose.view;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -21,19 +21,12 @@ public class EventDetailView extends RelativeLayout {
     private final static int NAME = 2;
     private final static int LOCATION = 3;
     private final static int TEACHER = 4;
-    private View rootView;
 
     public EventDetailView(Context context) {
         super(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        rootView = inflater.inflate(R.layout.detail_event_layout, this, false);
+        View rootView = inflater.inflate(R.layout.detail_event_layout, this, false);
         addView(rootView);
-    }
-
-    public void setWidth(int width) {
-        ViewGroup.LayoutParams params = rootView.findViewById(R.id.uberParent).getLayoutParams();
-        params.width = width;
-        rootView.findViewById(R.id.uberParent).setLayoutParams(params);
     }
 
     public void setData(ArrayList<String> data, int offSet) {
@@ -93,9 +86,19 @@ public class EventDetailView extends RelativeLayout {
                 classType.equalsIgnoreCase("hertentamen") ||
                 classType.equalsIgnoreCase("deeltoets") ||
                 classType.equalsIgnoreCase("tussentoets")) {
-            shape.setColor(getResources().getColor(R.color.exam_color));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                shape.setColor(getResources().getColor(R.color.exam_color, null));
+            } else {
+                //noinspection deprecation
+                shape.setColor(getResources().getColor(R.color.exam_color));
+            }
         } else {
-            shape.setColor(getResources().getColor(R.color.green));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                shape.setColor(getResources().getColor(R.color.green, null));
+            } else {
+                //noinspection deprecation
+                shape.setColor(getResources().getColor(R.color.green));
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
@@ -46,6 +47,8 @@ import nl.workmoose.datanose.SyncCalendarService;
 import nl.workmoose.datanose.SyncReceiver;
 import nl.workmoose.datanose.WeekPagerAdapter;
 import nl.workmoose.datanose.view.OnScrollChangedView;
+
+import static java.util.Calendar.DECEMBER;
 
 /**
  * Rick Hutten
@@ -85,8 +88,10 @@ public class ScheduleActivity extends AppCompatActivity {
         actionBar = this.getSupportActionBar();
 
         // Parse the file downloaded
-        ParseIcs parseIcs = new ParseIcs(this);
-        eventList = parseIcs.readFile();
+        eventList = ParseIcs.readFile(this);
+        if (eventList.size() < 1) {
+            new SnackBar(this, getResources().getString(R.string.empty_schedule)).show();
+        }
 
         // Set that the user is signed in
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
@@ -120,7 +125,12 @@ public class ScheduleActivity extends AppCompatActivity {
             ((ViewGroup) findViewById(R.id.pagerParent)).bringChildToFront(sideContainer);
             sideContainer.setVisibility(View.VISIBLE);
             actionBar.setElevation(0);
-            actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                //noinspection deprecation
+                actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
+            } else {
+                actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week, null));
+            }
         }
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(currentAcademicDay);
@@ -184,7 +194,7 @@ public class ScheduleActivity extends AppCompatActivity {
             lastWeekOfYear.setMinimalDaysInFirstWeek(4);
 
             // December 28th always is in the last week
-            lastWeekOfYear.set(academicYear, Calendar.DECEMBER, 28);
+            lastWeekOfYear.set(academicYear, DECEMBER, 28);
             int totalWeeksInYear = lastWeekOfYear.get(Calendar.WEEK_OF_YEAR);
             week = week + (totalWeeksInYear - 36);
         }
@@ -221,7 +231,8 @@ public class ScheduleActivity extends AppCompatActivity {
         if (week < 36) {
             // The year we live in is not the academic year
             // OR we are in the same year, but in de first week of the next (like 31 dec)
-            if (rightNow.get(Calendar.MONTH) != Calendar.DECEMBER) {
+            //noinspection WrongConstant
+            if (rightNow.get(Calendar.MONTH) != DECEMBER) {
                 // If week is in the new calendar year
                 year -= 1;
             }
@@ -287,7 +298,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
         // Set the year range
         dialog.setDateRange(new MonthAdapter.CalendarDay(academicYear, Calendar.JANUARY, 1),
-                new MonthAdapter.CalendarDay(academicYear + 1, Calendar.DECEMBER, 31));
+                new MonthAdapter.CalendarDay(academicYear + 1, DECEMBER, 31));
 
         // Show dialog
         dialog.show(getSupportFragmentManager(), null);

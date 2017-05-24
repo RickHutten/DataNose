@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/fakeSnackBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:minHeight="56dp"
         android:paddingBottom="18dp"
         android:paddingTop="18dp"
@@ -41,7 +40,6 @@
     </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/settingsContainer"
             android:layout_above="@id/fakeSnackBar"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
@@ -68,7 +66,6 @@
                 android:background="@color/gray" />
 
             <RelativeLayout
-                android:id="@+id/synchronization"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"

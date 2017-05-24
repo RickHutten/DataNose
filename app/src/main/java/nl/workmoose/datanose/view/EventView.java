@@ -3,6 +3,7 @@ package nl.workmoose.datanose.view;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -43,20 +44,20 @@ public class EventView extends RelativeLayout {
     private final static int ANIMATION_SPEED = 175;
     private final static int ANIMATION_SPEED_BUTTON = 100;
     private final EventView eventView = this;
+    private final Context context;
+    private final View rootView;
+    private final RelativeLayout pagerParent;
+    private final ScheduleActivity activity;
     private String title;
     private String type;
     private String location;
-    private Context context;
     private float deltaX;
     private float deltaY;
     private float factorX;
     private float factorY;
-    private View rootView;
     private ArrayList<String> data;
     private int offSet;
     private WeekScheduleFragment fragment;
-    private RelativeLayout pagerParent;
-    private ScheduleActivity activity;
 
     /**
      * Inflates the layout from event_layout.xml to this view
@@ -73,6 +74,7 @@ public class EventView extends RelativeLayout {
         pagerParent = (RelativeLayout) activity.findViewById(R.id.pagerParent);
         this.context = context;
 
+        // Set text to invisible if the eventView is too small
         ViewTreeObserver vto = rootView.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -89,12 +91,7 @@ public class EventView extends RelativeLayout {
      */
     private void setTitle() {
         TextView tv = (TextView) rootView.findViewById(R.id.title);
-        if (title.startsWith(" ")) {
-            // Happens once in a while that the title start with a space.
-            // This should be removed
-            title = title.replaceFirst(" ", "");
-        }
-        tv.setText(title);
+        tv.setText(title.trim());
     }
 
     /**
@@ -102,7 +99,7 @@ public class EventView extends RelativeLayout {
      */
     private void setType() {
         TextView tv = (TextView) rootView.findViewById(R.id.type);
-        tv.setText(type);
+        tv.setText(type.trim());
     }
 
     /**
@@ -110,7 +107,7 @@ public class EventView extends RelativeLayout {
      */
     private void setLocation() {
         TextView tv = (TextView) rootView.findViewById(R.id.location);
-        tv.setText(location);
+        tv.setText(location.trim());
     }
 
     /**
@@ -263,7 +260,7 @@ public class EventView extends RelativeLayout {
         eventDetailView.startAnimation(animationSet);
     }
 
-    public void animateBack(final EventDetailView eventDetailView) {
+    private void animateBack(final EventDetailView eventDetailView) {
 
         final EventView eventView = this;
         // Create new animationset
@@ -327,9 +324,19 @@ public class EventView extends RelativeLayout {
                 type.equalsIgnoreCase("hertentamen") ||
                 type.equalsIgnoreCase("deeltoets") ||
                 type.equalsIgnoreCase("tussentoets")) {
-            shape.setColor(context.getResources().getColor(R.color.exam_color));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                shape.setColor(getResources().getColor(R.color.exam_color, null));
+            } else {
+                //noinspection deprecation
+                shape.setColor(getResources().getColor(R.color.exam_color));
+            }
         } else {
-            shape.setColor(context.getResources().getColor(R.color.green));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                shape.setColor(getResources().getColor(R.color.green, null));
+            } else {
+                //noinspection deprecation
+                shape.setColor(getResources().getColor(R.color.green));
+            }
         }
     }
 

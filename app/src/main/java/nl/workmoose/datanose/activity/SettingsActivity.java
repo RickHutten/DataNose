@@ -272,11 +272,6 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         if (settingsChanged) {

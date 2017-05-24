@@ -38,8 +38,8 @@ public class SyncCalendarService extends Service {
     private final static int LOCATION = 3;
     private final static int TEACHER = 4;
     private final static int UID = 5;
-    private static String ACCOUNT_NAME = "DataNose";
-    private int notifId = 1;
+    private static final String ACCOUNT_NAME = "DataNose";
+    private final int notifId = 1;
     private long calendarId = -1;
     private int agendaColor;
     private SharedPreferences sharedPref;
@@ -162,8 +162,7 @@ public class SyncCalendarService extends Service {
     private void startSync() {
         try {
             // Parse the file
-            ParseIcs parseIcs = new ParseIcs(getApplicationContext());
-            ArrayList<ArrayList<String>> eventList = parseIcs.readFile();
+            ArrayList<ArrayList<String>> eventList = ParseIcs.readFile(getApplicationContext());
 
             if (readAllCalendars().contains(ACCOUNT_NAME)) {
                 // Calendar already exsists, don't create new calendar

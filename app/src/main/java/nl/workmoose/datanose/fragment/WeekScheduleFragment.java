@@ -86,6 +86,7 @@ public class WeekScheduleFragment extends Fragment {
                 // Gets called after layout has been done but before display.
                 if (Build.VERSION.SDK_INT < 16) {
                     // Depricated after SDK 16
+                    //noinspection deprecation
                     scheduleView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 } else {
                     // New function for SDK >= 16

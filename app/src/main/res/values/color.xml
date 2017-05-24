@@ -13,11 +13,11 @@
     <color name="exam_color">#E87080</color> <!-- Color for exams -->
     <color name="green">#81C784</color> <!-- Main Event Color -->
 
-    <color name="dodger_blue">#3399FF</color> <!-- DodgerBlue -->
-    <color name="dark_sea_green">#70C78B</color> <!-- DarkSeaGreen -->
-    <color name="medium_aquamarine">#70C7B6</color> <!-- MediumAquamarine -->
-    <color name="rosy_brown">#C78B70</color> <!-- RosyBrown -->
-    <color name="medium_orchid">#B670C7</color> <!-- MediumOrchid -->
-    <color name="pale_violet_red">#C77080</color> <!-- PaleVioletRed -->
+    <!-- DodgerBlue -->
+    <!-- DarkSeaGreen -->
+    <!-- MediumAquamarine -->
+    <!-- RosyBrown -->
+    <!-- MediumOrchid -->
+    <!-- PaleVioletRed -->
 
 </resources>

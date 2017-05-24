@@ -1,12 +1,12 @@
 package nl.workmoose.datanose;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
@@ -44,7 +44,7 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
     final private static int READ_TIMEOUT = 25000;
     final private static int CONN_TIMEOUT = 25000;
 
-    private Context context;
+    private final Context context;
     private String studentId;
     private SharedPreferences sharedPref;
 
@@ -77,7 +77,7 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
                 msg = context.getString(R.string.timeout);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                msg = context.getString(R.string.file_not_fount);
+                msg = context.getString(R.string.file_not_found);
             } catch (ConnectException e) {
                 e.printStackTrace();
                 msg = context.getString(R.string.connection_error);
@@ -96,8 +96,8 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
     }
 
     /**
-     * If file is downloaded succesfully, start ScheduleActivity.
-     * If file is not downloaded succesfully, notify the user and restart LoginActivity.
+     * If file is downloaded successfully, start ScheduleActivity.
+     * If file is not downloaded successfully, notify the user and restart LoginActivity.
      *
      * @param result: result string returned from doInBackGround.
      */
@@ -107,33 +107,29 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
         Log.i("DownloadIcs", "Result: " + result);
         sharedPref.edit().putBoolean("isDownloading", false).apply();
 
-
         if (result.equals("File downloaded")) {
-            // Get calendar instance for this time
+            // Get calendar instance for this time, save the time the last iCal was downloaded
             Calendar now = Calendar.getInstance();
+            sharedPref.edit().putLong("lastDownloaded", now.getTimeInMillis()).apply();
 
             // Save correct student ID to sharedPreferences
             sharedPref.edit().putString("studentId", studentId).apply();
             Log.i("DownloadIcs", "Currently logged in: " + studentId);
 
-            // Save the time the last iCal was downloaded
-            sharedPref.edit().putLong("lastDownloaded", now.getTimeInMillis()).apply();
-
-            try {
-                //  Start ScheduleActivity
-                Activity currentActivity = (Activity) context;
+            if (context instanceof AppCompatActivity) {
+                //  Start new ScheduleActivity
+                AppCompatActivity currentActivity = (AppCompatActivity) context;
                 Log.i("DownloadIcs", "Done downloading, start new ScheduleActivity");
 
                 if (!sharedPref.getBoolean("syncSaved", false)) {
                     // If the file is only being downloaded without syncing, set refreshing to false
                     sharedPref.edit().putBoolean("refreshing", false).apply();
                 }
-
                 Intent intent = new Intent(context, ScheduleActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 currentActivity.startActivity(intent);
                 currentActivity.overridePendingTransition(R.anim.slide_up, R.anim.do_nothing);
-            } catch (Exception e) {
+            } else {
                 // When called from receiver
                 Log.i("DownloadIcs", "Done downloading");
                 if (!sharedPref.getBoolean("syncSaved", false)) {
@@ -142,20 +138,21 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
                 }
             }
         } else {
-
             // There was an error during download
             // Show the user what error occurred
-            try {
-                new SnackBar((Activity) context, result).show();
-            } catch (Exception e) {
+            if (!(context instanceof AppCompatActivity)) {
                 // Called from the receiver (alarm)
                 // TODO: notify the user that the schedule is not updated
+                return;
             }
-            try {
-                // Try casting it to LoginActivity
+            // Show error message to user
+            new SnackBar((AppCompatActivity) context, result).show();
+
+            // Act accordingly to the calling activity
+            if (context instanceof LoginActivity) {
                 LoginActivity loginActivity = (LoginActivity) context;
                 loginActivity.backToBeginning();
-            } catch (ClassCastException e) {
+            } else if (context instanceof ScheduleActivity) {
                 // The calling Activity is not LoginActivity but ScheduleActivity
                 ScheduleActivity scheduleActivity = (ScheduleActivity) context;
                 sharedPref.edit().putBoolean("refreshing", false).apply();
@@ -163,7 +160,6 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
                 // Hide the refreshing container
                 View refreshingContainer = scheduleActivity.findViewById(R.id.refreshContainer);
                 refreshingContainer.setVisibility(View.INVISIBLE);
-
             }
         }
     }

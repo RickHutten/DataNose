@@ -17,14 +17,9 @@ import nl.workmoose.datanose.activity.ScheduleActivity;
  * Parses the file that has already been downloaded. The information is
  * saved in an ArrayList.
  */
-public class ParseIcs {
+public abstract class ParseIcs {
 
     final private static String FILE_NAME = "WARNING: DO NOT OPEN, VERY DANGEROUS FILE";
-    private Context context;
-
-    public ParseIcs(Context context) {
-        this.context = context;
-    }
 
     /**
      * The actual parsing. It reads the file and puts the information in an
@@ -32,7 +27,7 @@ public class ParseIcs {
      *
      * @return ArrayList: ArrayList containing the data from the iCalendar file
      */
-    public ArrayList<ArrayList<String>> readFile() {
+    public static ArrayList<ArrayList<String>> readFile(Context context) {
         // To time this function
         long startTime = System.currentTimeMillis();
 
@@ -61,8 +56,9 @@ public class ParseIcs {
 
             // The actual file reading, it reads line by line.
             while ((line = br.readLine()) != null) {
-                if (line.equals("BEGIN:VEVENT")) {
+                if (line.startsWith("BEGIN:VEVENT")) {
                     // Begin event, clear previous values
+                    event = new ArrayList<>();
                     begin = "";
                     end = "";
                     name = "";
@@ -70,22 +66,22 @@ public class ParseIcs {
                     teacher = "";
                     uid = "";
                 }
-                if (line.startsWith("DTSTART")) {
+                else if (line.startsWith("DTSTART")) {
                     // Start time of event
                     begin = line.split(":")[1];
                     event.add(begin);
                 }
-                if (line.startsWith("DTEND")) {
+                else if (line.startsWith("DTEND")) {
                     // End time of event
                     end = line.split(":")[1];
                     event.add(end);
                 }
-                if (line.startsWith("SUMMARY")) {
+                else if (line.startsWith("SUMMARY")) {
                     // Name of class
                     name = line.split(":")[1];
                     event.add(name);
                 }
-                if (line.startsWith("LOCATION")) {
+                else if (line.startsWith("LOCATION")) {
                     // Location of the event
                     try {
                         location = line.split(":")[1];
@@ -95,17 +91,17 @@ public class ParseIcs {
                     }
                     event.add(location);
                 }
-                if (line.startsWith("DESCRIPTION")) {
+                else if (line.startsWith("DESCRIPTION")) {
                     // Teacher of the class
                     teacher = line.split(":")[1];
                     event.add(teacher);
                 }
-                if (line.startsWith("UID")) {
+                else if (line.startsWith("UID")) {
                     // Unique identifier of the event
                     uid = line.split(":")[1];
                     event.add(uid);
                 }
-                if (line.equals("END:VEVENT")) {
+                else if (line.equals("END:VEVENT")) {
                     // End of event
                     if (begin.equals("") || end.equals("") || name.equals("") || location.equals("") ||
                             teacher.equals("") || uid.equals("")) {
@@ -115,8 +111,7 @@ public class ParseIcs {
                         // Put values in eventList if everything is correct
                         // Use a copy of the event, because if you clear the event,
                         // the value in eventList will be cleared also
-                        eventList.add((ArrayList<String>) event.clone());
-                        event.clear();
+                        eventList.add(event);
                     }
                 }
             }

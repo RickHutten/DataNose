@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/weekScheduleContainer"
-    android:clipChildren="false"
-    android:background="@color/white">
+    android:clipChildren="false">
 
     <nl.workmoose.datanose.view.OnScrollChangedView
         android:id="@+id/scheduleScrollView"
@@ -17,7 +16,6 @@
         tools:context=".activity.ScheduleActivity">
 
         <RelativeLayout
-            android:id="@+id/scheduleContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipChildren="false">
@@ -45,7 +43,6 @@
     </nl.workmoose.datanose.view.OnScrollChangedView>
 
     <RelativeLayout
-        android:id="@+id/dateContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 

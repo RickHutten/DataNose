@@ -1,12 +1,14 @@
 package nl.workmoose.datanose.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -18,32 +20,30 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.gc.materialdesign.views.ButtonFlat;
-import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
 import com.gc.materialdesign.widgets.Dialog;
 import com.gc.materialdesign.widgets.SnackBar;
 
+import nl.workmoose.datanose.DownloadIcs;
 import nl.workmoose.datanose.R;
-import nl.workmoose.datanose.StudentIdChecker;
 
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
  * <p>
- * First activity where the user can put in his/her student ID, calls StudentIdChecker
- * and (possibly) downloads the iCalendar file before the next activity is called.
- * If the user was already signed in, it skips this activity and goes directly
- * to ScheduleActivity
+ * First activity where the user can put in his/her student ID, downloads the iCalendar
+ * file before the next activity is called. If the user was already signed in, it skips
+ * this activity and goes directly to ScheduleActivity
  */
-public class LoginActivity extends Activity {
+public class LoginActivity extends AppCompatActivity {
 
     private static final String SHARED_PREF = "prefs";
     private static final int ANIMATION_DURATION = 500;
     private final Context context = this;
-    public Dialog dialog;
+    private Dialog dialog;
     private Boolean enableBack = true; // To enable/disable the back button
     private EditText idInput;
     private Boolean created = true;  // Flag if onResume is called when creating the activity
-    private ProgressBarCircularIndeterminate progressBar;
+    private View progressBar;
     private ButtonFlat okButton;
     private View inputContainer;
     private int screen_height;
@@ -95,7 +95,7 @@ public class LoginActivity extends Activity {
         screen_height = size.y;
 
         // Assign progressBar
-        progressBar = (ProgressBarCircularIndeterminate) findViewById(R.id.progressBar);
+        progressBar = findViewById(R.id.progressBar);
 
         // Make animation and add to inputContainer
         Animation slideIn = new TranslateAnimation(0, 0, screen_height, 0);
@@ -175,16 +175,16 @@ public class LoginActivity extends Activity {
         // Disable button and start progressBar
         okButton.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
-        progressBar.restartAnimation();
 
         // Get last signed in information
         if (sharedPref.contains("studentId")) {
 
             if (!sharedPref.getString("studentId", "-1").equals(studentId)) {
                 // If the input student ID is different from the previous one
-                Log.i("LoginActivity", "New student ID, check new ID");
-                StudentIdChecker idChecker = new StudentIdChecker(this);
-                idChecker.execute(studentId);
+                if (hasInternetConnection(context)) {
+                    DownloadIcs downloadIcs = new DownloadIcs(context);
+                    downloadIcs.execute(studentId);
+                }
             } else {
                 Log.i("LoginActivity", "Same student ID as before, don't download file");
                 // The student number is the same as before
@@ -208,9 +208,10 @@ public class LoginActivity extends Activity {
             }
         } else {
             // No previous sign in detected
-            Log.i("LoginActivity", "First run, download file");
-            StudentIdChecker idChecker = new StudentIdChecker(this);
-            idChecker.execute(studentId);
+            if (hasInternetConnection(context)) {
+                DownloadIcs downloadIcs = new DownloadIcs(context);
+                downloadIcs.execute(studentId);
+            }
         }
     }
 
@@ -253,6 +254,13 @@ public class LoginActivity extends Activity {
         // Set EditText and button enabled
         okButton.setEnabled(true);
         idInput.setEnabled(true);
+    }
+
+    private boolean hasInternetConnection(Context context) {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
     }
 
     @Override
