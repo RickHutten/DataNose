@@ -67,7 +67,7 @@ public class ScheduleActivity extends AppCompatActivity {
     private final static int DP_HOUR_WIDTH = 50; // Width of the hour bar in dp
     public int academicYear;
     public boolean isAnyEventPressed = false;
-    private ViewPager viewPager;
+    public ViewPager viewPager;
     private ActionBar actionBar;
     private Menu menu;
     private ArrayList<ArrayList<String>> eventList;

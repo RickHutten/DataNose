@@ -102,7 +102,7 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
      * @param result: result string returned from doInBackGround.
      */
     @Override
-    protected void onPostExecute(String result) {
+    protected void onPostExecute(final String result) {
         super.onPostExecute(result);
         Log.i("DownloadIcs", "Result: " + result);
         sharedPref.edit().putBoolean("isDownloading", false).apply();
@@ -145,8 +145,14 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
                 // TODO: notify the user that the schedule is not updated
                 return;
             }
-            // Show error message to user
-            new SnackBar((AppCompatActivity) context, result).show();
+
+            // Show error message to user. Run on UI thread because it can throw exception
+            ((AppCompatActivity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new SnackBar((AppCompatActivity) context, result).show();
+                }
+            });
 
             // Act accordingly to the calling activity
             if (context instanceof LoginActivity) {

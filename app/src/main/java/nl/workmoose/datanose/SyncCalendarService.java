@@ -23,7 +23,6 @@ import java.util.TimeZone;
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
- * 10189939
  * <p>
  * This file creates an calendar to write the events in. It only creates a calendar if there hasn't
  * one been created already. It loads the events into the calendar.

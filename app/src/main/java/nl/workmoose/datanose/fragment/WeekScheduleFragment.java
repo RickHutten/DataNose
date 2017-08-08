@@ -159,6 +159,11 @@ public class WeekScheduleFragment extends Fragment {
             int beginMinute = beginTime % 100;
             int endMinute = endTime % 100;
 
+            if (beginHour < 8 || endHour >= 23) {
+                // Does not fit in schedule, just skip the event
+                continue;
+            }
+
             // Set data to ArrayList
             for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
                 if (i < 0) {
@@ -180,6 +185,11 @@ public class WeekScheduleFragment extends Fragment {
             int beginMinute = beginTime % 100;
             int endMinute = endTime % 100;
             int maxItems = 1;
+
+            if (beginHour < 8 || endHour >= 23) {
+                // Does not fit in schedule, just skip the event
+                continue;
+            }
 
             // Set data to ArrayList
             for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
@@ -209,6 +219,11 @@ public class WeekScheduleFragment extends Fragment {
             int endHour = (int) Math.ceil(endTime / 100);
             int beginMinute = beginTime % 100;
             int endMinute = endTime % 100;
+
+            if (beginHour < 8 || endHour >= 23) {
+                // Does not fit in schedule, just skip the event
+                continue;
+            }
 
             // Make final ArrayList
             for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
@@ -242,6 +257,11 @@ public class WeekScheduleFragment extends Fragment {
                 int endHour = (int) Math.ceil(endTime / 100);
                 int beginMinute = beginTime % 100;
                 int endMinute = endTime % 100;
+
+                if (beginHour < 8 || endHour >= 23) {
+                    // Does not fit in schedule, just skip the event
+                    continue;
+                }
 
                 // Set canPlaceEvent initially to true
                 Boolean canPlaceEvent = true;
@@ -481,6 +501,9 @@ public class WeekScheduleFragment extends Fragment {
                 }
             }
         });
+        if (adapter == null) {
+            adapter = (WeekPagerAdapter) ((ScheduleActivity) getActivity()).viewPager.getAdapter();
+        }
         adapter.register(this);
     }
 
