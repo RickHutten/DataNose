@@ -174,7 +174,7 @@ public class ScheduleActivity extends AppCompatActivity {
     }
 
     /**
-     * Calculate the academic dat given a calendar object
+     * Calculate the academic day given a calendar object
      *
      * @param calendar: calendar object of day to calculate
      * @return int: integer that represents the academic day
@@ -188,7 +188,7 @@ public class ScheduleActivity extends AppCompatActivity {
         academicYear = getAcademicYear();
 
         // Week 36 is the first week of the academic year
-        if (week >= 36) {
+        if (week >= 32) {
             // The week is in the current academic year
             week -= 36;
         } else {
@@ -196,9 +196,8 @@ public class ScheduleActivity extends AppCompatActivity {
             Calendar lastWeekOfYear = Calendar.getInstance();
             lastWeekOfYear.setFirstDayOfWeek(Calendar.MONDAY);
             lastWeekOfYear.setMinimalDaysInFirstWeek(4);
+            lastWeekOfYear.set(academicYear, DECEMBER, 28);  // December 28th always is in the last week
 
-            // December 28th always is in the last week
-            lastWeekOfYear.set(academicYear, DECEMBER, 28);
             int totalWeeksInYear = lastWeekOfYear.get(Calendar.WEEK_OF_YEAR);
             week = week + (totalWeeksInYear - 36);
         }
@@ -211,7 +210,11 @@ public class ScheduleActivity extends AppCompatActivity {
         // Reformat the day
         if (currentDayInWeek < 0) {
             currentDayInWeek += 7;
-        }  // mon = 0, tue = 2, .., sun = 6
+        }  // mon = 0, tue = 1, .., sun = 6
+        // If in week 32 - 36, week number is negative. Show first day of 36th week
+        if (week < 0) {
+            return 0;
+        }
         return week * 7 + currentDayInWeek; // Day of the academic year, FINALLY :P
     }
 
@@ -231,13 +234,13 @@ public class ScheduleActivity extends AppCompatActivity {
         int week = rightNow.get(Calendar.WEEK_OF_YEAR);
         int year = rightNow.get(Calendar.YEAR); // Current year
 
-        // Week 36 is the first week of the academic year
-        if (week < 36) {
+        // Week 36 is the first week of the academic year, but switch to next academic year
+        // on week 32
+        if (week < 32) {
             // The year we live in is not the academic year
-            // OR we are in the same year, but in de first week of the next (like 31 dec)
-            //noinspection WrongConstant
-            if (rightNow.get(Calendar.MONTH) != DECEMBER) {
-                // If week is in the new calendar year
+            // OR we are in the same year, but in de first week of the next year (like 31 dec)
+            if (rightNow.get(Calendar.DAY_OF_MONTH) < 15) {
+                // If week is not in the current academic year
                 year -= 1;
             }
         }
