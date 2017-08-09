@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -59,7 +60,12 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Get saved settings
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
-        agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green, null));
+        } else {
+            //noinspection deprecation
+            agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
+        }
         sync_saved = sharedPref.getBoolean("syncSaved", false);
 
         // Set checkboxes to saved state
@@ -133,7 +139,15 @@ public class SettingsActivity extends AppCompatActivity {
                 colorButton.setBackgroundColor(color);
 
                 // If the color is not the same as the previous one, there has been a change
-                if (color != sharedPref.getInt("agendaColor", getResources().getColor(R.color.green))) {
+                int agendaColor;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green, null));
+                } else {
+                    //noinspection deprecation
+                    agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
+                }
+
+                if (color != agendaColor) {
                     if (syncCheckBox.isChecked()) {
                         // Show the snackbar
                         showFakeSnackBar();
@@ -218,7 +232,13 @@ public class SettingsActivity extends AppCompatActivity {
             // Not the same values
             return;
         }
-        int savedColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
+        int savedColor;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            savedColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green, null));
+        } else {
+            //noinspection deprecation
+            savedColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
+        }
         if (agendaColor != savedColor) {
             // The colors are not the same
             if (!sync_saved && syncCheckBox.isChecked() == sync_saved) {
@@ -259,10 +279,20 @@ public class SettingsActivity extends AppCompatActivity {
 
         if (brightness > 220) {
             // If the color is very light, set the color of the text to black
-            colorButton.setTextColor(getResources().getColor(R.color.black));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                colorButton.setTextColor(getResources().getColor(R.color.black, null));
+            } else {
+                //noinspection deprecation
+                colorButton.setTextColor(getResources().getColor(R.color.black));
+            }
         } else {
             // Else set it to white
-            colorButton.setTextColor(getResources().getColor(R.color.white));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                colorButton.setTextColor(getResources().getColor(R.color.white, null));
+            } else {
+                //noinspection deprecation
+                colorButton.setTextColor(getResources().getColor(R.color.white));
+            }
         }
     }
 

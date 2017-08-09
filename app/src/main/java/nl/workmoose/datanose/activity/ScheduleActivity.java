@@ -34,6 +34,7 @@ import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
 import com.gc.materialdesign.widgets.Dialog;
 import com.gc.materialdesign.widgets.SnackBar;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -162,7 +163,7 @@ public class ScheduleActivity extends AppCompatActivity {
         for (int i = 8; i <= 23; i++) {
             // Create new TextView and set text
             TextView time = new TextView(scheduleActivity);
-            time.setText(i + ":00");
+            time.setText(MessageFormat.format("{0}:00", i));
 
             // Make layoutparams
             time.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(DP_HOUR_WIDTH),
@@ -453,7 +454,12 @@ public class ScheduleActivity extends AppCompatActivity {
 
         // Set paint for the text
         Paint paint = new Paint();
-        paint.setColor(getResources().getColor(R.color.black));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            paint.setColor(getResources().getColor(R.color.black, null));
+        } else {
+            //noinspection deprecation
+            paint.setColor(getResources().getColor(R.color.black));
+        }
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(dpToPx(12));
         paint.setTypeface(Typeface.DEFAULT_BOLD);
@@ -465,7 +471,7 @@ public class ScheduleActivity extends AppCompatActivity {
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
         // Draw on the image
-        new Canvas(iconBitmap).drawText("" + dayOfMonth, iconBitmap.getWidth() / 2, (3/4f * iconBitmap.getHeight()), paint);
+        new Canvas(iconBitmap).drawText("" + dayOfMonth, iconBitmap.getWidth() / 2, (3 / 4f * iconBitmap.getHeight()), paint);
         Drawable newIcon = new BitmapDrawable(getResources(), iconBitmap);
 
         // Set the new icon to the button
@@ -526,7 +532,12 @@ public class ScheduleActivity extends AppCompatActivity {
             Log.i("ScheduleActivity", "Agenda not synced, don't delete items.");
         }
 
-        sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green)).apply();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green, null)).apply();
+        } else {
+            //noinspection deprecation
+            sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green)).apply();
+        }
         sharedPref.edit().putBoolean("signedIn", false).apply();
         // Exit current activity, go back to LoginActivity
         this.finish();
@@ -619,7 +630,12 @@ public class ScheduleActivity extends AppCompatActivity {
                 viewPager.requestLayout();
 
                 // Switch to week view
-                actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week, null));
+                } else {
+                    //noinspection deprecation
+                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
+                }
                 PagerAdapter WeekAdapter = new WeekPagerAdapter(getSupportFragmentManager());
                 int current_item = viewPager.getCurrentItem();
                 viewPager.setAdapter(WeekAdapter);
@@ -640,7 +656,12 @@ public class ScheduleActivity extends AppCompatActivity {
                 viewPager.requestLayout();
 
                 // Switch to day view
-                actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_day));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_day, null));
+                } else {
+                    //noinspection deprecation
+                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_day));
+                }
                 PagerAdapter DayAdapter = new DayPagerAdapter(getSupportFragmentManager());
                 int current_item_week = viewPager.getCurrentItem();
                 viewPager.setAdapter(DayAdapter);

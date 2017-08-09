@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import static android.os.Build.VERSION_CODES.JELLY_BEAN;
+
 /**
  * Rick Hutten
  * rick.hutten@gmail.com
@@ -61,7 +63,8 @@ public class SyncCalendarService extends Service {
             @Override
             public void run() {
                 // Set nofitication to keep task runnen even when application is closed
-                if (Build.VERSION.SDK_INT < 16) {
+                if (Build.VERSION.SDK_INT < JELLY_BEAN) {
+                    //noinspection deprecation
                     startForeground(notifId, new Notification.Builder(context).getNotification());
                 } else {
                     startForeground(notifId, new Notification.Builder(context).build());
@@ -110,7 +113,8 @@ public class SyncCalendarService extends Service {
         notificationBuilder.setProgress(maxProgress, progress, false);
 
         Notification notification;
-        if (Build.VERSION.SDK_INT < 16) {
+        if (Build.VERSION.SDK_INT < JELLY_BEAN) {
+            //noinspection deprecation
             notification = notificationBuilder.getNotification();
         } else {
             notification = notificationBuilder.build();
@@ -138,7 +142,8 @@ public class SyncCalendarService extends Service {
         notificationBuilder.setProgress(0, 100, true);
 
         Notification notification;
-        if (Build.VERSION.SDK_INT < 16) {
+        if (Build.VERSION.SDK_INT < JELLY_BEAN) {
+            //noinspection deprecation
             notification = notificationBuilder.getNotification();
         } else {
             notification = notificationBuilder.build();
@@ -239,7 +244,12 @@ public class SyncCalendarService extends Service {
         values.put(CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.ACCOUNT_TYPE_LOCAL);
         values.put(CalendarContract.Calendars.NAME, ACCOUNT_NAME);
         values.put(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME, ACCOUNT_NAME);
-        values.put(CalendarContract.Calendars.CALENDAR_COLOR, getResources().getColor(R.color.green));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            values.put(CalendarContract.Calendars.CALENDAR_COLOR, getResources().getColor(R.color.green, null));
+        } else {
+            //noinspection deprecation
+            values.put(CalendarContract.Calendars.CALENDAR_COLOR, getResources().getColor(R.color.green));
+        }
         values.put(CalendarContract.Calendars.SYNC_EVENTS, 1);
 
         // Create calender builder values
