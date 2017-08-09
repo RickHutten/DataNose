@@ -455,7 +455,7 @@ public class ScheduleActivity extends AppCompatActivity {
         Paint paint = new Paint();
         paint.setColor(getResources().getColor(R.color.black));
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(dpToPx(30));
+        paint.setTextSize(dpToPx(12));
         paint.setTypeface(Typeface.DEFAULT_BOLD);
         paint.setFakeBoldText(true);
         paint.setAntiAlias(true);
@@ -465,7 +465,7 @@ public class ScheduleActivity extends AppCompatActivity {
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
         // Draw on the image
-        new Canvas(iconBitmap).drawText("" + dayOfMonth, iconBitmap.getWidth() / 2, (2 * iconBitmap.getHeight()) / 3, paint);
+        new Canvas(iconBitmap).drawText("" + dayOfMonth, iconBitmap.getWidth() / 2, (3/4f * iconBitmap.getHeight()), paint);
         Drawable newIcon = new BitmapDrawable(getResources(), iconBitmap);
 
         // Set the new icon to the button

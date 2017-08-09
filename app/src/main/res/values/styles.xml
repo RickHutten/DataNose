@@ -18,10 +18,10 @@
         <item name="actionBarStyle">@style/ActionbarStyle</item>
         <item name="android:textColor">@color/black</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:homeAsUpIndicator">@drawable/ic_action_back</item>
-        <item name="homeAsUpIndicator">@drawable/ic_action_back</item>
-        <item name="actionOverflowButtonStyle">@style/OverFlow2</item>
-        <item name="android:actionOverflowButtonStyle">@style/OverFlow2</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_black</item>
+        <item name="homeAsUpIndicator">@drawable/ic_arrow_back_black</item>
+        <item name="actionOverflowButtonStyle">@style/OverFlow</item>
+        <item name="android:actionOverflowButtonStyle">@style/OverFlow</item>
     </style>
 
     <style name="ActionbarStyle" parent="@style/Widget.AppCompat.Light.ActionBar">
@@ -33,21 +33,12 @@
         <item name="titleTextStyle">@style/TextStyle</item>
     </style>
 
-    <style name="UpButton" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="android:color">@color/black</item>
-        <item name="color">@color/black</item>
-    </style>
-
     <style name="TextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textColor">@color/black</item>
     </style>
 
-    <style name="OverFlow" parent="@android:style/Widget.Holo.ActionButton.Overflow">
-        <item name="android:src">@drawable/ic_action_overflow</item>
-    </style>
-
-    <style name="OverFlow2" parent="Base.Widget.AppCompat.Light.PopupMenu.Overflow">
-        <item name="android:src">@drawable/ic_action_overflow</item>
+    <style name="OverFlow" parent="Base.Widget.AppCompat.Light.PopupMenu.Overflow">
+        <item name="android:src">@drawable/ic_more_vert_black</item>
     </style>
 
 </resources>
