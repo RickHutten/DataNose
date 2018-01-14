@@ -31,7 +31,7 @@ import nl.workmoose.datanose.view.EventView;
 abstract public class BaseFragment extends Fragment {
 
     protected final static long MILLIS_IN_DAY = 86400000; // Milliseconds in a day
-    protected final static long DP_HOUR_HEIGHT = 60; // Height of 1 hour in dp
+    protected final static int DP_HOUR_HEIGHT = 60; // Height of 1 hour in dp
     protected final static int DP_HOUR_WIDTH = 50; // Width of the hour bar in dp
 
     protected final static int BEGIN_TIME = 0;
@@ -187,8 +187,8 @@ abstract public class BaseFragment extends Fragment {
 
         // Making the occupationList
         // necessary for determining the width of the events
+        ArrayList<ArrayList<String>> eventsThatDontFit = new ArrayList<>();
         for (ArrayList<String> event : events) {
-            // Loop through every event
             // Get begin and end time
             int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
             int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
@@ -199,81 +199,39 @@ abstract public class BaseFragment extends Fragment {
             int endMinute = endTime % 100;
 
             if (beginHour < 8 || endHour >= 23) {
-                // Does not fit in schedule, just skip the event
+                // Does not fit in schedule, skip event and delete it later
+                eventsThatDontFit.add(event);
                 continue;
             }
 
-            // Set data to ArrayList
             for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
-                if (i < 0) {
-                    // If the time is too early
-                    continue;
-                }
+                // Add 1 to every timeslot in the occupationList
                 occupationList.set(i - 8 * 12, occupationList.get(i - 8 * 12) + 1);
             }
         }
-        // Count the number of events at the same time
-        int globalMaxWidth = 1; // The maximum number of events at the same time of the whole day
+        // Remove events that don't fit in the schedule
+        events.removeAll(eventsThatDontFit);
+
+        // Get the number of simultaneous events per event
         for (ArrayList<String> event : events) {
-            // Loop through every event.. again
             // Get begin and end time
             int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
             int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
+
             int beginHour = (int) Math.floor(beginTime / 100);
             int endHour = (int) Math.ceil(endTime / 100);
             int beginMinute = beginTime % 100;
             int endMinute = endTime % 100;
-            int maxItems = 1;
-
-            if (beginHour < 8 || endHour >= 23) {
-                // Does not fit in schedule, just skip the event
-                continue;
-            }
+            int maxItems = 1;  // Max events per event
 
             // Set data to ArrayList
             for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
-                if (i < 0) {
-                    // If the time is too early, this workaround will probably result in errors
-                    continue;
-                }
                 if (occupationList.get(i - 8 * 12) > maxItems) {
                     maxItems = occupationList.get(i - 8 * 12);
-                    if (maxItems > globalMaxWidth) {
-                        globalMaxWidth = maxItems;
-                    }
                 }
             }
             // Add the number of events at the same time to the event
-            event.add("" + maxItems);
-        }
-        // Calculate the width of the items per 5 minutes
-        ArrayList<Integer> widthList = new ArrayList<>(Collections.nCopies(16 * 12, 0));
-
-        // Last loop through the events to calculate the final width of the items
-        for (ArrayList<String> event : events) {
-            // Get begin and end time
-            int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
-            int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
-            int beginHour = (int) Math.floor(beginTime / 100);
-            int endHour = (int) Math.ceil(endTime / 100);
-            int beginMinute = beginTime % 100;
-            int endMinute = endTime % 100;
-
-            if (beginHour < 8 || endHour >= 23) {
-                // Does not fit in schedule, just skip the event
-                continue;
-            }
-
-            // Make final ArrayList
-            for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
-                if (i < 0) {
-                    // If the time is too early
-                    continue;
-                }
-                if (Integer.parseInt(event.get(MAX_ITEMS)) > widthList.get(i - 8 * 12)) {
-                    widthList.set(i - 8 * 12, Integer.parseInt(event.get(MAX_ITEMS)));
-                }
-            }
+            event.add(Integer.toString(maxItems));
         }
 
         ArrayList<Boolean> columnOccupation;
@@ -292,25 +250,17 @@ abstract public class BaseFragment extends Fragment {
                 // Check if the desired place is free
                 int beginTime = Integer.parseInt(event.get(BEGIN_TIME).substring(9, 13)) + offSet;
                 int endTime = Integer.parseInt(event.get(END_TIME).substring(9, 13)) + offSet;
+
                 int beginHour = (int) Math.floor(beginTime / 100);
                 int endHour = (int) Math.ceil(endTime / 100);
                 int beginMinute = beginTime % 100;
                 int endMinute = endTime % 100;
-
-                if (beginHour < 8 || endHour >= 23) {
-                    // Does not fit in schedule, just skip the event
-                    continue;
-                }
 
                 // Set canPlaceEvent initially to true
                 Boolean canPlaceEvent = true;
 
                 // Check if place is already occupied
                 for (int i = beginHour * 12 + beginMinute / 5; i < endHour * 12 + endMinute / 5; i++) {
-                    if (i < 0) {
-                        // If the time is too early, this workaround will probably result in errors
-                        continue;
-                    }
                     if (columnOccupation.get(i - 8 * 12)) {
                         canPlaceEvent = false;
                         break;
@@ -324,10 +274,9 @@ abstract public class BaseFragment extends Fragment {
                     }
 
                     // Place the event
-                    long length = (endHour * 60L + endMinute) - (beginHour * 60L + beginMinute);
-                    float width = scheduleView.getWidth();
-                    int itemWidth = (int) width / widthList.get(beginHour * 12 - 8 * 12 + beginMinute / 5);
-
+                    int length = (endHour * 60 + endMinute) - (beginHour * 60 + beginMinute);
+                    int width = scheduleView.getWidth();
+                    int itemWidth = width / Integer.parseInt(event.get(MAX_ITEMS));
 
                     // Create new EventView
                     EventView eventView = new EventView(scheduleActivity);
@@ -360,7 +309,7 @@ abstract public class BaseFragment extends Fragment {
                     // Add to removed events
                     removedEvents.add(event);
                 }
-                // End of this event in the loop
+                // End of this event in the loop, check next event
             }
             // Remove the events that are drawn this pass in the while loop
             events.removeAll(removedEvents);
@@ -450,15 +399,15 @@ abstract public class BaseFragment extends Fragment {
             return;
         }
         // Get the marginTop
-        long lineMargin = (hour - 8) * DP_HOUR_HEIGHT + minute + getDpOffset();
+        int lineMargin = (hour - 8) * DP_HOUR_HEIGHT + minute + getDpOffset();
 
         // Get the timeLine from resource xml
-        View timeLine = rootView.findViewById(R.id.timeLine);
+        RelativeLayout timeLine = (RelativeLayout) rootView.findViewById(R.id.timeLine);
 
         // Make layoutparams
-        RelativeLayout.LayoutParams lpLine = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(2));
-        lpLine.setMargins(0, dpToPx(lineMargin), 0, 0);
+        RelativeLayout.LayoutParams lpLine = (RelativeLayout.LayoutParams)timeLine.getLayoutParams();
+        int timelineHeight = timeLine.getChildAt(0).getLayoutParams().height;
+        lpLine.setMargins(lpLine.leftMargin, dpToPx(lineMargin)-timelineHeight/2, lpLine.rightMargin, lpLine.bottomMargin);
 
         // Set layoutparams and set visibility to VISIBLE
         timeLine.setLayoutParams(lpLine);

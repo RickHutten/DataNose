@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/student_id"
-            android:textSize="25sp"
+            android:textSize="20sp"
             android:textColor="@color/black"
             android:layout_centerHorizontal="true"
             android:id="@+id/studentIdText"
@@ -48,14 +48,13 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:inputType="number"
-            android:ems="10"
+            android:ems="6"
             android:id="@+id/idInput"
             android:layout_below="@id/studentIdText"
             android:gravity="center"
             android:textColor="@color/black"
-            android:textCursorDrawable="@color/black"
+            android:textCursorDrawable="@null"
             android:textSize="25sp"
-            android:background="@color/white"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="0dp" />
 
@@ -67,7 +66,7 @@
             android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:text="@string/ok"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textColor="@color/blue"/>
 
     </RelativeLayout>

@@ -296,12 +296,17 @@ public class EventView extends RelativeLayout {
                 // Set text visible
                 eventView.setAlpha(1f);
                 eventView.findViewById(R.id.textContainer).setVisibility(VISIBLE);
-                pagerParent.removeView(eventDetailView);
+                // Cannot change hierarchy (removing view) in onAnimationEnd
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        pagerParent.removeView(eventDetailView);
+                    }
+                });
                 // Set OnClickListener back on the view
                 eventView.setOnTouchListener(getTouchListener());
                 eventView.findViewById(R.id.eventContainer).setBackgroundResource(R.drawable.event_background);
                 setColor();
-
             }
 
             @Override
