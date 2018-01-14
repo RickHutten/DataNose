@@ -391,6 +391,7 @@ public class ScheduleActivity extends AppCompatActivity {
                     // Get the refreshing container
                     View refreshingContainer = findViewById(R.id.refreshContainer);
                     refreshingContainer.setVisibility(View.VISIBLE);
+                    refreshingContainer.bringToFront();
                 } catch (Exception e) {
                     // When called from the receiver
                 }
