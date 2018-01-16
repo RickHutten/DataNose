@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 
 import nl.workmoose.datanose.R;
 import nl.workmoose.datanose.WeekPagerAdapter;
@@ -41,7 +40,7 @@ public class WeekScheduleFragment extends BaseFragment {
 
         sv.setOnScrollChangedListener(new ListeningScrollView.OnScrollChangedListener() {
             @Override
-            public void onScrollChanged(ScrollView view, int x, int y, int oldx, int oldy) {
+            public void onScrollChanged(int y) {
                 int scroll = sv.getScrollY(); //for verticalScrollView
                 adapter.scrollTo(scroll);
                 scheduleActivity.setTimeHolderScroll(scroll);

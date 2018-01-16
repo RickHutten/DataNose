@@ -26,7 +26,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
@@ -111,7 +110,7 @@ public class ScheduleActivity extends AppCompatActivity {
         calendarNow.set(Calendar.YEAR, calendarNow.get(Calendar.YEAR));
 
         // Calculate current academic day
-        currentAcademicDay = calculateAcademicDay(calendarNow);
+        currentAcademicDay = calculateAcademicDay(calendarNow, true);
 
         Log.i("ScheduleActivity", "In daylight saving: " + TimeZone.getDefault().inDaylightTime(new Date()));
 
@@ -145,7 +144,7 @@ public class ScheduleActivity extends AppCompatActivity {
         ListeningScrollView scrollView = (ListeningScrollView) findViewById(R.id.timeHolderScrollView);
         scrollView.setOnScrollChangedListener(new ListeningScrollView.OnScrollChangedListener() {
             @Override
-            public void onScrollChanged(ScrollView view, int x, int y, int oldx, int oldy) {
+            public void onScrollChanged(int y) {
                 ((WeekPagerAdapter) viewPager.getAdapter()).scrollTo(y);
             }
         });
@@ -178,9 +177,12 @@ public class ScheduleActivity extends AppCompatActivity {
      * Calculate the academic day given a calendar object
      *
      * @param calendar: calendar object of day to calculate
+     * @param currentDay: if we have to calculate the current day. This will make the calendar
+     *                  jump from week 32 to week 36. Otherwise, the date is chosen from the
+     *                  datepicker and we don't have to make the jump.
      * @return int: integer that represents the academic day
      */
-    private int calculateAcademicDay(Calendar calendar) {
+    private int calculateAcademicDay(Calendar calendar, boolean currentDay) {
 
         // Calculate academic week
         int week = calendar.get(Calendar.WEEK_OF_YEAR);
@@ -188,8 +190,16 @@ public class ScheduleActivity extends AppCompatActivity {
         // Get academic year
         academicYear = getAcademicYear();
 
+        // Check if we have to jump to the next year if 32 >= week > 36
+        if (currentDay) {
+            if (week >= 32 == week < 36) {
+                // Show first page of viewpager
+                return 0;
+            }
+        }
+
         // Week 36 is the first week of the academic year
-        if (week >= 32) {
+        if (week >= 36) {
             // The week is in the current academic year
             week -= 36;
         } else {
@@ -212,10 +222,7 @@ public class ScheduleActivity extends AppCompatActivity {
         if (currentDayInWeek < 0) {
             currentDayInWeek += 7;
         }  // mon = 0, tue = 1, .., sun = 6
-        // If in week 32 - 36, week number is negative. Show first day of 36th week
-        if (week < 0) {
-            return 0;
-        }
+
         return week * 7 + currentDayInWeek; // Day of the academic year, FINALLY :P
     }
 
@@ -238,10 +245,9 @@ public class ScheduleActivity extends AppCompatActivity {
         // Week 36 is the first week of the academic year, but switch to next academic year
         // on week 32
         if (week < 32) {
-            // The year we live in is not the academic year
-            // OR we are in the same year, but in de first week of the next year (like 31 dec)
-            if (rightNow.get(Calendar.DAY_OF_MONTH) < 15) {
-                // If week is not in the current academic year
+            // If it's the first week but still december, don't subtract a year
+            if (rightNow.get(Calendar.MONTH) != Calendar.DECEMBER) {
+                // If today is not in the current academic year, subtract one
                 year -= 1;
             }
         }
@@ -253,6 +259,19 @@ public class ScheduleActivity extends AppCompatActivity {
      * corresponding item in the actionbar
      */
     private void showDatePickerDialog() {
+        // Check if date is in this academic year:
+        // Make calendar instance of the first academic day
+        Calendar firstAcademicDay = Calendar.getInstance();
+        firstAcademicDay.setFirstDayOfWeek(Calendar.MONDAY);
+        firstAcademicDay.setMinimalDaysInFirstWeek(4);
+        firstAcademicDay.set(Calendar.YEAR, academicYear);
+        firstAcademicDay.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        firstAcademicDay.set(Calendar.WEEK_OF_YEAR, 36);
+
+        // Make calendar instance of the last academic day
+        Calendar lastAcademicDay = (Calendar) firstAcademicDay.clone();
+        lastAcademicDay.add(Calendar.DAY_OF_YEAR, 363);
+
         CalendarDatePickerDialogFragment.OnDateSetListener dateSetListener = new CalendarDatePickerDialogFragment.OnDateSetListener() {
             @Override
             public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
@@ -264,32 +283,14 @@ public class ScheduleActivity extends AppCompatActivity {
                 date.set(Calendar.MONTH, monthOfYear);
                 date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                // Check if date is in this academic year:
-                // Make calendar instance of the first academic day
-                Calendar firstAcademicDay = Calendar.getInstance();
-                firstAcademicDay.setFirstDayOfWeek(Calendar.MONDAY);
-                firstAcademicDay.setMinimalDaysInFirstWeek(4);
-                firstAcademicDay.set(Calendar.YEAR, academicYear);
-                firstAcademicDay.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                firstAcademicDay.set(Calendar.WEEK_OF_YEAR, 36);
-
-                // Make calendar instance of the last academix day
-                Calendar lastAcademicDay = Calendar.getInstance();
-                lastAcademicDay.setFirstDayOfWeek(Calendar.MONDAY);
-                lastAcademicDay.setMinimalDaysInFirstWeek(4);
-                lastAcademicDay.set(Calendar.YEAR, academicYear);
-                lastAcademicDay.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                lastAcademicDay.set(Calendar.WEEK_OF_YEAR, 36);
-                lastAcademicDay.add(Calendar.DAY_OF_YEAR, 363);
-
-                // The date is not in the current academic year
-                if (date.before(firstAcademicDay) || date.after(lastAcademicDay)) {
-                    new SnackBar(scheduleActivity, getResources().getString(R.string.date_not_in_year)).show();
-                    return;
-                }
-
                 // Set the ViewPager to the selected day
-                int academicDay = calculateAcademicDay(date);
+                int academicDay = calculateAcademicDay(date, false);
+
+                // Make sure the academic day is in range of the viewpager
+                if (academicDay <= 0) academicDay = 0;
+                if (academicDay >= viewPager.getAdapter().getCount()) academicDay = viewPager.getAdapter().getCount() - 1;
+
+                // Set the viewpager to the academic day
                 viewPager.setCurrentItem(academicDay, true);
             }
         };
@@ -304,9 +305,9 @@ public class ScheduleActivity extends AppCompatActivity {
         // Monday is day nr. 2
         dialog.setFirstDayOfWeek(Calendar.MONDAY);
 
-        // Set the year range
-        dialog.setDateRange(new MonthAdapter.CalendarDay(academicYear, Calendar.JANUARY, 1),
-                new MonthAdapter.CalendarDay(academicYear + 1, DECEMBER, 31));
+        // Set the range of dates
+        dialog.setDateRange(new MonthAdapter.CalendarDay(firstAcademicDay),
+                new MonthAdapter.CalendarDay(lastAcademicDay));
 
         // Show dialog
         dialog.show(getSupportFragmentManager(), null);

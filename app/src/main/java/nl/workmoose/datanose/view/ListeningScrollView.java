@@ -27,11 +27,11 @@ public class ListeningScrollView extends ScrollView {
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
         if (mOnScrollChangedListener != null) {
-            mOnScrollChangedListener.onScrollChanged(this, l, t, oldl, oldt);
+            mOnScrollChangedListener.onScrollChanged(t);
         }
     }
 
     public interface OnScrollChangedListener {
-        void onScrollChanged(ScrollView view, int x, int y, int oldx, int oldy);
+        void onScrollChanged(int y);
     }
 }

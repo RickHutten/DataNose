@@ -35,6 +35,6 @@ public class DayPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         // The number of days in a year
-        return 365;
+        return 364;
     }
 }

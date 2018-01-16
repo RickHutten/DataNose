@@ -30,22 +30,21 @@ import nl.workmoose.datanose.view.EventView;
 
 abstract public class BaseFragment extends Fragment {
 
-    protected final static long MILLIS_IN_DAY = 86400000; // Milliseconds in a day
-    protected final static int DP_HOUR_HEIGHT = 60; // Height of 1 hour in dp
-    protected final static int DP_HOUR_WIDTH = 50; // Width of the hour bar in dp
+    final static int DP_HOUR_HEIGHT = 60; // Height of 1 hour in dp
+    final static int DP_HOUR_WIDTH = 50; // Width of the hour bar in dp
 
-    protected final static int BEGIN_TIME = 0;
-    protected final static int END_TIME = 1;
-    protected final static int MAX_ITEMS = 6; // Max items at the same time per event
+    private final static int BEGIN_TIME = 0;
+    private final static int END_TIME = 1;
+    private final static int MAX_ITEMS = 6; // Max items at the same time per event
 
-    protected int position;
-    protected int academicYear;
-    protected ArrayList<ArrayList<String>> events;
-    protected long currentDayInMillis;
+    private int position;
+    private int academicYear;
+    private ArrayList<ArrayList<String>> events;
+    private long currentDayInMillis;
 
-    protected ScheduleActivity scheduleActivity;
-    protected RelativeLayout scheduleView;
-    protected ViewGroup rootView;
+    ScheduleActivity scheduleActivity;
+    RelativeLayout scheduleView;
+    ViewGroup rootView;
     private Fragment childFragment;
 
     /**
@@ -53,7 +52,7 @@ abstract public class BaseFragment extends Fragment {
      *
      * @param childFragment the fragment that extends BaseFragment
      */
-    protected void init(final Fragment childFragment) {
+    void init(final Fragment childFragment) {
         this.childFragment = childFragment;
 
         Bundle bundle = getArguments();
@@ -113,9 +112,11 @@ abstract public class BaseFragment extends Fragment {
         firstAcademicDay.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         firstAcademicDay.set(Calendar.WEEK_OF_YEAR, 36);
 
+        // Add days to first academic day depending on the position
+        firstAcademicDay.add(Calendar.DAY_OF_MONTH, position);
+
         // Calculate the milliseconds of the current view
-        long millisFirstDay = firstAcademicDay.getTimeInMillis();
-        return (millisFirstDay + position * MILLIS_IN_DAY);
+        return firstAcademicDay.getTimeInMillis();
     }
 
     /**
@@ -162,7 +163,7 @@ abstract public class BaseFragment extends Fragment {
      * @param dp: value to convert into pixels
      * @return int: int of the number of pixels
      */
-    protected int dpToPx(float dp) {
+    int dpToPx(float dp) {
         if (!isAdded()) {
             // If fragment is not added to an activity, return dimension not converted
             // or the app may crash
@@ -323,7 +324,7 @@ abstract public class BaseFragment extends Fragment {
      *
      * @return boolean: Boolean, true if today, false if not.
      */
-    protected Boolean today() {
+    private Boolean today() {
         // The actual current date
         Calendar rightNow = Calendar.getInstance();
         rightNow.setFirstDayOfWeek(Calendar.MONDAY);
@@ -342,7 +343,7 @@ abstract public class BaseFragment extends Fragment {
     /**
      * Sets the TextView's of the date (top left of the fragment)
      */
-    protected void setTitleDate() {
+    private void setTitleDate() {
         // Set calendar
         Calendar thisPage = Calendar.getInstance();
         thisPage.setFirstDayOfWeek(Calendar.MONDAY);
@@ -370,7 +371,7 @@ abstract public class BaseFragment extends Fragment {
     /**
      * Draws the line at the current time
      */
-    protected void drawTimeLine() {
+    private void drawTimeLine() {
         // If this screen is not today, don't show line at current time
         if (!today()) {
             return;
