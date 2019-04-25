@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "nl.workmoose.datanose"
         minSdkVersion 14
-        targetSdkVersion 25
-        versionCode 8
-        versionName "2.4"
+        targetSdkVersion 28
+        versionCode 9
+        versionName "2.5"
     }
 
     compileOptions {
@@ -26,8 +26,8 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.code-troopers.betterpickers:library:3.1.0'
-    compile project(':MaterialDesign')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'com.code-troopers.betterpickers:library:3.1.0'
+    implementation project(':MaterialDesign')
 }

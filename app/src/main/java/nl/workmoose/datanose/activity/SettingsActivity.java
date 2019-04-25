@@ -6,8 +6,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,17 +53,16 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         // Get views from layout
-        fakeSnackBar = (RelativeLayout) findViewById(R.id.fakeSnackBar);
-        colorButton = (ButtonRectangle) findViewById(R.id.colorButton);
-        syncNowButton = (ButtonFlat) findViewById(R.id.syncNowButton);
-        syncCheckBox = (CheckBox) findViewById(R.id.syncCheckBox);
+        fakeSnackBar = findViewById(R.id.fakeSnackBar);
+        colorButton = findViewById(R.id.colorButton);
+        syncNowButton = findViewById(R.id.syncNowButton);
+        syncCheckBox = findViewById(R.id.syncCheckBox);
 
         // Get saved settings
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green, null));
         } else {
-            //noinspection deprecation
             agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
         }
         sync_saved = sharedPref.getBoolean("syncSaved", false);
@@ -143,7 +142,6 @@ public class SettingsActivity extends AppCompatActivity {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                     agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green, null));
                 } else {
-                    //noinspection deprecation
                     agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
                 }
 
@@ -236,7 +234,6 @@ public class SettingsActivity extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             savedColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green, null));
         } else {
-            //noinspection deprecation
             savedColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
         }
         if (agendaColor != savedColor) {
@@ -282,7 +279,6 @@ public class SettingsActivity extends AppCompatActivity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 colorButton.setTextColor(getResources().getColor(R.color.black, null));
             } else {
-                //noinspection deprecation
                 colorButton.setTextColor(getResources().getColor(R.color.black));
             }
         } else {
@@ -290,7 +286,6 @@ public class SettingsActivity extends AppCompatActivity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 colorButton.setTextColor(getResources().getColor(R.color.white, null));
             } else {
-                //noinspection deprecation
                 colorButton.setTextColor(getResources().getColor(R.color.white));
             }
         }
@@ -298,11 +293,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                finish();
-                return true;
+        // Respond to the action bar's Up/Home button
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

@@ -36,7 +36,7 @@ public class WeekScheduleFragment extends BaseFragment {
 
         init(this);
 
-        sv = (ListeningScrollView) rootView.findViewById(R.id.scheduleScrollView);
+        sv = rootView.findViewById(R.id.scheduleScrollView);
 
         sv.setOnScrollChangedListener(new ListeningScrollView.OnScrollChangedListener() {
             @Override
@@ -106,7 +106,7 @@ public class WeekScheduleFragment extends BaseFragment {
             throw new NullPointerException("rootView is null, wtf");
         }
         if (sv == null) {
-            sv = (ListeningScrollView) rootView.findViewById(R.id.scheduleScrollView);
+            sv = rootView.findViewById(R.id.scheduleScrollView);
         }
         if (sv == null) {
             throw new NullPointerException("scrollView is null, wtf");

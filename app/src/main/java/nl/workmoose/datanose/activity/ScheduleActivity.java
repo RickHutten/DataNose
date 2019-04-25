@@ -14,10 +14,10 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -115,7 +115,7 @@ public class ScheduleActivity extends AppCompatActivity {
         Log.i("ScheduleActivity", "In daylight saving: " + TimeZone.getDefault().inDaylightTime(new Date()));
 
         //Instantiate a ViewPager and a PagerAdapter.
-        viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager = findViewById(R.id.pager);
         viewPager.setPageMargin(-1);  // Visual bug fix
         PagerAdapter pagerAdapter;
 
@@ -124,12 +124,11 @@ public class ScheduleActivity extends AppCompatActivity {
         } else {
             // Mode is week
             pagerAdapter = new WeekPagerAdapter((getSupportFragmentManager()));
-            RelativeLayout sideContainer = (RelativeLayout) findViewById(R.id.side_container);
+            RelativeLayout sideContainer = findViewById(R.id.side_container);
             ((ViewGroup) findViewById(R.id.pagerParent)).bringChildToFront(sideContainer);
             sideContainer.setVisibility(View.VISIBLE);
             if (actionBar != null) {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    //noinspection deprecation
                     actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
                 } else {
                     actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week, null));
@@ -141,7 +140,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
         setActivityTimeHolder();
 
-        ListeningScrollView scrollView = (ListeningScrollView) findViewById(R.id.timeHolderScrollView);
+        ListeningScrollView scrollView = findViewById(R.id.timeHolderScrollView);
         scrollView.setOnScrollChangedListener(new ListeningScrollView.OnScrollChangedListener() {
             @Override
             public void onScrollChanged(int y) {
@@ -156,7 +155,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
     private void setActivityTimeHolder() {
         // Get container for the times
-        LinearLayout timeHolder = (LinearLayout) findViewById(R.id.activityTimeHolder);
+        LinearLayout timeHolder = findViewById(R.id.activityTimeHolder);
 
         // Make textView's for the left container displaying the hours of the day (9:00, 10:00,..)
         for (int i = 8; i <= 23; i++) {
@@ -459,7 +458,6 @@ public class ScheduleActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             paint.setColor(getResources().getColor(R.color.black, null));
         } else {
-            //noinspection deprecation
             paint.setColor(getResources().getColor(R.color.black));
         }
         paint.setTextAlign(Paint.Align.CENTER);
@@ -523,7 +521,7 @@ public class ScheduleActivity extends AppCompatActivity {
      * The user logs out, the events in the calendar have to be deleted
      */
     private void signOut() {
-        Boolean synced = sharedPref.getBoolean("syncSaved", false);
+        boolean synced = sharedPref.getBoolean("syncSaved", false);
 
         if (synced) {
             // Delete the items from the users agenda
@@ -537,7 +535,6 @@ public class ScheduleActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green, null)).apply();
         } else {
-            //noinspection deprecation
             sharedPref.edit().putInt("agendaColor", getResources().getColor(R.color.green)).apply();
         }
         sharedPref.edit().putBoolean("signedIn", false).apply();
@@ -625,7 +622,7 @@ public class ScheduleActivity extends AppCompatActivity {
                 break;
             case R.id.action_show_week:
                 sharedPref.edit().putString("mode", "week").apply();
-                RelativeLayout sideContainer = (RelativeLayout) findViewById(R.id.side_container);
+                RelativeLayout sideContainer = findViewById(R.id.side_container);
                 ((ViewGroup) findViewById(R.id.pagerParent)).bringChildToFront(sideContainer);
                 sideContainer.setVisibility(View.VISIBLE);
                 viewPager.invalidate();
@@ -652,7 +649,7 @@ public class ScheduleActivity extends AppCompatActivity {
                 break;
             case R.id.action_show_day:
                 sharedPref.edit().putString("mode", "day").apply();
-                RelativeLayout mySideContainer = (RelativeLayout) findViewById(R.id.side_container);
+                RelativeLayout mySideContainer = findViewById(R.id.side_container);
                 mySideContainer.setVisibility(View.GONE);
                 viewPager.invalidate();
                 viewPager.requestLayout();

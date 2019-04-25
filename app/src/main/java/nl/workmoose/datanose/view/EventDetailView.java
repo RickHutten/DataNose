@@ -62,11 +62,11 @@ public class EventDetailView extends RelativeLayout {
 
         // Get views from layout
         View detailContainer = findViewById(R.id.detailContainer);
-        TextView titleText = (TextView) findViewById(R.id.title);
-        TextView typeText = (TextView) findViewById(R.id.typeDetail);
-        TextView timeText = (TextView) findViewById(R.id.time);
-        TextView teacherText = (TextView) findViewById(R.id.teacher);
-        TextView locationText = (TextView) findViewById(R.id.locationDetail);
+        TextView titleText = findViewById(R.id.title);
+        TextView typeText = findViewById(R.id.typeDetail);
+        TextView timeText = findViewById(R.id.time);
+        TextView teacherText = findViewById(R.id.teacher);
+        TextView locationText = findViewById(R.id.locationDetail);
 
         // Set texts of the views
         titleText.setText(title);

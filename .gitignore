@@ -52,3 +52,4 @@ build
 local.properties
 DataNose.iml
 build/intermediates/dex-cache/cache.xml
+*.jks

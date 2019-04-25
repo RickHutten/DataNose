@@ -68,17 +68,32 @@ public abstract class ParseIcs {
                 }
                 else if (line.startsWith("DTSTART")) {
                     // Start time of event
-                    begin = line.split(":")[1];
+                    try {
+                        begin = line.split(":")[1];
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        // No location is given
+                        begin = " ";
+                    }
                     event.add(begin);
                 }
                 else if (line.startsWith("DTEND")) {
                     // End time of event
-                    end = line.split(":")[1];
+                    try {
+                        end = line.split(":")[1];
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        // No location is given
+                        end = " ";
+                    }
                     event.add(end);
                 }
                 else if (line.startsWith("SUMMARY")) {
                     // Name of class
-                    name = line.split(":")[1];
+                    try {
+                        name = line.split(":")[1];
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        // No location is given
+                        name = " ";
+                    }
                     event.add(name);
                 }
                 else if (line.startsWith("LOCATION")) {
@@ -93,12 +108,22 @@ public abstract class ParseIcs {
                 }
                 else if (line.startsWith("DESCRIPTION")) {
                     // Teacher of the class
-                    teacher = line.split(":")[1];
+                    try {
+                        teacher = line.split(":")[1];
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        // No location is given
+                        teacher = " ";
+                    }
                     event.add(teacher);
                 }
                 else if (line.startsWith("UID")) {
                     // Unique identifier of the event
-                    uid = line.split(":")[1];
+                    try {
+                        uid = line.split(":")[1];
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        // No location is given
+                        uid = " ";
+                    }
                     event.add(uid);
                 }
                 else if (line.equals("END:VEVENT")) {

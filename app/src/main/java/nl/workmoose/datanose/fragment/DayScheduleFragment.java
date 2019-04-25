@@ -42,7 +42,7 @@ public class DayScheduleFragment extends BaseFragment {
     @Override
     protected void setEmptySchedule() {
         // Get container for the times
-        LinearLayout timeHolder = (LinearLayout) rootView.findViewById(R.id.timeHolder);
+        LinearLayout timeHolder = rootView.findViewById(R.id.timeHolder);
 
         // Make textView's for the left container displaying the hours of the day (9:00, 10:00,..)
         for (int i = 8; i <= 23; i++) {

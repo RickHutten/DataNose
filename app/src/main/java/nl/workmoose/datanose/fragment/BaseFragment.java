@@ -2,7 +2,7 @@ package nl.workmoose.datanose.fragment;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -67,17 +67,14 @@ abstract public class BaseFragment extends Fragment {
         events = scheduleActivity.getEventsOnDate(currentDayInMillis);
 
         // Get scheduleView from the xml resource file
-        scheduleView = (RelativeLayout) rootView.findViewById(R.id.scheduleView);
+        scheduleView = rootView.findViewById(R.id.scheduleView);
         scheduleView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 // Gets called after layout has been done but before display.
                 if (Build.VERSION.SDK_INT < 16) {
-                    // Depricated after SDK 16
-                    //noinspection deprecation
                     scheduleView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 } else {
-                    // New function for SDK >= 16
                     scheduleView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
                 // This is called here because now the width and height of the
@@ -128,7 +125,7 @@ abstract public class BaseFragment extends Fragment {
             return;
         }
         // Get ScrollView
-        ScrollView sv = (ScrollView) rootView.findViewById(R.id.scheduleScrollView);
+        ScrollView sv = rootView.findViewById(R.id.scheduleScrollView);
 
         // Scroll to first event
         int hour = 100; // Yeah its not pretty, but it's the only thing that works that I can think of
@@ -351,9 +348,9 @@ abstract public class BaseFragment extends Fragment {
         thisPage.setTimeInMillis(currentDayInMillis);
 
         // Get TextViews for the title
-        TextView monthView = (TextView) rootView.findViewById(R.id.month);
-        TextView dayOfMonthView = (TextView) rootView.findViewById(R.id.dayOfMonth);
-        TextView dayOfWeekView = (TextView) rootView.findViewById(R.id.dayOfWeek);
+        TextView monthView = rootView.findViewById(R.id.month);
+        TextView dayOfMonthView = rootView.findViewById(R.id.dayOfMonth);
+        TextView dayOfWeekView = rootView.findViewById(R.id.dayOfWeek);
 
         // Get month, day of month and day of week in string format
         String dayOfMonth = "" + thisPage.get(Calendar.DAY_OF_MONTH);
@@ -379,7 +376,7 @@ abstract public class BaseFragment extends Fragment {
 
         if (childFragment instanceof WeekScheduleFragment) {
             // Color background of fragment
-            RelativeLayout weekScheduleContainer = (RelativeLayout) rootView.findViewById(R.id.weekScheduleContainer);
+            RelativeLayout weekScheduleContainer = rootView.findViewById(R.id.weekScheduleContainer);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 weekScheduleContainer.setBackgroundColor(getResources().getColor(R.color.light_gray, null));
             } else {
@@ -403,7 +400,7 @@ abstract public class BaseFragment extends Fragment {
         int lineMargin = (hour - 8) * DP_HOUR_HEIGHT + minute + getDpOffset();
 
         // Get the timeLine from resource xml
-        RelativeLayout timeLine = (RelativeLayout) rootView.findViewById(R.id.timeLine);
+        RelativeLayout timeLine = rootView.findViewById(R.id.timeLine);
 
         // Make layoutparams
         RelativeLayout.LayoutParams lpLine = (RelativeLayout.LayoutParams)timeLine.getLayoutParams();

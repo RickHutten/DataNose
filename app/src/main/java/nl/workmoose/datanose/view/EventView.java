@@ -71,7 +71,7 @@ public class EventView extends RelativeLayout {
         rootView = inflater.inflate(R.layout.event_layout, this, false);
         addView(rootView);
         activity = (ScheduleActivity) context;
-        pagerParent = (RelativeLayout) activity.findViewById(R.id.pagerParent);
+        pagerParent = activity.findViewById(R.id.pagerParent);
         this.context = context;
 
         // Set text to invisible if the eventView is too small
@@ -90,7 +90,7 @@ public class EventView extends RelativeLayout {
      * Sets the title for this view
      */
     private void setTitle() {
-        TextView tv = (TextView) rootView.findViewById(R.id.title);
+        TextView tv = rootView.findViewById(R.id.title);
         tv.setText(title.trim());
     }
 
@@ -98,7 +98,7 @@ public class EventView extends RelativeLayout {
      * Sets the type for this event (Hoorcollege, Werkcollege etc.)
      */
     private void setType() {
-        TextView tv = (TextView) rootView.findViewById(R.id.type);
+        TextView tv = rootView.findViewById(R.id.type);
         tv.setText(type.trim());
     }
 
@@ -106,7 +106,7 @@ public class EventView extends RelativeLayout {
      * Sets the location for this event
      */
     private void setLocation() {
-        TextView tv = (TextView) rootView.findViewById(R.id.location);
+        TextView tv = rootView.findViewById(R.id.location);
         tv.setText(location.trim());
     }
 
@@ -156,7 +156,7 @@ public class EventView extends RelativeLayout {
         // Get elements from xml
         ScrollView scrollView = (ScrollView) getParent().getParent().getParent();
 
-        RelativeLayout detailContainer = (RelativeLayout) eventDetailView.findViewById(R.id.detailContainer);
+        RelativeLayout detailContainer = eventDetailView.findViewById(R.id.detailContainer);
         ViewGroup.LayoutParams lp = ((View) detailContainer.getParent()).getLayoutParams();
         lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
         lp.height = ViewGroup.LayoutParams.MATCH_PARENT;

@@ -8,7 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         // Check whether the user is signed in or not
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
-        Boolean signedIn = sharedPref.getBoolean("signedIn", false);
+        boolean signedIn = sharedPref.getBoolean("signedIn", false);
         if (signedIn) {
             // If the user is signed in, go to ScheduleActivity
             if (sharedPref.contains("studentId")) {
@@ -124,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
         inputContainer.setAnimation(slideIn);
 
         // Add onKeyListener to EditText so the user can press enter to proceed
-        idInput = (EditText) findViewById(R.id.idInput);
+        idInput = findViewById(R.id.idInput);
         idInput.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -139,7 +139,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         // Set onClickListener to ok button
-        okButton = (ButtonFlat) findViewById(R.id.okButton);
+        okButton = findViewById(R.id.okButton);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
