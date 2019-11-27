@@ -145,7 +145,6 @@ public abstract class ParseIcs {
             e.printStackTrace();
             Log.i("ParseIcs", "Error parsing file");
             ((ScheduleActivity) context).finish();
-            ((ScheduleActivity) context).overridePendingTransition(R.anim.do_nothing, R.anim.slide_down);
         }
 
         // Log the time parsing took

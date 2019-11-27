@@ -32,6 +32,7 @@
     <string name="ask_sign_out_question">If you sign out, the calendar will be erased from your phone. Do you really want to sign out?</string>
     <string name="if_you_have_questions">If you have questions or are experiencing issues, you can send us an email us at:</string>
     <string name="email_address">info@workmoose.nl</string>
+    <string name="settings_student_id">Student ID:</string>
 
     <string-array name="months">
         <item>Jan</item>

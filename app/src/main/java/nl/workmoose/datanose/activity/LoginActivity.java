@@ -3,6 +3,7 @@ package nl.workmoose.datanose.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,11 +18,11 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
-import com.gc.materialdesign.views.ButtonFlat;
-import com.gc.materialdesign.widgets.Dialog;
-import com.gc.materialdesign.widgets.SnackBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import nl.workmoose.datanose.DownloadIcs;
 import nl.workmoose.datanose.R;
@@ -39,12 +40,11 @@ public class LoginActivity extends AppCompatActivity {
     private static final String SHARED_PREF = "prefs";
     private static final int ANIMATION_DURATION = 500;
     private final Context context = this;
-    private Dialog dialog;
     private Boolean enableBack = true; // To enable/disable the back button
     private EditText idInput;
     private Boolean created = true;  // Flag if onResume is called when creating the activity
     private View progressBar;
-    private ButtonFlat okButton;
+    private Button okButton;
     private View inputContainer;
     private int screen_height;
     private SharedPreferences sharedPref;
@@ -81,7 +81,6 @@ public class LoginActivity extends AppCompatActivity {
                     Log.i("LoginActivity", "Currently logged in: " + studentId);
                     Intent i = new Intent(context, ScheduleActivity.class);
                     startActivity(i);
-                    overridePendingTransition(R.anim.slide_up, R.anim.do_nothing);
                 }
             }
         }
@@ -125,28 +124,18 @@ public class LoginActivity extends AppCompatActivity {
 
         // Add onKeyListener to EditText so the user can press enter to proceed
         idInput = findViewById(R.id.idInput);
-        idInput.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-                // If the user presses on enter
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
-                    idEntered();
-                    return true;
-                }
-                return false;
+        idInput.setOnKeyListener((v, keyCode, event) -> {
+            // If the user presses on enter
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
+                idEntered();
+                return true;
             }
+            return false;
         });
 
         // Set onClickListener to ok button
         okButton = findViewById(R.id.okButton);
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                idEntered();
-            }
-        });
-
+        okButton.setOnClickListener(v -> idEntered());
     }
 
     /**
@@ -157,9 +146,12 @@ public class LoginActivity extends AppCompatActivity {
         String studentId = idInput.getText().toString();
 
         // If the input is empty, go back.
-        if (studentId.equals("")) {
+        if (studentId.isEmpty()) {
             String message = getResources().getString(R.string.enter_student_id);
-            new SnackBar(this, message).show();
+            Snackbar s = Snackbar.make(idInput, message, Snackbar.LENGTH_LONG);
+            TextView tv = s.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+            tv.setTextColor(Color.WHITE);
+            s.show();
             return;
         }
 
@@ -201,7 +193,6 @@ public class LoginActivity extends AppCompatActivity {
                         Intent i = new Intent(context, ScheduleActivity.class);
                         LoginActivity currentActivity = (LoginActivity) context;
                         currentActivity.startActivity(i);
-                        currentActivity.overridePendingTransition(R.anim.slide_up, R.anim.do_nothing);
 
                     }
                 }, ANIMATION_DURATION);
@@ -268,10 +259,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onResume();
         if (!created) {  // Only run when activity is not created
             backToBeginning();
-            if (dialog != null) {
-                dialog.dismiss();
-                dialog = null;
-            }
         }
         created = false;
     }

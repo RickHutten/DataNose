@@ -19,7 +19,7 @@
         android:visibility="invisible">
 
         <!-- Fake version of the snackbar -->
-        <com.gc.materialdesign.views.ButtonFlat
+        <Button
             android:id="@+id/syncNowButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,6 +27,8 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="24dp"
             android:textColor="@color/blue"
+            android:background="?attr/selectableItemBackground"
+            style="?android:attr/borderlessButtonStyle"
             android:text="@string/save" />
 
         <TextView
@@ -78,12 +80,13 @@
                     android:layout_below="@id/syncTitle"
                     android:layout_marginTop="20dp">
 
-                    <com.gc.materialdesign.views.CheckBox
+                    <CheckBox
                         android:id="@+id/syncCheckBox"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_marginLeft="10dp"
-                        android:background="@color/blue"
+                        android:buttonTint="@color/blue"
+                        android:checked="true"
                         android:layout_centerVertical="true"
                         android:layout_alignParentRight="true" />
 
@@ -99,30 +102,26 @@
 
                 </RelativeLayout>
 
-                <com.gc.materialdesign.views.ButtonRectangle
-                    android:id="@+id/colorButton"
-                    android:layout_marginTop="10dp"
-                    android:layout_below="@id/syncCheckContainer"
-                    android:layout_width="200dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_height="50dp"
-                    android:text="@string/pick_color"
-                    android:textSize="16sp"
-                    android:background="@color/green"
-                    android:textColor="@color/white"/>
-
                 <View
                     android:id="@+id/bottomRule"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="12dp"
-                    android:layout_below="@id/colorButton"
+                    android:layout_below="@id/syncCheckContainer"
                     android:background="@color/gray" />
 
                 <TextView
-                    android:id="@+id/experiencing_issues"
+                    android:id="@+id/student_id"
                     android:layout_below="@id/bottomRule"
                     android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:textSize="12sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/experiencing_issues"
+                    android:layout_below="@id/student_id"
                     android:textSize="12sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

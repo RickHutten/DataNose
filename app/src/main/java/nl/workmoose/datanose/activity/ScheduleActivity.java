@@ -1,12 +1,14 @@
 package nl.workmoose.datanose.activity;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -30,8 +32,7 @@ import android.widget.TextView;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
-import com.gc.materialdesign.widgets.Dialog;
-import com.gc.materialdesign.widgets.SnackBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -90,10 +91,16 @@ public class ScheduleActivity extends AppCompatActivity {
             actionBar.setElevation(0);
         }
 
+        viewPager = findViewById(R.id.pager);
+        viewPager.setPageMargin(-1);  // Visual bug fix
+
         // Parse the file downloaded
         eventList = ParseIcs.readFile(this);
         if (eventList.size() < 1) {
-            new SnackBar(this, getResources().getString(R.string.empty_schedule)).show();
+            Snackbar s = Snackbar.make(viewPager, getResources().getString(R.string.empty_schedule), Snackbar.LENGTH_LONG);
+            TextView tv = s.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+            tv.setTextColor(Color.WHITE);
+            s.show();
         }
 
         // Set that the user is signed in
@@ -115,8 +122,6 @@ public class ScheduleActivity extends AppCompatActivity {
         Log.i("ScheduleActivity", "In daylight saving: " + TimeZone.getDefault().inDaylightTime(new Date()));
 
         //Instantiate a ViewPager and a PagerAdapter.
-        viewPager = findViewById(R.id.pager);
-        viewPager.setPageMargin(-1);  // Visual bug fix
         PagerAdapter pagerAdapter;
 
         if (sharedPref.getString("mode", "day").equalsIgnoreCase("day")) {
@@ -128,11 +133,7 @@ public class ScheduleActivity extends AppCompatActivity {
             ((ViewGroup) findViewById(R.id.pagerParent)).bringChildToFront(sideContainer);
             sideContainer.setVisibility(View.VISIBLE);
             if (actionBar != null) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
-                } else {
-                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week, null));
-                }
+                actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week, null));
             }
         }
         viewPager.setAdapter(pagerAdapter);
@@ -141,12 +142,7 @@ public class ScheduleActivity extends AppCompatActivity {
         setActivityTimeHolder();
 
         ListeningScrollView scrollView = findViewById(R.id.timeHolderScrollView);
-        scrollView.setOnScrollChangedListener(new ListeningScrollView.OnScrollChangedListener() {
-            @Override
-            public void onScrollChanged(int y) {
-                ((WeekPagerAdapter) viewPager.getAdapter()).scrollTo(y);
-            }
-        });
+        scrollView.setOnScrollChangedListener(y -> ((WeekPagerAdapter) viewPager.getAdapter()).scrollTo(y));
     }
 
     public void setTimeHolderScroll(int y) {
@@ -499,6 +495,9 @@ public class ScheduleActivity extends AppCompatActivity {
             // The alarm should have already gone off
             // change the nextAlarmTime
             Log.i("ScheduleActivity", "The alarm should have already gone off");
+            while (timeNow > nextAlarmTime) {
+                nextAlarmTime += repeatTime;
+            }
         }
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -540,7 +539,6 @@ public class ScheduleActivity extends AppCompatActivity {
         sharedPref.edit().putBoolean("signedIn", false).apply();
         // Exit current activity, go back to LoginActivity
         this.finish();
-        overridePendingTransition(R.anim.do_nothing, R.anim.slide_down);
     }
 
     /**
@@ -611,9 +609,15 @@ public class ScheduleActivity extends AppCompatActivity {
             case R.id.action_settings:
                 // Check if the system is syncing at the moment
                 if (checkIfSyncing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
+                    Snackbar s = Snackbar.make(viewPager, getResources().getString(R.string.busy_syncing), Snackbar.LENGTH_LONG);
+                    TextView tv = s.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                    tv.setTextColor(Color.WHITE);
+                    s.show();
                 } else if (checkIfRefreshing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
+                    Snackbar s = Snackbar.make(viewPager, getResources().getString(R.string.busy_refreshing), Snackbar.LENGTH_LONG);
+                    TextView tv = s.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                    tv.setTextColor(Color.WHITE);
+                    s.show();
                 } else {
                     // If the system is not syncing at the moment, start SettingsActivity
                     Intent i = new Intent(this, SettingsActivity.class);
@@ -629,22 +633,14 @@ public class ScheduleActivity extends AppCompatActivity {
                 viewPager.requestLayout();
 
                 // Switch to week view
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week, null));
-                } else {
-                    //noinspection deprecation
-                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week));
-                }
+                actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_week, null));
                 PagerAdapter WeekAdapter = new WeekPagerAdapter(getSupportFragmentManager());
                 int current_item = viewPager.getCurrentItem();
                 viewPager.setAdapter(WeekAdapter);
                 viewPager.setCurrentItem(current_item);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        item.setVisible(false);  // Set this menu to invisible
-                        menu.findItem(R.id.action_show_day).setVisible(true);
-                    }
+                new Handler().postDelayed(() -> {
+                    item.setVisible(false);  // Set this menu to invisible
+                    menu.findItem(R.id.action_show_day).setVisible(true);
                 }, 500);
                 break;
             case R.id.action_show_day:
@@ -655,30 +651,28 @@ public class ScheduleActivity extends AppCompatActivity {
                 viewPager.requestLayout();
 
                 // Switch to day view
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_day, null));
-                } else {
-                    //noinspection deprecation
-                    actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_day));
-                }
+                actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background_day, null));
                 PagerAdapter DayAdapter = new DayPagerAdapter(getSupportFragmentManager());
                 int current_item_week = viewPager.getCurrentItem();
                 viewPager.setAdapter(DayAdapter);
                 viewPager.setCurrentItem(current_item_week);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        item.setVisible(false);  // Set this menu to invisible
-                        menu.findItem(R.id.action_show_week).setVisible(true);
-                    }
+                new Handler().postDelayed(() -> {
+                    item.setVisible(false);  // Set this menu to invisible
+                    menu.findItem(R.id.action_show_week).setVisible(true);
                 }, 500);
                 break;
             case R.id.sign_out:
                 // Check if the system is syncing at the moment
                 if (checkIfSyncing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
+                    Snackbar s = Snackbar.make(viewPager, getResources().getString(R.string.busy_syncing), Snackbar.LENGTH_LONG);
+                    TextView tv = s.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                    tv.setTextColor(Color.WHITE);
+                    s.show();
                 } else if (checkIfRefreshing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
+                    Snackbar s = Snackbar.make(viewPager, getResources().getString(R.string.busy_refreshing), Snackbar.LENGTH_LONG);
+                    TextView tv = s.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                    tv.setTextColor(Color.WHITE);
+                    s.show();
                 } else {
                     // If the system is not syncing at the moment
                     // Ask the user is he/she really wants to sign out if calendar is synced
@@ -701,9 +695,15 @@ public class ScheduleActivity extends AppCompatActivity {
                 ((ViewGroup) findViewById(R.id.pagerParent)).bringChildToFront(findViewById(R.id.refreshContainer));
                 // Check if the system is syncing at the moment
                 if (checkIfSyncing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_syncing)).show();
+                    Snackbar s = Snackbar.make(viewPager, getResources().getString(R.string.busy_syncing), Snackbar.LENGTH_LONG);
+                    TextView tv = s.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                    tv.setTextColor(Color.WHITE);
+                    s.show();
                 } else if (checkIfRefreshing()) {
-                    new SnackBar(this, getResources().getString(R.string.busy_refreshing)).show();
+                    Snackbar s = Snackbar.make(viewPager, getResources().getString(R.string.busy_refreshing), Snackbar.LENGTH_LONG);
+                    TextView tv = s.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                    tv.setTextColor(Color.WHITE);
+                    s.show();
                 } else {
                     // If the system is not syncing at the moment, force refresh the iCal file
                     checkForNewVersion(this, true);
@@ -719,39 +719,24 @@ public class ScheduleActivity extends AppCompatActivity {
      */
     private void askToSignOut() {
         Log.i("ScheduleActivity", "Asking user corfirmation to sign out.");
-        final Dialog dialog = new Dialog(this, getString(R.string.ask_sign_out_title),
-                getString(R.string.ask_sign_out_question),
-                getString(R.string.button_cancel),
-                getString(R.string.sign_out));
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.ask_sign_out_question)
+                .setTitle(R.string.ask_sign_out_title);
+        AlertDialog alertDialog = builder.create();
 
-        dialog.setCancelable(true);
-        dialog.setCanceledOnTouchOutside(true);
+        alertDialog.setCancelable(true);
+        alertDialog.setCanceledOnTouchOutside(true);
 
-        // Set listener for the continue button
-        dialog.setOnAcceptButtonClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                // Sign out when the dismiss animation of the dialog is finished
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        signOut();
-                    }
-                }, 250);
-            }
+        // Set listener for the continue button and cancel
+        builder.setPositiveButton(R.string.sign_out, (dialog, id) -> {
+            dialog.dismiss();
+            // Sign out when the dismiss animation of the dialog is finished
+            new Handler().postDelayed(this::signOut, 250);
         });
-
-        // Set listener for the cancel button
-        dialog.setOnCancelButtonClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton(R.string.button_cancel, (dialog, id) -> dialog.dismiss());
 
         // Show the dialog
-        dialog.show();
+        alertDialog.show();
     }
 
 

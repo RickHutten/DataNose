@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "943761614961",
+    "firebase_url": "https://datanose-ac121.firebaseio.com",
+    "project_id": "datanose-ac121",
+    "storage_bucket": "datanose-ac121.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:943761614961:android:ed710a5eeb6ed1936d13d0",
+        "android_client_info": {
+          "package_name": "nl.workmoose.datanose"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "943761614961-c82fqtsphihkdnh6rdbcgfv7uacnir99.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBB8ELqxI2kDAcg5dkeO3QgEP7lhgFsOw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "943761614961-c82fqtsphihkdnh6rdbcgfv7uacnir99.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

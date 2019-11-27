@@ -3,14 +3,14 @@ package nl.workmoose.datanose;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-
-import com.gc.materialdesign.widgets.SnackBar;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,6 +24,8 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Calendar;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import nl.workmoose.datanose.activity.LoginActivity;
 import nl.workmoose.datanose.activity.ScheduleActivity;
@@ -128,7 +130,6 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
                 Intent intent = new Intent(context, ScheduleActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 currentActivity.startActivity(intent);
-                currentActivity.overridePendingTransition(R.anim.slide_up, R.anim.do_nothing);
             } else {
                 // When called from receiver
                 Log.i("DownloadIcs", "Done downloading");
@@ -146,21 +147,25 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
                 return;
             }
 
-            // Show error message to user. Run on UI thread because it can throw exception
-            ((AppCompatActivity) context).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    new SnackBar((AppCompatActivity) context, result).show();
-                }
-            });
-
             // Act accordingly to the calling activity
             if (context instanceof LoginActivity) {
                 LoginActivity loginActivity = (LoginActivity) context;
+                loginActivity.runOnUiThread(() -> {
+                    Snackbar s = Snackbar.make(loginActivity.findViewById(R.id.loginActivityContainer), result, Snackbar.LENGTH_LONG);
+                    TextView tv = s.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                    tv.setTextColor(Color.WHITE);
+                    s.show();
+                });
                 loginActivity.backToBeginning();
             } else if (context instanceof ScheduleActivity) {
                 // The calling Activity is not LoginActivity but ScheduleActivity
                 ScheduleActivity scheduleActivity = (ScheduleActivity) context;
+                scheduleActivity.runOnUiThread(() -> {
+                    Snackbar s = Snackbar.make(scheduleActivity.findViewById(R.id.pagerParent), result, Snackbar.LENGTH_LONG);
+                    TextView tv = s.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                    tv.setTextColor(Color.WHITE);
+                    s.show();
+                });
                 sharedPref.edit().putBoolean("refreshing", false).apply();
 
                 // Hide the refreshing container
@@ -179,7 +184,10 @@ public class DownloadIcs extends AsyncTask<String, Void, String> {
     private boolean hasInternetConnection(Context context) {
         ConnectivityManager connMgr = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        NetworkInfo networkInfo = null;
+        if (connMgr != null) {
+            networkInfo = connMgr.getActiveNetworkInfo();
+        }
         return (networkInfo != null && networkInfo.isConnected());
     }
 

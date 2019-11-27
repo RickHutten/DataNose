@@ -1,10 +1,10 @@
 package nl.workmoose.datanose.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.os.Build;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,12 +14,10 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.RelativeLayout;
-
-import com.gc.materialdesign.views.ButtonFlat;
-import com.gc.materialdesign.views.ButtonRectangle;
-import com.gc.materialdesign.views.CheckBox;
-import com.gc.materialdesign.widgets.ColorSelector;
+import android.widget.TextView;
 
 import nl.workmoose.datanose.R;
 import nl.workmoose.datanose.SyncCalendarService;
@@ -36,12 +34,12 @@ public class SettingsActivity extends AppCompatActivity {
     private static final int ANIMATION_DURATION = 500;
 
     private int agendaColor;
-    private ButtonRectangle colorButton;
     private SharedPreferences sharedPref;
     private RelativeLayout fakeSnackBar;
-    private ButtonFlat syncNowButton;
+    private Button syncNowButton;
     private CheckBox syncCheckBox;
     private Boolean sync_saved;
+    private SettingsActivity activity;
     private Boolean settingsChanged = false;
 
     /**
@@ -51,30 +49,25 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        activity = this;
 
         // Get views from layout
         fakeSnackBar = findViewById(R.id.fakeSnackBar);
-        colorButton = findViewById(R.id.colorButton);
         syncNowButton = findViewById(R.id.syncNowButton);
         syncCheckBox = findViewById(R.id.syncCheckBox);
 
         // Get saved settings
         sharedPref = getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green, null));
-        } else {
-            agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
-        }
+        agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green, null));
         sync_saved = sharedPref.getBoolean("syncSaved", false);
+
+        TextView studentIdView = findViewById(R.id.student_id);
+        String studentId = sharedPref.getString("studentId", "");
+        String message = String.format("%s %s", getResources().getText(R.string.settings_student_id), studentId);
+        studentIdView.setText(message);
 
         // Set checkboxes to saved state
         syncCheckBox.setChecked(sync_saved);
-
-        // Set the color background of the colorButton
-        colorButton.setBackgroundColor(agendaColor);
-
-        // Set the color of the text
-        setButtonTextColor();
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -89,76 +82,44 @@ public class SettingsActivity extends AppCompatActivity {
      * Sets all the onClickListeners in the layout
      */
     private void setOnClickListeners() {
-        colorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Show the color picker so the user can select a color for the calendar items
-                showColorPicker();
-            }
+        syncNowButton.setOnClickListener(v -> {
+            // Hide the snackbar and save the current settings
+            hideFakeSnackBar();
+            saveCurrentSettings();
         });
 
-        syncNowButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Hide the snackbar and save the current settings
-                hideFakeSnackBar();
-                saveCurrentSettings();
-            }
-        });
+        syncCheckBox.setOnClickListener(v -> {
+            boolean isChecked = syncCheckBox.isChecked();
 
-        syncCheckBox.setOncheckListener(new CheckBox.OnCheckListener() {
-            @Override
-            public void onCheck(boolean isChecked) {
-                // To determine if the snackbar should be showed
-                if (isChecked != sync_saved) {
-                    showFakeSnackBar();
-                } else {
-                    // Request to hide the snackbar, maybe the color has changed
-                    requestHideFakeSnackBar();
+            if (isChecked) {
+                if (checkSelfPermission(Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED ||
+                        checkSelfPermission(Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+
+                    String[] permissions = new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR};
+                    requestPermissions(permissions, 1);
                 }
+            }
+
+            // To determine if the snackbar should be showed
+            if (isChecked != sync_saved) {
+                showFakeSnackBar();
+            } else {
+                // Request to hide the snackbar, maybe the color has changed
+                requestHideFakeSnackBar();
             }
         });
     }
 
-    /**
-     * Shows the ColorSelector so the user can select a color for the agenda items
-     */
-    private void showColorPicker() {
-        // Make listener
-        ColorSelector.OnColorSelectedListener colorSelectedListener = new ColorSelector.OnColorSelectedListener() {
-            @Override
-            public void onColorSelected(int color) {
-                // Set the color to the given value
-                agendaColor = color;
-
-                // "Guess" if the text is still readable, otherwise set color to black/white
-                setButtonTextColor();
-
-                // Set the chosen color to the background of the button
-                colorButton.setBackgroundColor(color);
-
-                // If the color is not the same as the previous one, there has been a change
-                int agendaColor;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green, null));
-                } else {
-                    agendaColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
-                }
-
-                if (color != agendaColor) {
-                    if (syncCheckBox.isChecked()) {
-                        // Show the snackbar
-                        showFakeSnackBar();
-                    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 1) {
+            for (int i : grantResults) {
+                if (i == PackageManager.PERMISSION_DENIED) {
+                    syncCheckBox.setChecked(false);
+                    syncCheckBox.callOnClick();
                 }
             }
-        };
-
-        // Create new ColorSelector and add listener
-        ColorSelector colorSelector = new ColorSelector(this, agendaColor, colorSelectedListener);
-
-        // Show the ColorSelector
-        colorSelector.show();
+        }
     }
 
     /**
@@ -231,11 +192,7 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
         int savedColor;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            savedColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green, null));
-        } else {
-            savedColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green));
-        }
+        savedColor = sharedPref.getInt("agendaColor", getResources().getColor(R.color.green, null));
         if (agendaColor != savedColor) {
             // The colors are not the same
             if (!sync_saved && syncCheckBox.isChecked() == sync_saved) {
@@ -258,37 +215,6 @@ public class SettingsActivity extends AppCompatActivity {
         // Save to sharedPreferences
         sharedPref.edit().putBoolean("syncSaved", sync_saved).apply();
         sharedPref.edit().putInt("agendaColor", agendaColor).apply();
-    }
-
-    /**
-     * Sets the color of the text of the button to black if the color is too bright
-     * and the color to white otherwise
-     */
-    private void setButtonTextColor() {
-
-        // Get the rgb vales of the given color to determine the brightness
-        int r = Color.red(agendaColor);
-        int g = Color.green(agendaColor);
-        int b = Color.blue(agendaColor);
-
-        // Calculate the brightness. This is called the HSP model
-        int brightness = (int) Math.pow(0.299 * Math.pow(r, 2) + 0.587 * Math.pow(g, 2) + 0.114 * Math.pow(b, 2), 0.5);
-
-        if (brightness > 220) {
-            // If the color is very light, set the color of the text to black
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                colorButton.setTextColor(getResources().getColor(R.color.black, null));
-            } else {
-                colorButton.setTextColor(getResources().getColor(R.color.black));
-            }
-        } else {
-            // Else set it to white
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                colorButton.setTextColor(getResources().getColor(R.color.white, null));
-            } else {
-                colorButton.setTextColor(getResources().getColor(R.color.white));
-            }
-        }
     }
 
     @Override
