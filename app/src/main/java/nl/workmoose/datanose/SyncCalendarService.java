@@ -439,8 +439,15 @@ public class SyncCalendarService extends Service {
         return -1;
     }
 
+    /**
+     * Removes the DataNose calendar completely
+     */
     private void removeCalendar() {
-        // TODO:
+        Uri evuri = CalendarContract.Calendars.CONTENT_URI;
+        //substitue your calendar id into the 0
+        long calid = getCalendarId();
+        Uri deleteUri = ContentUris.withAppendedId(evuri, calid);
+        getContentResolver().delete(deleteUri, null, null);
     }
 
     /**
